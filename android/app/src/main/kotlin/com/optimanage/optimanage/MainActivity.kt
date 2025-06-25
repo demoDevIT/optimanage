@@ -1,0 +1,5 @@
+package com.optimanage.optimanage
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity: FlutterActivity()
