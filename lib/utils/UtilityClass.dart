@@ -152,7 +152,7 @@ class UtilityClass {
                   padding: const EdgeInsets.all(10),
                   margin: const EdgeInsets.symmetric(horizontal: 10),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF003366),
+                    color: const Color(0xFF25507C),
                     //border: Border.all(color: Colors.green[400]!, width: 2),
                     borderRadius: BorderRadius.circular(10),
                   ),
