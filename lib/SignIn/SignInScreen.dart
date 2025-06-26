@@ -3,6 +3,7 @@ import 'package:optimanage/SignIn/signinprovider.dart';
 import 'package:provider/provider.dart';
 import '../Home/home_screen.dart';
 import '../forget/forget_screen.dart';
+import '../utils/UtilityClass.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -13,10 +14,24 @@ class SignInScreen extends StatefulWidget {
 
 class _SignInScreenState extends State<SignInScreen> {
   bool _obscureText = true;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
+  }
+
+  bool validateAndSave() {
+    print("checking-> 1");
+    final isValid = _formKey.currentState!.validate();
+    print("checking-> ${isValid.toString()}");
+    if (isValid) {
+      _formKey.currentState!.save();
+      return true;
+    } else {
+      return false;
+    }
   }
 
   @override
@@ -25,6 +40,7 @@ class _SignInScreenState extends State<SignInScreen> {
       onTap: () => FocusScope.of(context).unfocus(),
       // Hide keyboard on outside tap
       child: Scaffold(
+          key: _scaffoldKey,
         backgroundColor: Colors.white,
         body: SingleChildScrollView(
             child: Consumer<signinprovider>(
@@ -74,70 +90,77 @@ class _SignInScreenState extends State<SignInScreen> {
                     const SizedBox(height: 32),
 
                     // Employee ID TextField
-                    TextFormField(
-                      controller: provider.empIDController,
-                      keyboardType: TextInputType.name,
-                      textInputAction: TextInputAction.next,
-                      validator: provider.validateempIDTextField,
-                      decoration: InputDecoration(
-                        hintText: 'Employee ID',
-                        hintStyle: const TextStyle(color: Colors.grey),
-                        filled: true,
-                        fillColor: const Color(0xFFF5F7FA),
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 16, horizontal: 16),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(
-                              color: Colors.deepPurpleAccent, width: 1.5),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            controller: provider.empIDController,
+                            keyboardType: TextInputType.name,
+                            textInputAction: TextInputAction.next,
+                            validator: provider.validateempIDTextField,
+                            decoration: InputDecoration(
+                              hintText: 'Employee ID',
+                              hintStyle: const TextStyle(color: Colors.grey),
+                              filled: true,
+                              fillColor: const Color(0xFFF5F7FA),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 16, horizontal: 16),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide.none,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                    color: Colors.deepPurpleAccent, width: 1.5),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
 
-                    const SizedBox(height: 16),
-
-                    // Password TextField
-                    TextFormField(
-                      obscureText: _obscureText,
-                      controller: provider.passwordController,
-                      keyboardType: TextInputType.name,
-                      textInputAction: TextInputAction.next,
-                      validator: provider.validatepasswordTextField,
-                      decoration: InputDecoration(
-                        hintText: 'Password',
-                        hintStyle: const TextStyle(color: Colors.grey),
-                        filled: true,
-                        fillColor: const Color(0xFFF5F7FA),
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 16, horizontal: 16),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(
-                              color: Colors.deepPurpleAccent, width: 1.5),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscureText
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                            color: Colors.grey,
                           ),
-                          onPressed: () {
-                            setState(() {
-                              _obscureText = !_obscureText;
-                            });
-                          },
-                        ),
+                          const SizedBox(height: 16),
+                          TextFormField(
+                            obscureText: _obscureText,
+                            controller: provider.passwordController,
+                            keyboardType: TextInputType.name,
+                            textInputAction: TextInputAction.next,
+                            validator: provider.validatepasswordTextField,
+                            decoration: InputDecoration(
+                              hintText: 'Password',
+                              hintStyle: const TextStyle(color: Colors.grey),
+                              filled: true,
+                              fillColor: const Color(0xFFF5F7FA),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 16, horizontal: 16),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide.none,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(
+                                    color: Colors.deepPurpleAccent, width: 1.5),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscureText
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: Colors.grey,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _obscureText = !_obscureText;
+                                  });
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
+
+
 
                     const SizedBox(height: 12),
 
@@ -165,13 +188,32 @@ class _SignInScreenState extends State<SignInScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => HomeScreen()),
-                          );
+                        onPressed: () async {
+                          bool cannect = await UtilityClass
+                              .checkInternetConnectivity();
+                          if (cannect == true) {
+                            if (validateAndSave()) {
+                              // _checkGps(provider);
+                              await provider.loginUser(_scaffoldKey.currentContext!);
+                            }
+                          } else {
+                            // await UtilityClass.askForInput(
+                            //   'Optmanage App',
+                            //   "Please connect internet.",
+                            //   'Okay',
+                            //   'Okay',
+                            //   true,
+                            // );
+                          }
+                          provider.notifyListeners();
                         },
+                        // onPressed: () {
+                        //   Navigator.pushReplacement(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //         builder: (context) => HomeScreen()),
+                        //   );
+                        // },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF25507C),
                           padding: const EdgeInsets.symmetric(vertical: 16),

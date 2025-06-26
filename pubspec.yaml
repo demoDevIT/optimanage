@@ -38,6 +38,12 @@ dependencies:
   table_calendar: ^3.0.9
   intl: ^0.18.1
   provider: any
+  connectivity_plus: any
+  loading_animation_widget: any
+  dio: any
+  encrypt:  any
+  shared_preferences: any
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
