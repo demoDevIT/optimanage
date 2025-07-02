@@ -23,18 +23,36 @@ class TimeSheetScreen extends StatefulWidget {
 class _TimeSheetScreenState extends State<TimeSheetScreen> {
   var provider;
 
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   provider = Provider.of<timesheet_provider>(context, listen: false);
+  //   if (widget.status == "daily") {
+  //     provider.showLeaveDetails = true;
+  //     provider.showdailyDetails = false;
+  //   } else {
+  //     provider.showLeaveDetails = false;
+  //     provider.showdailyDetails = true;
+  //   }
+  // }
+
   @override
   void initState() {
     super.initState();
-    provider = Provider.of<timesheet_provider>(context, listen: false);
-    if (widget.status == "daily") {
-      provider.showLeaveDetails = true;
-      provider.showdailyDetails = false;
-    } else {
-      provider.showLeaveDetails = false;
-      provider.showdailyDetails = true;
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      provider = Provider.of<timesheet_provider>(context, listen: false);
+      provider.fetchTimesheetData(context); // ✅ Pass context here
+
+      if (widget.status == "daily") {
+        provider.showLeaveDetails = true;
+        provider.showdailyDetails = false;
+      } else {
+        provider.showLeaveDetails = false;
+        provider.showdailyDetails = true;
+      }
+    });
   }
+
 
   @override
   void dispose() {

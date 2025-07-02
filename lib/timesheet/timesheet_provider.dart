@@ -2,7 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../notaskassign/notaskassign_sceen.dart';
+import '../utils/UtilityClass.dart';
 import 'ApprovalModalPopup.dart';
+import 'package:optimanage/services/HttpService.dart';
+import 'package:optimanage/constant/Constants.dart';
+import 'package:dio/dio.dart';
 
 class timesheet_provider with ChangeNotifier {
   DateTime focusedDay = DateTime.now();
@@ -447,6 +451,43 @@ class timesheet_provider with ChangeNotifier {
       ),
     );
   }
+
+  Future<void> fetchTimesheetData(BuildContext context) async {
+    try {
+      UtilityClass.showProgressDialog(context, 'Please wait...');
+
+      HttpService http = HttpService('https://optimanageapi.devitsandbox.com');
+
+      Map<String, dynamic> inputText = {
+        "MonthId": 6,
+        "YearId": 2025,
+        "UserId": 44,
+        "RoleId": 5,
+      };
+
+      final response = await http.postRequest(
+        "/api/Timesheet/GetTimesheetList",
+        inputText,
+      );
+
+      UtilityClass.dismissProgressDialog();
+      print("✅ Response: ${response.data}");
+
+    } catch (e) {
+      UtilityClass.dismissProgressDialog();
+      print("❌ Exception while calling API: $e");
+
+      UtilityClass.askForInput(
+        'Error',
+        'API call failed: $e',
+        'OK',
+        'Cancel',
+        true,
+      );
+    }
+  }
+
+
 
 
 

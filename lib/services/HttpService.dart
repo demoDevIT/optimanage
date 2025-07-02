@@ -8,12 +8,11 @@ import '../utils/UtilityClass.dart';
 class HttpService {
   late Dio _dio;
   // , "Authorization" : "Bearer ${StaticVariables.authToken}"
-  HttpService(BuildContext context, String baseUrl) {
+  HttpService(String baseUrl) {
     _dio = Dio(BaseOptions(
       baseUrl: baseUrl,
-      //  headers: {"Content-Type": "application/json", "Authorization" : "Bearer ${StaticVariables.authToken}"},
       headers: {"Content-Type": "application/json"},
-      connectTimeout: const Duration(milliseconds: 15000),
+      connectTimeout: const Duration(seconds: 15),
     ));
 
     (_dio.httpClientAdapter as IOHttpClientAdapter).onHttpClientCreate =
@@ -23,8 +22,9 @@ class HttpService {
       return client;
     };
 
-    initializeInterceptors(context);
+    initializeInterceptors();
   }
+
 
   Future<Response> getRequest(String endPoint) async{
     debugPrint("Call Started!");
@@ -42,18 +42,50 @@ class HttpService {
 
   }
 
-  Future<Response> postRequest(String endpoint, dynamic param) async{
-    debugPrint("Call Started!");
-    Response response;
-    try {
-      response = await _dio.post(endpoint, data: json.encode(param));
-    } on DioError catch (e) {
-      debugPrint(e.message);
-      throw Exception(e.message);
-    }
-    return response;
+  // Future<Response> postRequest(String endpoint, dynamic param) async{
+  //   debugPrint("Call Started!");
+  //   Response response;
+  //   try {
+  //     response = await _dio.post(endpoint, data: json.encode(param));
+  //   } on DioError catch (e) {
+  //     debugPrint(e.message);
+  //     throw Exception(e.message);
+  //   }
+  //   return response;
+  //
+  // }
 
+  Future<Response> postRequest(String endpoint, dynamic param) async {
+    debugPrint("Call Started!");
+    debugPrint("URL: ${_dio.options.baseUrl}$endpoint");
+    debugPrint("Data: ${json.encode(param)}");
+
+    try {
+      final response = await _dio.post(
+        endpoint,
+        data: json.encode(param),
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+      debugPrint("Response: ${response.data}");
+      return response;
+    } on DioError catch (e) {
+      debugPrint("❌ DioError occurred!");
+      debugPrint("Type: ${e.type}");
+      debugPrint("Message: ${e.message}");
+      debugPrint("Error: ${e.error}");
+      debugPrint("URI: ${e.requestOptions.uri}");
+      debugPrint("Headers: ${e.requestOptions.headers}");
+      debugPrint("Data: ${e.requestOptions.data}");
+      debugPrint("Response: ${e.response}");
+      throw Exception("Dio error: ${e.message}");
+    }
   }
+
+
 
   Future<Response> MultipartFilePostRequest(String endpoint, FormData formData) async{
     debugPrint("Call Started!, FormData formData");
@@ -86,28 +118,21 @@ class HttpService {
 
   }
 
-  initializeInterceptors(BuildContext context) {
+  initializeInterceptors() {
     _dio.interceptors.add(InterceptorsWrapper(
-        onError: (error, handler){
-          debugPrint('onError: ${error.message}');
-          UtilityClass.dismissProgressDialog();
-          if(error.response?.statusCode == 401) {
-            UtilityClass.askForInput('Alert', 'You are not authorized.', 'Okay', 'Okay', true);
-          } else {
-            UtilityClass.askForInput( 'Alert', 'Some issue occurred while connecting with server. Please try again.', 'Okay', 'Okay', true);
-          }
-          return handler.reject(error); //.next(error);
-        },
-        onRequest: (request, handler){
-          debugPrint("onRequest: ${request.method} ${request.path}");
-          UtilityClass.showProgressDialog(context, 'Please wait...');
-          return handler.next(request);
-        },
-        onResponse: (response, handler){
-          debugPrint('onResponse: ${response.data.toString()}');
-          UtilityClass.dismissProgressDialog();
-          return handler.next(response);
-        }
+      onError: (error, handler) {
+        debugPrint('onError: ${error.message}');
+        return handler.reject(error);
+      },
+      onRequest: (request, handler) {
+        debugPrint("onRequest: ${request.method} ${request.path}");
+        return handler.next(request);
+      },
+      onResponse: (response, handler) {
+        debugPrint('onResponse: ${response.data.toString()}');
+        return handler.next(response);
+      },
     ));
   }
+
 }

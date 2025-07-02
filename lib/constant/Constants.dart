@@ -1,6 +1,7 @@
 abstract class Constants {
-  static const baseurl = "https://optimanageapi.devitsandbox.com/api";
-  static const loginUrl = "/Authentication/Login";
+  static const baseurl = "https://optimanageapi.devitsandbox.com";
+  static const loginUrl = "/api/Authentication/Login";
+  static const timesheetUrl = "${baseurl}/Timesheet/GetTimesheetList";
 
   //static const imageUploadUrl =  "http://rajkisan.rajasthan.gov.in/rajkisanapp/Service/ImageUploaderNewServer";
 

@@ -40,7 +40,8 @@ class signinprovider with ChangeNotifier {
 
   Future<void> loginUser(BuildContext buildContext) async {
     print("working===working");
-    HttpService http = HttpService(buildContext, Constants.baseurl);
+    HttpService http = HttpService(Constants.baseurl);
+
     String empId = empIDController.text;
     String pass = passwordController.text;
     Response response = await http
