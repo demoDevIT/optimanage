@@ -8,7 +8,7 @@ import 'package:optimanage/services/HttpService.dart';
 import 'package:optimanage/constant/Constants.dart';
 import 'package:dio/dio.dart';
 
-class timesheet_provider with ChangeNotifier {
+class timesheet_provider extends ChangeNotifier {
   DateTime focusedDay = DateTime.now();
   DateTime? selectedDay;
   bool _showLeaveDetails = false;
@@ -39,27 +39,100 @@ class timesheet_provider with ChangeNotifier {
   //   notifyListeners();
   // }
 
-  final Map<DateTime, String> statuses = {
-    DateTime.utc(2025, 6, 17): 'Holiday',
-    DateTime.utc(2025, 6, 18): 'Entry',
-    DateTime.utc(2025, 6, 19): 'No Entry',
-    DateTime.utc(2025, 6, 20): 'Holiday',
-  };
+  // final Map<DateTime, String> statuses = {
+  //   DateTime.utc(2025, 6, 17): 'Holiday',
+  //   DateTime.utc(2025, 6, 18): 'Entry',
+  //   DateTime.utc(2025, 6, 19): 'No Entry',
+  //   DateTime.utc(2025, 6, 20): 'Holiday',
+  // };
 
-  final Map<String, Color> statusColorMap = {
-    'Holiday': Color(0xFFE5C7F0),
-    'Entry': Color(0xFFA0FFA1),
-    'No Entry': Color(0xFFFFBABA),
-    'weekendColor': Color(0xFFD3E8FF),
-    // Add more as needed
-  };
-  final Color weekendColor = Color(0xFFD3E8FF); // Light blue for weekends
+  // final Map<String, Color> statusColorMap = {
+  //   'Holiday': Color(0xFFE5C7F0),
+  //   'Entry': Color(0xFFA0FFA1),
+  //   'No Entry': Color(0xFFFFBABA),
+  //   'weekendColor': Color(0xFFD3E8FF),
+  //   // Add more as needed
+  // };
+
+  // Color status map per day
+  Map<DateTime, String> _dayColorHexes = {}; // Raw hexes
+  Map<DateTime, Color> statuses = {}; // Mapped colors
+
+ // //final Color weekendColor = Color(0xFFD3E8FF); // Light blue for weekends
+  final weekendColor = Colors.blue.shade200;
+  // Helper to parse hex string to Color
+  Color hexToColor(String hex) {
+    hex = hex.replaceAll("#", "");
+    if (hex.length == 6) hex = "FF$hex";
+    return Color(int.parse("0x$hex"));
+  }
+
+  // Simulate API response (replace with dynamic later)
+  void loadHardcodedColorsForJuly2025() {
+    final Map<String, String> apiData = {
+      "Day1": "#AED6F1",
+      "Day2": "#90EE90",
+      "Day3": "#90EE90",
+      "Day4": "#90EE90",
+      "Day5": "#90EE90",
+      "Day6": "#90EE90",
+      "Day7": "#AED6F1",
+      "Day8": "#AED6F1",
+      "Day9": "#90EE90",
+      "Day10": "#90EE90",
+      "Day11": "#90EE90",
+      "Day12": "#90EE90",
+      "Day13": "#AED6F1",
+      "Day14": "#AED6F1",
+      "Day15": "#90EE90",
+      "Day16": "#90EE90",
+      "Day17": "#AED6F1",
+      "Day18": "#90EE90",
+      "Day19": "#90EE90",
+      "Day20": "#AED6F1",
+      "Day21": "#AED6F1",
+      "Day22": "#90EE90",
+      "Day23": "#90EE90",
+      "Day24": "#90EE90",
+      "Day25": "#AED6F1",
+      "Day26": "#90EE90",
+      "Day27": "#90EE90",
+      "Day28": "#AED6F1",
+      "Day29": "#AED6F1",
+      "Day30": "#90EE90",
+      "Day31": "#90EE90",
+    };
+
+    final now = DateTime.now();
+    final year = 2025;
+    final month = 7;
+
+    _dayColorHexes.clear();
+    statuses.clear();
+
+    apiData.forEach((key, hex) {
+      final dayNum = int.tryParse(key.replaceAll("Day", ""));
+      if (dayNum != null) {
+        final date = DateTime(year, month, dayNum);
+        _dayColorHexes[date] = hex;
+        statuses[date] = hexToColor(hex);
+      }
+    });
+
+    notifyListeners();
+  }
 
   void showSelectDateBottomSheet(
       BuildContext context, String status, DateTime focusedDay, double height) {
     showNoTaskBottomSheet(context, status, focusedDay, height);
     notifyListeners();
   }
+
+  // void showSelectDateBottomSheet(
+  //     BuildContext context, String title, DateTime date, double height) {
+  //   showLeaveDetails = true;
+  //   notifyListeners();
+  // }
 
   void showNoTaskBottomSheet(
       BuildContext context, String type, DateTime date, double getHeight) {
@@ -608,6 +681,8 @@ class timesheet_provider with ChangeNotifier {
       },
     );
   }
+
+  Map<String, Color> get statusColorMap => {};
 
   Widget _buildRow(String label, String value, {Color valueColor = Colors.black}) {
     return Padding(

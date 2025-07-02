@@ -41,7 +41,8 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       provider = Provider.of<timesheet_provider>(context, listen: false);
-      provider.fetchTimesheetData(context); // ✅ Pass context here
+      provider.fetchTimesheetData(context);
+      provider.loadHardcodedColorsForJuly2025();// ✅ Pass context here
 
       if (widget.status == "daily") {
         provider.showLeaveDetails = true;
@@ -160,31 +161,23 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                   ),
                   calendarBuilders: CalendarBuilders(
                     defaultBuilder: (context, day, _) {
-                      final normalizedDay =
-                          DateTime.utc(day.year, day.month, day.day);
-                      final status = provider.statuses[normalizedDay];
-                      //final color = statusColorMap[status] ?? Colors.transparent;
+                      final normalizedDay = DateTime(day.year, day.month, day.day);
+                      final color = provider.statuses[normalizedDay];
+
                       final isWeekend = day.weekday == DateTime.saturday ||
                           day.weekday == DateTime.sunday;
 
-                      // Priority: Status color > Weekend color > Transparent
-                      final backgroundColor = provider.statusColorMap[status] ??
-                          (isWeekend
-                              ? provider.weekendColor
-                              : Colors.transparent);
+                      final backgroundColor = color ??
+                          (isWeekend ? provider.weekendColor : Colors.transparent);
 
                       return Container(
                         width: 35,
-                        // your desired width
                         height: 35,
-                        // your desired height
                         alignment: Alignment.center,
                         margin: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
                           color: backgroundColor,
-                          // shape: BoxShape.circle,
-                          borderRadius:
-                              BorderRadius.circular(10), // 4 corner radius
+                          borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(
                           '${day.day}',
@@ -195,27 +188,8 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                         ),
                       );
                     },
-                    todayBuilder: (context, day, focusedDay) {
-                      return Container(
-                        width: 35,
-                        height: 35,
-                        alignment: Alignment.center,
-                        margin: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: Colors.blue.shade100,
-                          borderRadius: BorderRadius.circular(
-                              10), // rounded corners instead of circle
-                        ),
-                        child: Text(
-                          '${day.day}',
-                          style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      );
-                    },
                   ),
+
                 ),
                 Padding(
                   padding:
