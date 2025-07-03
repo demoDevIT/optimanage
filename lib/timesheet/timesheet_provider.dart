@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -7,6 +9,9 @@ import 'ApprovalModalPopup.dart';
 import 'package:optimanage/services/HttpService.dart';
 import 'package:optimanage/constant/Constants.dart';
 import 'package:dio/dio.dart';
+import 'package:optimanage/timesheet/TaskSummaryModalPopup.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class timesheet_provider extends ChangeNotifier {
   DateTime focusedDay = DateTime.now();
@@ -544,7 +549,7 @@ class timesheet_provider extends ChangeNotifier {
       );
 
       UtilityClass.dismissProgressDialog();
-      print("✅ Response: ${response.data}");
+      print("✅ calendar Response: ${response.data}");
 
     } catch (e) {
       UtilityClass.dismissProgressDialog();
@@ -560,126 +565,254 @@ class timesheet_provider extends ChangeNotifier {
     }
   }
 
+  List<TaskSummaryModalPopup> taskSummaries = [];
+
+  Future<void> fetchTaskSummary(DateTime date, int userId) async {
+    HttpService http = HttpService('https://optimanageapi.devitsandbox.com');
+
+    final body = {
+      "ProjectId": 0,
+      "FromDate": date.toIso8601String().split('T')[0],
+      "ToDate": date.toIso8601String().split('T')[0],
+      "UserId": userId,
+      "SearchText": ""
+    };
+
+    try {
+      final response = await http.postRequest(
+        "/api/Timesheet/GetTaskSummaryList",
+        body,
+      );
+
+      UtilityClass.dismissProgressDialog();
+      print("✅ task summary Response: ${response.data}");
+
+      final resultString = response.data['Result'];
+
+      if (resultString != null) {
+        final List decodedList = jsonDecode(resultString);
+
+        taskSummaries = decodedList
+            .map((item) => TaskSummaryModalPopup.fromJson(item))
+            .toList();
+
+        notifyListeners();
+      } else {
+        print("⚠️ Empty result from API");
+        taskSummaries = []; // Reset
+        notifyListeners();
+      }
+    } catch (e) {
+      print("❌ Error fetching task summary: $e");
+    }
+  }
 
 
 
+  // void showtaskSummaryBottomSheet(
+  //     BuildContext context, String type, DateTime date, double getHeight) {
+  //   leaveType = "Half Day";
+  //
+  //   showModalBottomSheet(
+  //     context: context,
+  //     isScrollControlled: true,
+  //     shape: const RoundedRectangleBorder(
+  //       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+  //     ),
+  //     builder: (context) {
+  //       return FractionallySizedBox(
+  //         heightFactor: getHeight, // Adjust as needed
+  //         child: Container(
+  //           decoration: const BoxDecoration(
+  //             color: Colors.white, // Set background to white
+  //             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+  //           ),
+  //           padding: const EdgeInsets.all(16),
+  //           child: SingleChildScrollView(
+  //             child: Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               children: [
+  //                 const Center(
+  //                   child: Text(
+  //                     "View Hour Summary",
+  //                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+  //                   ),
+  //                 ),
+  //                 const SizedBox(height: 10),
+  //                 const Text(
+  //                   "Date: 01/04/2025 and Resource: undefined",
+  //                   style: TextStyle(
+  //                     fontSize: 14,
+  //                     fontWeight: FontWeight.bold,
+  //                   ),
+  //                 ),
+  //                 const SizedBox(height: 12),
+  //                 Container(
+  //                   width: double.infinity,
+  //                   padding: const EdgeInsets.all(12),
+  //                   decoration: BoxDecoration(
+  //                     color: Color(0xFFF5F9FE),
+  //                     borderRadius: BorderRadius.circular(12),
+  //                   ),
+  //                   child: Column(
+  //                     crossAxisAlignment: CrossAxisAlignment.start,
+  //                     children: [
+  //                       const Text(
+  //                         "RajKisan_2024_25",
+  //                         style: TextStyle(
+  //                           fontWeight: FontWeight.w600,
+  //                           fontSize: 16,
+  //                           height: 1.6,
+  //                         ),
+  //                       ),
+  //                       const SizedBox(height: 10),
+  //
+  //                       _buildRow("Timesheet Date", "01-04-2025"),
+  //                       const Divider(
+  //                         color: Color(0xFFE2E2E2), // light grey line
+  //                         thickness: 1,
+  //                         height: 20,
+  //                       ),
+  //
+  //                       _buildRow("Start Time", "10:00 AM"),
+  //                       const Divider(
+  //                         color: Color(0xFFE2E2E2), // light grey line
+  //                         thickness: 1,
+  //                         height: 20,
+  //                       ),
+  //
+  //                       _buildRow("End Time", "07:00 PM"),
+  //                       const Divider(
+  //                         color: Color(0xFFE2E2E2), // light grey line
+  //                         thickness: 1,
+  //                         height: 20,
+  //                       ),
+  //
+  //                       _buildRow("Task Time", "9 Hr 0 Min"),
+  //                       const Divider(
+  //                         color: Color(0xFFE2E2E2), // light grey line
+  //                         thickness: 1,
+  //                         height: 20,
+  //                       ),
+  //
+  //                       _buildRow("Status", "Completed", valueColor: Colors.green),
+  //                       const Divider(
+  //                         color: Color(0xFFE2E2E2), // light grey line
+  //                         thickness: 1,
+  //                         height: 20,
+  //                       ),
+  //
+  //                       _buildRow("Entry Date/Time", "04-04-2025, 11:02 AM"),
+  //
+  //                       const SizedBox(height: 12),
+  //                       const Text(
+  //                         "Task Description",
+  //                         style: TextStyle(fontWeight: FontWeight.w600),
+  //                       ),
+  //                       const SizedBox(height: 4),
+  //                       const Text(
+  //                         "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s....",
+  //                         style: TextStyle(color: Colors.black54),
+  //                       ),
+  //                     ],
+  //                   ),
+  //
+  //                 ),
+  //
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 
   void showtaskSummaryBottomSheet(
-      BuildContext context, String type, DateTime date, double getHeight) {
+      BuildContext context, String type, DateTime date, double getHeight, List<TaskSummaryModalPopup> summaries) {
     leaveType = "Half Day";
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return FractionallySizedBox(
-          heightFactor: getHeight, // Adjust as needed
-          child: Container(
-            decoration: const BoxDecoration(
-              color: Colors.white, // Set background to white
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-            ),
-            padding: const EdgeInsets.all(16),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Center(
-                    child: Text(
-                      "View Hour Summary",
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                    ),
+    //final provider = Provider.of<timesheet_provider>(context, listen: false);
+
+    fetchTaskSummary(date, 55).then((_) {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        builder: (context) {
+          return FractionallySizedBox(
+            heightFactor: getHeight,
+            child: Consumer<timesheet_provider>(
+              builder: (context, provider, _) {
+                return Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                   ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    "Date: 01/04/2025 and Resource: undefined",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Color(0xFFF5F9FE),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                  padding: const EdgeInsets.all(16),
+                  child: SingleChildScrollView(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "RajKisan_2024_25",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                            height: 1.6,
+                        const Center(
+                          child: Text(
+                            "View Hour Summary",
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                           ),
                         ),
                         const SizedBox(height: 10),
-
-                        _buildRow("Timesheet Date", "01-04-2025"),
-                        const Divider(
-                          color: Color(0xFFE2E2E2), // light grey line
-                          thickness: 1,
-                          height: 20,
+                        Text(
+                          "Date: ${DateFormat("dd-MM-yyyy").format(date)}",
+                          style: const TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.bold),
                         ),
-
-                        _buildRow("Start Time", "10:00 AM"),
-                        const Divider(
-                          color: Color(0xFFE2E2E2), // light grey line
-                          thickness: 1,
-                          height: 20,
-                        ),
-
-                        _buildRow("End Time", "07:00 PM"),
-                        const Divider(
-                          color: Color(0xFFE2E2E2), // light grey line
-                          thickness: 1,
-                          height: 20,
-                        ),
-
-                        _buildRow("Task Time", "9 Hr 0 Min"),
-                        const Divider(
-                          color: Color(0xFFE2E2E2), // light grey line
-                          thickness: 1,
-                          height: 20,
-                        ),
-
-                        _buildRow("Status", "Completed", valueColor: Colors.green),
-                        const Divider(
-                          color: Color(0xFFE2E2E2), // light grey line
-                          thickness: 1,
-                          height: 20,
-                        ),
-
-                        _buildRow("Entry Date/Time", "04-04-2025, 11:02 AM"),
-
                         const SizedBox(height: 12),
-                        const Text(
-                          "Task Description",
-                          style: TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s....",
-                          style: TextStyle(color: Colors.black54),
-                        ),
+                        ...provider.taskSummaries.map((task) => Container(
+                          width: double.infinity,
+                          margin: const EdgeInsets.only(bottom: 12),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF5F9FE),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                task.projectName,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                  height: 1.6,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              _buildRow("Employee", task.employeeName),
+                              _buildRow("Total Tasks", task.totalTasks.toString()),
+                              _buildRow("Completed", task.completedTasks.toString()),
+                              _buildRow("Pending", task.pendingTasks.toString()),
+                              _buildRow("Estimated", task.estimateTaskDuration),
+                              _buildRow("Utilized", task.utilizedDuration),
+                              _buildRow("Completion Rate", "${task.completionRate}%"),
+                              _buildRow(
+                                "Quality",
+                                task.taskQuality,
+                                //valueColor: HexColor(task.taskQualityColor),
+                              ),
+                            ],
+                          ),
+                        )),
                       ],
                     ),
-
                   ),
-
-                ],
-              ),
+                );
+              },
             ),
-          ),
-        );
-      },
-    );
+          );
+        },
+      );
+    });
   }
 
   Map<String, Color> get statusColorMap => {};

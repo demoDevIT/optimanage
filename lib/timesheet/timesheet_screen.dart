@@ -10,6 +10,7 @@ import '../constant/common.dart';
 import '../notaskassign/notaskassign_sceen.dart';
 import '../selftask/selftask_provider.dart';
 import '../selftask/selftask_screen.dart';
+import '../utils/UtilityClass.dart';
 
 class TimeSheetScreen extends StatefulWidget {
   final String? status;
@@ -129,8 +130,27 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                           ),
                         );
                       } else if(widget.status == "daily" && !isWeekend){
-                        provider.showtaskSummaryBottomSheet(
-                            context, "Add Leave", provider.selectedDay!, 0.75);
+                        UtilityClass.showProgressDialog(context, 'Please wait...'); // Optional loading indicator
+                         provider.fetchTaskSummary(provider.selectedDay!, 55); // pass real userId
+                        // provider.showtaskSummaryBottomSheet(
+                        //     context, "Add Leave", provider.selectedDay!, 0.75);
+
+                        if (context.mounted) {
+                          if (provider.taskSummaries.isNotEmpty) {
+                            provider.showtaskSummaryBottomSheet(
+                              context,
+                              "Add Leave",
+                              provider.selectedDay!,
+                              0.75,
+                              provider.taskSummaries, // send full list
+                            );
+                          } else {
+                            // Optional: show a message
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("No task summary available.")),
+                            );
+                          }
+                        }
                       }
                     });
                   },
