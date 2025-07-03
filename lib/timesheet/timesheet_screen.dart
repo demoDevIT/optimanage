@@ -130,12 +130,11 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                           ),
                         );
                       } else if(widget.status == "daily" && !isWeekend){
-                        UtilityClass.showProgressDialog(context, 'Please wait...'); // Optional loading indicator
+                         // Optional loading indicator
                          provider.fetchTaskSummary(provider.selectedDay!, 55); // pass real userId
                         // provider.showtaskSummaryBottomSheet(
                         //     context, "Add Leave", provider.selectedDay!, 0.75);
 
-                        if (context.mounted) {
                           if (provider.taskSummaries.isNotEmpty) {
                             provider.showtaskSummaryBottomSheet(
                               context,
@@ -150,7 +149,7 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                               SnackBar(content: Text("No task summary available.")),
                             );
                           }
-                        }
+
                       }
                     });
                   },

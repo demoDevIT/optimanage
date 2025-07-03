@@ -572,8 +572,8 @@ class timesheet_provider extends ChangeNotifier {
   List<TaskSummaryModalPopup> taskSummaries = [];
 
   Future<void> fetchTaskSummary(DateTime date, int userId) async {
+    UtilityClass.showProgressDialog(context, 'Please wait...');
     HttpService http = HttpService('https://optimanageapi.devitsandbox.com');
-
     final body = {
       "ProjectId": 0,
       "FromDate": date.toIso8601String().split('T')[0],
@@ -727,87 +727,77 @@ class timesheet_provider extends ChangeNotifier {
       BuildContext context, String type, DateTime date, double getHeight, List<TaskSummaryModalPopup> summaries) {
     leaveType = "Half Day";
     //final provider = Provider.of<timesheet_provider>(context, listen: false);
-
-    fetchTaskSummary(date, 55).then((_) {
-      showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        builder: (context) {
-          return FractionallySizedBox(
-            heightFactor: getHeight,
-            child: Consumer<timesheet_provider>(
-              builder: (context, provider, _) {
-                return Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          padding: const EdgeInsets.all(16),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Center(
+                  child: Text(
+                    "View Hour Summary",
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                   ),
-                  padding: const EdgeInsets.all(16),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Center(
-                          child: Text(
-                            "View Hour Summary",
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          "Date: ${DateFormat("dd-MM-yyyy").format(date)}",
-                          style: const TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 12),
-                        ...provider.taskSummaries.map((task) => Container(
-                          width: double.infinity,
-                          margin: const EdgeInsets.only(bottom: 12),
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF5F9FE),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                task.projectName,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 16,
-                                  height: 1.6,
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              _buildRow("Employee", task.employeeName),
-                              _buildRow("Total Tasks", task.totalTasks.toString()),
-                              _buildRow("Completed", task.completedTasks.toString()),
-                              _buildRow("Pending", task.pendingTasks.toString()),
-                              _buildRow("Estimated", task.estimateTaskDuration),
-                              _buildRow("Utilized", task.utilizedDuration),
-                              _buildRow("Completion Rate", "${task.completionRate}%"),
-                              _buildRow(
-                                "Quality",
-                                task.taskQuality,
-                                //valueColor: HexColor(task.taskQualityColor),
-                              ),
-                            ],
-                          ),
-                        )),
-                      ],
-                    ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  "Date: ${DateFormat("dd-MM-yyyy").format(date)}",
+                  style: const TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 12),
+                ...taskSummaries.map((task) => Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F9FE),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                );
-              },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        task.projectName,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                          height: 1.6,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      _buildRow("Employee", task.employeeName),
+                      _buildRow("Total Tasks", task.totalTasks.toString()),
+                      _buildRow("Completed", task.completedTasks.toString()),
+                      _buildRow("Pending", task.pendingTasks.toString()),
+                      _buildRow("Estimated", task.estimateTaskDuration),
+                      _buildRow("Utilized", task.utilizedDuration),
+                      _buildRow("Completion Rate", "${task.completionRate}%"),
+                      _buildRow(
+                        "Quality",
+                        task.taskQuality,
+                        //valueColor: HexColor(task.taskQualityColor),
+                      ),
+                    ],
+                  ),
+                )),
+              ],
             ),
-          );
-        },
-      );
-    });
+          ),
+        );
+      },
+    );
   }
 
   Map<String, Color> get statusColorMap => {};
