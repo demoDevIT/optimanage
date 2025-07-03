@@ -63,8 +63,9 @@ class timesheet_provider extends ChangeNotifier {
   Map<DateTime, String> _dayColorHexes = {}; // Raw hexes
   Map<DateTime, Color> statuses = {}; // Mapped colors
 
- // //final Color weekendColor = Color(0xFFD3E8FF); // Light blue for weekends
+  // //final Color weekendColor = Color(0xFFD3E8FF); // Light blue for weekends
   final weekendColor = Colors.blue.shade200;
+
   // Helper to parse hex string to Color
   Color hexToColor(String hex) {
     hex = hex.replaceAll("#", "");
@@ -332,7 +333,8 @@ class timesheet_provider extends ChangeNotifier {
                                     color: Color(0xFFE6E6E6),
                                     thickness: 1,
                                     height: 1,
-                                    indent: 0, // ✅ No left margin
+                                    indent: 0,
+                                    // ✅ No left margin
                                     endIndent: 0, // ✅ No right margin
                                   ),
 
@@ -343,11 +345,13 @@ class timesheet_provider extends ChangeNotifier {
                                     decoration: InputDecoration(
                                       filled: true,
                                       fillColor: Color(0xFFF5F9FE),
-                                     // labelText: "Leave Type",
-                                      labelStyle: TextStyle(color: Color(0xFF25507C)),
+                                      // labelText: "Leave Type",
+                                      labelStyle:
+                                          TextStyle(color: Color(0xFF25507C)),
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
-                                        borderSide: BorderSide.none, // No border
+                                        borderSide:
+                                            BorderSide.none, // No border
                                       ),
                                       suffixIcon: Icon(
                                         Icons.arrow_drop_down,
@@ -357,9 +361,9 @@ class timesheet_provider extends ChangeNotifier {
                                     ),
                                     items: ["Half Day", "Full Day"]
                                         .map((type) => DropdownMenuItem(
-                                      value: type,
-                                      child: Text(type),
-                                    ))
+                                              value: type,
+                                              child: Text(type),
+                                            ))
                                         .toList(),
                                     onChanged: (val) {
                                       if (val != null) {
@@ -399,7 +403,8 @@ class timesheet_provider extends ChangeNotifier {
                                       contentPadding: const EdgeInsets.all(10),
                                       enabledBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
-                                        borderSide: BorderSide.none, // No border
+                                        borderSide:
+                                            BorderSide.none, // No border
                                       ),
                                       focusedBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
@@ -550,7 +555,6 @@ class timesheet_provider extends ChangeNotifier {
 
       UtilityClass.dismissProgressDialog();
       print("✅ calendar Response: ${response.data}");
-
     } catch (e) {
       UtilityClass.dismissProgressDialog();
       print("❌ Exception while calling API: $e");
@@ -607,10 +611,8 @@ class timesheet_provider extends ChangeNotifier {
     }
   }
 
-
-
-  // void showtaskSummaryBottomSheet(
-  //     BuildContext context, String type, DateTime date, double getHeight) {
+  // void showtaskSummaryBottomSheet(BuildContext context, String type,
+  //     DateTime date, double getHeight, List<TaskSummaryModalPopup> summaries) {
   //   leaveType = "Half Day";
   //
   //   showModalBottomSheet(
@@ -635,7 +637,8 @@ class timesheet_provider extends ChangeNotifier {
   //                 const Center(
   //                   child: Text(
   //                     "View Hour Summary",
-  //                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+  //                     style:
+  //                         TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
   //                   ),
   //                 ),
   //                 const SizedBox(height: 10),
@@ -666,44 +669,38 @@ class timesheet_provider extends ChangeNotifier {
   //                         ),
   //                       ),
   //                       const SizedBox(height: 10),
-  //
   //                       _buildRow("Timesheet Date", "01-04-2025"),
   //                       const Divider(
   //                         color: Color(0xFFE2E2E2), // light grey line
   //                         thickness: 1,
   //                         height: 20,
   //                       ),
-  //
   //                       _buildRow("Start Time", "10:00 AM"),
   //                       const Divider(
   //                         color: Color(0xFFE2E2E2), // light grey line
   //                         thickness: 1,
   //                         height: 20,
   //                       ),
-  //
   //                       _buildRow("End Time", "07:00 PM"),
   //                       const Divider(
   //                         color: Color(0xFFE2E2E2), // light grey line
   //                         thickness: 1,
   //                         height: 20,
   //                       ),
-  //
   //                       _buildRow("Task Time", "9 Hr 0 Min"),
   //                       const Divider(
   //                         color: Color(0xFFE2E2E2), // light grey line
   //                         thickness: 1,
   //                         height: 20,
   //                       ),
-  //
-  //                       _buildRow("Status", "Completed", valueColor: Colors.green),
+  //                       _buildRow("Status", "Completed",
+  //                           valueColor: Colors.green),
   //                       const Divider(
   //                         color: Color(0xFFE2E2E2), // light grey line
   //                         thickness: 1,
   //                         height: 20,
   //                       ),
-  //
   //                       _buildRow("Entry Date/Time", "04-04-2025, 11:02 AM"),
-  //
   //                       const SizedBox(height: 12),
   //                       const Text(
   //                         "Task Description",
@@ -716,9 +713,7 @@ class timesheet_provider extends ChangeNotifier {
   //                       ),
   //                     ],
   //                   ),
-  //
   //                 ),
-  //
   //               ],
   //             ),
   //           ),
@@ -817,7 +812,8 @@ class timesheet_provider extends ChangeNotifier {
 
   Map<String, Color> get statusColorMap => {};
 
-  Widget _buildRow(String label, String value, {Color valueColor = Colors.black}) {
+  Widget _buildRow(String label, String value,
+      {Color valueColor = Colors.black}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
@@ -845,6 +841,4 @@ class timesheet_provider extends ChangeNotifier {
       ),
     );
   }
-
-
 }
