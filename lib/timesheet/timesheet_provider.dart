@@ -574,6 +574,7 @@ class timesheet_provider extends ChangeNotifier {
   Future<void> fetchTaskSummary(DateTime date, int userId) async {
     UtilityClass.showProgressDialog(context, 'Please wait...');
     HttpService http = HttpService('https://optimanageapi.devitsandbox.com');
+
     final body = {
       "ProjectId": 0,
       "FromDate": date.toIso8601String().split('T')[0],
