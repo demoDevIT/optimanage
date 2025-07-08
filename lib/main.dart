@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:optimanage/tasksummary/tasksummary_provider.dart';
 import 'package:optimanage/timesheet/timesheet_provider.dart';
 import 'package:provider/provider.dart';
 import 'SignIn/signinprovider.dart';
@@ -12,6 +13,8 @@ void main() {
         providers: [
           ChangeNotifierProvider(create: (_) => timesheet_provider(_)),
           ChangeNotifierProvider(create: (_) => signinprovider()),
+          ChangeNotifierProvider(create: (_) => TaskSummaryProvider()),
+         // ChangeNotifierProvider(create: (_) => TaskSummaryProvider())
         ],
         child: MyApp(),
       )
