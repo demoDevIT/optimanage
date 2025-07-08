@@ -43,7 +43,11 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       provider = Provider.of<timesheet_provider>(context, listen: false);
       provider.fetchTimesheetData(context);
-      provider.loadHardcodedColorsForJuly2025();// ✅ Pass context here
+
+    //  provider.loadDynamicColorsFromApi();// ✅ Pass context
+    //   provider.loadDynamicColorsFromApi({
+    //     'userId': '123', // example keys — replace with real data
+    //   });
 
       if (widget.status == "daily") {
         provider.showLeaveDetails = true;
@@ -106,9 +110,9 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                           selectedDay.weekday == DateTime.saturday ||
                               selectedDay.weekday == DateTime.sunday;
 
-                      print("Selected date${selectedDay}");
-                      print("Selected day${focusedDay}");
-                      print("Selected date${widget.status}");
+                    //  print("Selected date${selectedDay}");
+                    //  print("Selected day${focusedDay}");
+                    //  print("Selected date${widget.status}");
                       if (widget.status != "daily" && !isWeekend) {
                         provider.showSelectDateBottomSheet(
                             context, "Add Leave", provider.selectedDay!, 550);
@@ -129,28 +133,26 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                             ],
                           ),
                         );
-                      } else if(widget.status == "daily" && !isWeekend){
-                         // Optional loading indicator
-                         provider.fetchTaskSummary(provider.selectedDay!, 55); // pass real userId
-                        // provider.showtaskSummaryBottomSheet(
-                        //     context, "Add Leave", provider.selectedDay!, 0.75);
+                      } else if (widget.status == "daily" && !isWeekend) {
+                        UtilityClass.showProgressDialog(context, 'Please wait...');
+                        provider.fetchTaskSummary(provider.selectedDay!, 55);
+                        Navigator.pop(context); // close progress dialog
 
-                          if (provider.taskSummaries.isNotEmpty) {
-                            provider.showtaskSummaryBottomSheet(
-                              context,
-                              "Add Leave",
-                              provider.selectedDay!,
-                              0.75,
-                              provider.taskSummaries, // send full list
-                            );
-                          } else {
-                            // Optional: show a message
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("No task summary available.")),
-                            );
-                          }
-
+                        if (provider.taskSummaries.isNotEmpty) {
+                          provider.showtaskSummaryBottomSheet(
+                            context,
+                            "Add Leave",
+                            provider.selectedDay!,
+                            0.75,
+                            provider.taskSummaries,
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("No task summary available.")),
+                          );
+                        }
                       }
+
                     });
                   },
                   calendarStyle: CalendarStyle(
@@ -186,8 +188,8 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                       final isWeekend = day.weekday == DateTime.saturday ||
                           day.weekday == DateTime.sunday;
 
-                      final backgroundColor = color ??
-                          (isWeekend ? provider.weekendColor : Colors.transparent);
+                      final backgroundColor = color ?? (isWeekend ? provider.weekendColor : Colors.transparent);
+                    //  print("Day: $normalizedDay | Color: ${provider.statuses[normalizedDay]}");
 
                       return Container(
                         width: 35,

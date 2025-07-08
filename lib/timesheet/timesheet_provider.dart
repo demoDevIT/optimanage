@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:optimanage/timesheet/CalendraModel.dart';
 
 import '../notaskassign/notaskassign_sceen.dart';
 import '../utils/UtilityClass.dart';
@@ -12,6 +13,8 @@ import 'package:dio/dio.dart';
 import 'package:optimanage/timesheet/TaskSummaryModalPopup.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+
+import 'CalendraModel.dart';
 
 class timesheet_provider extends ChangeNotifier {
   DateTime focusedDay = DateTime.now();
@@ -74,56 +77,40 @@ class timesheet_provider extends ChangeNotifier {
   }
 
   // Simulate API response (replace with dynamic later)
-  void loadHardcodedColorsForJuly2025() {
-    final Map<String, String> apiData = {
-      "Day1": "#AED6F1",
-      "Day2": "#90EE90",
-      "Day3": "#90EE90",
-      "Day4": "#90EE90",
-      "Day5": "#90EE90",
-      "Day6": "#90EE90",
-      "Day7": "#AED6F1",
-      "Day8": "#AED6F1",
-      "Day9": "#90EE90",
-      "Day10": "#90EE90",
-      "Day11": "#90EE90",
-      "Day12": "#90EE90",
-      "Day13": "#AED6F1",
-      "Day14": "#AED6F1",
-      "Day15": "#90EE90",
-      "Day16": "#90EE90",
-      "Day17": "#AED6F1",
-      "Day18": "#90EE90",
-      "Day19": "#90EE90",
-      "Day20": "#AED6F1",
-      "Day21": "#AED6F1",
-      "Day22": "#90EE90",
-      "Day23": "#90EE90",
-      "Day24": "#90EE90",
-      "Day25": "#AED6F1",
-      "Day26": "#90EE90",
-      "Day27": "#90EE90",
-      "Day28": "#AED6F1",
-      "Day29": "#AED6F1",
-      "Day30": "#90EE90",
-      "Day31": "#90EE90",
-    };
 
-    final now = DateTime.now();
-    final year = 2025;
-    final month = 7;
 
+  void loadDynamicColorsFromApi(List<String> dayColors) {
     _dayColorHexes.clear();
     statuses.clear();
+    final RegExp dayKeyPattern = RegExp(r'^Day(\d+)$');
+    print("APIDATA");
+    print("Api response${dayColors}");
 
-    apiData.forEach((key, hex) {
-      final dayNum = int.tryParse(key.replaceAll("Day", ""));
-      if (dayNum != null) {
-        final date = DateTime(year, month, dayNum);
-        _dayColorHexes[date] = hex;
-        statuses[date] = hexToColor(hex);
-      }
-    });
+
+
+
+    // result?.forEach((key, value) {
+    //   final match = dayKeyPattern.firstMatch(key);
+    //
+    //   if (match != null) {
+    //     final dayNum = match.group(1); // e.g., "1"
+    //     final dateKey = "Date$dayNum";
+    //
+    //     if (apiData.containsKey(dateKey)) {
+    //       String rawDateStr = apiData[dateKey];
+    //       // Clean up possible brackets and whitespaces
+    //       String cleanedDate = rawDateStr.replaceAll(RegExp(r'[\[\]\s]'), '');
+    //
+    //       final parsedDate = DateTime.tryParse(cleanedDate);
+    //       if (parsedDate != null) {
+    //         final normalizedDate = DateTime(parsedDate.year, parsedDate.month, parsedDate.day);
+    //         final hexColor = value.toString();
+    //         _dayColorHexes[normalizedDate] = hexColor;
+    //         statuses[normalizedDate] = hexToColor(hexColor); // ✅ normalize
+    //       }
+    //     }
+    //   }
+    // });
 
     notifyListeners();
   }
@@ -542,10 +529,10 @@ class timesheet_provider extends ChangeNotifier {
       HttpService http = HttpService('https://optimanageapi.devitsandbox.com');
 
       Map<String, dynamic> inputText = {
-        "MonthId": 6,
+        "MonthId": 7,
         "YearId": 2025,
         "UserId": 44,
-        "RoleId": 5,
+      //  "RoleId": 5,
       };
 
       final response = await http.postRequest(
@@ -555,6 +542,59 @@ class timesheet_provider extends ChangeNotifier {
 
       UtilityClass.dismissProgressDialog();
       print("✅ calendar Response: ${response.data}");
+
+      CalendraModel getresponse = CalendraModel.fromJson(response.data);
+
+      if (getresponse.result != null && getresponse.result!.isNotEmpty) {
+        print(getresponse.result);
+        final List<dynamic> resultList = jsonDecode(getresponse.result!);
+        if (resultList.isNotEmpty) {
+          final Map<String, dynamic> employeeData = resultList[0];
+          // Extract day color values
+          for (int i = 1; i <= 31; i++) {
+            String dayKey = 'Day$i';
+            String date = 'Date$i';
+            if (employeeData.containsKey(dayKey) && employeeData.containsKey(date)) {
+              final Map<String, dynamic> employeeData = resultList[0];
+
+              final now = DateTime.now();
+              final year = now.year;
+              final month = now.month;
+
+              _dayColorHexes.clear();
+              statuses.clear();
+
+              for (int i = 1; i <= 31; i++) {
+                String dayKey = 'Day$i';
+                String dateKey = 'Date$i';
+
+                if (employeeData.containsKey(dayKey) && employeeData.containsKey(dateKey)) {
+                  String colorHex = employeeData[dayKey].toString().replaceAll('#', '');
+                  String dateStr = employeeData[dateKey].toString().replaceAll('[', '').replaceAll(']', '').trim();
+
+                  try {
+                    final date = DateTime.parse(dateStr);
+                    final color = Color(int.parse('0xFF$colorHex'));
+                    _dayColorHexes[date] = colorHex;
+                    statuses[date] = color;
+                  } catch (e) {
+                    print("❌ Error parsing Day$i → $e");
+                  }
+                }
+              }
+
+              notifyListeners();
+            }
+          }
+
+        }
+      } else {
+        print("❌ No data found in Result.");
+      }
+
+
+
+
     } catch (e) {
       UtilityClass.dismissProgressDialog();
       print("❌ Exception while calling API: $e");
@@ -572,25 +612,19 @@ class timesheet_provider extends ChangeNotifier {
   List<TaskSummaryModalPopup> taskSummaries = [];
 
   Future<void> fetchTaskSummary(DateTime date, int userId) async {
-    UtilityClass.showProgressDialog(context, 'Please wait...');
-    HttpService http = HttpService('https://optimanageapi.devitsandbox.com');
-
-    final body = {
-      "ProjectId": 0,
-      "FromDate": date.toIso8601String().split('T')[0],
-      "ToDate": date.toIso8601String().split('T')[0],
-      "UserId": userId,
-      "SearchText": ""
-    };
-
     try {
+      HttpService http = HttpService('https://optimanageapi.devitsandbox.com');
+
+      final body = {
+        "FromDate": "2025-06-18",
+        "ToDate": "2025-06-18",
+        "UserId": 55
+      };
+
       final response = await http.postRequest(
-        "/api/Timesheet/GetTaskSummaryList",
+        "/api/Timesheet/GetHourSummaryList",
         body,
       );
-
-      UtilityClass.dismissProgressDialog();
-      print("✅ task summary Response: ${response.data}");
 
       final resultString = response.data['Result'];
 
@@ -600,17 +634,18 @@ class timesheet_provider extends ChangeNotifier {
         taskSummaries = decodedList
             .map((item) => TaskSummaryModalPopup.fromJson(item))
             .toList();
-
-        notifyListeners();
       } else {
-        print("⚠️ Empty result from API");
-        taskSummaries = []; // Reset
-        notifyListeners();
+        taskSummaries = [];
       }
+
+      notifyListeners();
     } catch (e) {
-      print("❌ Error fetching task summary: $e");
+      debugPrint("❌ Error fetching task summary: $e");
+      taskSummaries = [];
+      notifyListeners();
     }
   }
+
 
   // void showtaskSummaryBottomSheet(BuildContext context, String type,
   //     DateTime date, double getHeight, List<TaskSummaryModalPopup> summaries) {
@@ -725,9 +760,12 @@ class timesheet_provider extends ChangeNotifier {
   // }
 
   void showtaskSummaryBottomSheet(
-      BuildContext context, String type, DateTime date, double getHeight, List<TaskSummaryModalPopup> summaries) {
-    leaveType = "Half Day";
-    //final provider = Provider.of<timesheet_provider>(context, listen: false);
+      BuildContext context,
+      String type,
+      DateTime date,
+      double getHeight,
+      List<TaskSummaryModalPopup> summaries) {
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -735,13 +773,16 @@ class timesheet_provider extends ChangeNotifier {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
+        final screenHeight = MediaQuery.of(context).size.height;
+
         return Container(
           decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
           padding: const EdgeInsets.all(16),
-          child: SingleChildScrollView(
+          child: SizedBox(
+            height: screenHeight * 0.5, // ✅ Half screen height
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -752,47 +793,144 @@ class timesheet_provider extends ChangeNotifier {
                   ),
                 ),
                 const SizedBox(height: 10),
+
                 Text(
-                  "Date: ${DateFormat("dd-MM-yyyy").format(date)}",
+                  "Date: ${DateFormat("dd/MM/yyyy").format(date)} and Resource: undefined",
                   style: const TextStyle(
-                      fontSize: 14, fontWeight: FontWeight.bold),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-                const SizedBox(height: 12),
-                ...taskSummaries.map((task) => Container(
-                  width: double.infinity,
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF5F9FE),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        task.projectName,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
-                          height: 1.6,
+
+                const SizedBox(height: 10),
+
+                // ✅ Scrollable content
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: summaries.map((task) => Container(
+                        width: double.infinity,
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF5F9FE),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 6,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      _buildRow("Employee", task.employeeName),
-                      _buildRow("Total Tasks", task.totalTasks.toString()),
-                      _buildRow("Completed", task.completedTasks.toString()),
-                      _buildRow("Pending", task.pendingTasks.toString()),
-                      _buildRow("Estimated", task.estimateTaskDuration),
-                      _buildRow("Utilized", task.utilizedDuration),
-                      _buildRow("Completion Rate", "${task.completionRate}%"),
-                      _buildRow(
-                        "Quality",
-                        task.taskQuality,
-                        //valueColor: HexColor(task.taskQualityColor),
-                      ),
-                    ],
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              task.ProjectName,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Column(
+                              children: [
+                                _buildRow("Timesheet Date", task.EntryDate),
+                                const Divider(
+                                  thickness: 1,
+                                  height: 1,
+                                  color: Color(0xFFE2E2E2),
+                                ),
+                              ],
+                            ),
+
+                            Column(
+                              children: [
+                                _buildRow("Start Time", task.StartTime),
+                                const Divider(
+                                  thickness: 1,
+                                  height: 1,
+                                  color: Color(0xFFE2E2E2),
+                                ),
+                              ],
+                            ),
+
+                            Column(
+                              children: [
+                                _buildRow("End Time", task.EndTime),
+                                const Divider(
+                                  thickness: 1,
+                                  height: 1,
+                                  color: Color(0xFFE2E2E2),
+                                ),
+                              ],
+                            ),
+
+                            Column(
+                              children: [
+                                _buildRow("Task Time", task.TaskTime),
+                                const Divider(
+                                  thickness: 1,
+                                  height: 1,
+                                  color: Color(0xFFE2E2E2),
+                                ),
+                              ],
+                            ),
+
+
+                            Column(
+                              children: [
+                                _buildRow(
+                                  "Status",
+                                  task.strTaskStauts,
+                                  valueColor: task.strTaskStauts.toLowerCase() == "completed"
+                                      ? Colors.green
+                                      : Colors.black,
+                                ),
+                                const Divider(
+                                  thickness: 1,
+                                  height: 1,
+                                  color: Color(0xFFE2E2E2),
+                                ),
+                              ],
+                            ),
+
+                            Column(
+                              children: [
+                                _buildRow("Entry Date/Time", "${task.CreatedDate}, ${task.CreatedTime}"),
+                                const Divider(
+                                  thickness: 1,
+                                  height: 1,
+                                  color: Color(0xFFE2E2E2),
+                                ),
+                              ],
+                            ),
+
+
+                            const SizedBox(height: 8),
+                            const Text(
+                              "Task Description",
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              task.TaskShortDescription,
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )).toList(),
+                    ),
                   ),
-                )),
+                ),
               ],
             ),
           ),
@@ -801,35 +939,46 @@ class timesheet_provider extends ChangeNotifier {
     );
   }
 
+
+
+
   Map<String, Color> get statusColorMap => {};
 
-  Widget _buildRow(String label, String value,
-      {Color valueColor = Colors.black}) {
+  Widget _buildRow(String label, String value, {Color? valueColor}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
             child: Text(
               label,
-              style: const TextStyle(fontSize: 14),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              textAlign: TextAlign.right,
-              style: TextStyle(
-                fontSize: 14,
-                color: valueColor,
-                fontWeight: FontWeight.w500,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.normal,
+                color: Colors.black87,
               ),
             ),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: valueColor ?? Colors.black,
+            ),
+            textAlign: TextAlign.right,
           ),
         ],
       ),
     );
   }
+
+
+
+
+
+
+
 }
