@@ -42,12 +42,14 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       provider = Provider.of<timesheet_provider>(context, listen: false);
-      provider.fetchTimesheetData(context);
 
-    //  provider.loadDynamicColorsFromApi();// ✅ Pass context
-    //   provider.loadDynamicColorsFromApi({
-    //     'userId': '123', // example keys — replace with real data
-    //   });
+      final now = DateTime.now(); // 👈 Get current date
+      provider.focusedDay = now;
+      provider.selectedDay = now;
+
+      provider.fetchTimesheetData(context, now.month, now.year);
+      //provider.fetchTimesheetData(context);
+
 
       if (widget.status == "daily") {
         provider.showLeaveDetails = true;
@@ -100,6 +102,11 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                   firstDay: DateTime.utc(2020, 1, 1),
                   lastDay: DateTime.utc(2030, 12, 31),
                   calendarFormat: CalendarFormat.month,
+                  onPageChanged: (focusedDay) {
+                    provider.focusedDay = focusedDay;
+                    provider.selectedDay = DateTime(focusedDay.year, focusedDay.month, 1);
+                    provider.fetchTimesheetData(context, focusedDay.month, focusedDay.year);
+                  },
                   selectedDayPredicate: (day) =>
                       isSameDay(provider.selectedDay, day),
                   onDaySelected: (selectedDay, focusedDay) {
@@ -188,7 +195,8 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                       final isWeekend = day.weekday == DateTime.saturday ||
                           day.weekday == DateTime.sunday;
 
-                      final backgroundColor = color ?? (isWeekend ? provider.weekendColor : Colors.transparent);
+                    //  final backgroundColor = color ?? (isWeekend ? provider.weekendColor : Colors.transparent);
+                      final backgroundColor = color ?? (Colors.transparent);
                     //  print("Day: $normalizedDay | Color: ${provider.statuses[normalizedDay]}");
 
                       return Container(

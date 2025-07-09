@@ -522,15 +522,15 @@ class timesheet_provider extends ChangeNotifier {
     );
   }
 
-  Future<void> fetchTimesheetData(BuildContext context) async {
+  Future<void> fetchTimesheetData(BuildContext context,   int month, int year) async {
     try {
       UtilityClass.showProgressDialog(context, 'Please wait...');
 
       HttpService http = HttpService('https://optimanageapi.devitsandbox.com');
 
       Map<String, dynamic> inputText = {
-        "MonthId": 7,
-        "YearId": 2025,
+        "MonthId": month,
+        "YearId": year,
         "UserId": 44,
       //  "RoleId": 5,
       };
@@ -545,49 +545,33 @@ class timesheet_provider extends ChangeNotifier {
 
       CalendraModel getresponse = CalendraModel.fromJson(response.data);
 
+      _dayColorHexes.clear();
+      statuses.clear();
+
       if (getresponse.result != null && getresponse.result!.isNotEmpty) {
-        print(getresponse.result);
         final List<dynamic> resultList = jsonDecode(getresponse.result!);
-        if (resultList.isNotEmpty) {
-          final Map<String, dynamic> employeeData = resultList[0];
-          // Extract day color values
-          for (int i = 1; i <= 31; i++) {
-            String dayKey = 'Day$i';
-            String date = 'Date$i';
-            if (employeeData.containsKey(dayKey) && employeeData.containsKey(date)) {
-              final Map<String, dynamic> employeeData = resultList[0];
+        final Map<String, dynamic> employeeData = resultList[0];
 
-              final now = DateTime.now();
-              final year = now.year;
-              final month = now.month;
+        for (int i = 1; i <= 31; i++) {
+          String dayKey = 'Day$i';
+          String dateKey = 'Date$i';
 
-              _dayColorHexes.clear();
-              statuses.clear();
+          if (employeeData.containsKey(dayKey) && employeeData.containsKey(dateKey)) {
+            String colorHex = employeeData[dayKey].toString().replaceAll('#', '');
+            String dateStr = employeeData[dateKey].toString().replaceAll('[', '').replaceAll(']', '').trim();
 
-              for (int i = 1; i <= 31; i++) {
-                String dayKey = 'Day$i';
-                String dateKey = 'Date$i';
-
-                if (employeeData.containsKey(dayKey) && employeeData.containsKey(dateKey)) {
-                  String colorHex = employeeData[dayKey].toString().replaceAll('#', '');
-                  String dateStr = employeeData[dateKey].toString().replaceAll('[', '').replaceAll(']', '').trim();
-
-                  try {
-                    final date = DateTime.parse(dateStr);
-                    final color = Color(int.parse('0xFF$colorHex'));
-                    _dayColorHexes[date] = colorHex;
-                    statuses[date] = color;
-                  } catch (e) {
-                    print("❌ Error parsing Day$i → $e");
-                  }
-                }
-              }
-
-              notifyListeners();
+            try {
+              final date = DateTime.parse(dateStr);
+              final color = Color(int.parse('0xFF$colorHex'));
+              _dayColorHexes[date] = colorHex;
+              statuses[date] = color;
+            } catch (e) {
+              print("❌ Error parsing Day$i → $e");
             }
           }
-
         }
+
+        notifyListeners();
       } else {
         print("❌ No data found in Result.");
       }
