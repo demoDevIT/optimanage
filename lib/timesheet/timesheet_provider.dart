@@ -11,6 +11,7 @@ import 'package:optimanage/services/HttpService.dart';
 import 'package:optimanage/constant/Constants.dart';
 import 'package:dio/dio.dart';
 import 'package:optimanage/timesheet/TaskSummaryModalPopup.dart';
+import 'package:optimanage/timesheet/LeaveSummaryModalPopup.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -595,7 +596,8 @@ class timesheet_provider extends ChangeNotifier {
 
   List<TaskSummaryModalPopup> taskSummaries = [];
 
-  Future<void> fetchTaskSummary(DateTime date, int userId) async {
+  Future<void> fetchTaskSummary(DateTime date, int userId) async
+  {
     try {
       HttpService http = HttpService('https://optimanageapi.devitsandbox.com');
 
@@ -626,6 +628,43 @@ class timesheet_provider extends ChangeNotifier {
     } catch (e) {
       debugPrint("❌ Error fetching task summary: $e");
       taskSummaries = [];
+      notifyListeners();
+    }
+  }
+
+  List<LeaveSummaryModalPopup> leaveSummaries = [];
+
+  Future<void> fetchLeaveSummary(DateTime date, int userId) async {
+    try {
+      HttpService http = HttpService('https://optimanageapi.devitsandbox.com');
+
+      final body = {
+        "LeaveMonth": 5,
+        "LeaveYear": 2025,
+        "UserId": 55
+      };
+
+      final response = await http.postRequest(
+        "/api/Timesheet/GetLeaveSummaryList",
+        body,
+      );
+
+      final resultString = response.data['Result'];
+
+      if (resultString != null) {
+        final List decodedList = jsonDecode(resultString);
+
+        leaveSummaries = decodedList
+            .map((item) => LeaveSummaryModalPopup.fromJson(item))
+            .toList();
+      } else {
+        leaveSummaries = [];
+      }
+
+      notifyListeners();
+    } catch (e) {
+      debugPrint("❌ Error fetching leave summary: $e");
+      leaveSummaries = [];
       notifyListeners();
     }
   }

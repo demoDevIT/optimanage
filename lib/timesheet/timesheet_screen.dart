@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:optimanage/RD/rd_screen.dart';
 import 'package:optimanage/timesheet/timesheet_provider.dart';
 import 'package:provider/provider.dart';
@@ -49,6 +50,7 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
 
       provider.fetchTimesheetData(context, now.month, now.year);
       //provider.fetchTimesheetData(context);
+      provider.fetchLeaveSummary(now, 55);
 
 
       if (widget.status == "daily") {
@@ -106,6 +108,7 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                     provider.focusedDay = focusedDay;
                     provider.selectedDay = DateTime(focusedDay.year, focusedDay.month, 1);
                     provider.fetchTimesheetData(context, focusedDay.month, focusedDay.year);
+                    provider.fetchLeaveSummary(focusedDay, 55);
                   },
                   selectedDayPredicate: (day) =>
                       isSameDay(provider.selectedDay, day),
@@ -324,65 +327,71 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
   }
 
   Widget _buildLeaveSummaryBox(timesheet_provider provider) {
-    return GestureDetector(
-      onTap: () {
-        // setState(() {
-        //   provider.showLeaveDetails = true;
-        // });
-      },
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade300),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFF25507C),
-                borderRadius: BorderRadius.circular(8),
+    if (provider.leaveSummaries.isEmpty) return Container();
+
+    return Column(
+      children: provider.leaveSummaries.map((leave) {
+        final date = DateFormat("dd-MM-yyyy").parse(leave.LeaveDate);
+        final formattedDay = DateFormat("dd").format(date);
+        final formattedMonth = DateFormat("MMM").format(date).toUpperCase();
+
+        return Container(
+          margin: const EdgeInsets.only(bottom: 10),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.shade300),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF25507C),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  children: [
+                    Text(formattedDay,
+                        style: const TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold)),
+                    Text(formattedMonth,
+                        style: const TextStyle(
+                            color: Colors.white, fontSize: 10)),
+                  ],
+                ),
               ),
-              child: const Column(
-                children: [
-                  Text("01",
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold)),
-                  Text("JAN",
-                      style: TextStyle(color: Colors.white, fontSize: 10)),
-                ],
-              ),
-            ),
-            const SizedBox(width: 12),
-            const Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Leave applied for: 8 Hr 0 Min",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF25507C),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Leave applied for: ${leave.LeaveTimeInMinutes}",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF25507C),
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 4),
-                  Text("Reason: I was on full day leave",
-                      style: TextStyle(color: Colors.grey)),
-                ],
+                    const SizedBox(height: 4),
+                    Text("Reason: ${leave.Remarks}",
+                        style: const TextStyle(color: Colors.grey)),
+                  ],
+                ),
               ),
-            ),
-            const Icon(
-              Icons.chevron_right,
-              size: 28,
-              color: Color(0xFF69695D),
-            ),
-          ],
-        ),
-      ),
+              const Icon(
+                Icons.chevron_right,
+                size: 28,
+                color: Color(0xFF69695D),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
     );
   }
+
 
   Widget _buildTaskOptions() {
     return Padding(

@@ -1,0 +1,2 @@
+E:/jitendra/opti/optimanage/android/app/.cxx/RelWithDebInfo/3z5t3q6n/x86_64/CMakeFiles/edit_cache.dir
+E:/jitendra/opti/optimanage/android/app/.cxx/RelWithDebInfo/3z5t3q6n/x86_64/CMakeFiles/rebuild_cache.dir
