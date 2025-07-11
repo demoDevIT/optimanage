@@ -31,7 +31,7 @@ class UtilityClass {
             color: Colors.blueGrey,
           ),
         ),
-        duration: const Duration(milliseconds: 2000),
+        duration: const Duration(milliseconds: 3000),
         margin: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
         padding:
             const EdgeInsets.only(left: 10, right: 10, bottom: 15, top: 15),

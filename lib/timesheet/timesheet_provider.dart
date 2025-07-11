@@ -16,8 +16,12 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import 'CalendraModel.dart';
+import 'package:intl/intl.dart';
+import '../utils/UtilityClass.dart';
+import 'package:optimanage/constant/colors.dart';
 
 class timesheet_provider extends ChangeNotifier {
+  // final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   DateTime focusedDay = DateTime.now();
   DateTime? selectedDay;
   bool _showLeaveDetails = false;
@@ -79,6 +83,30 @@ class timesheet_provider extends ChangeNotifier {
 
   // Simulate API response (replace with dynamic later)
 
+  TimeOfDay? startTime = TimeOfDay(hour: 10, minute: 0);
+  TimeOfDay? endTime = TimeOfDay(hour: 19, minute: 30);
+  String leaveHour = "0";
+  String leaveMinute = "0";
+
+  // Add at the top of your provider class
+  DateTime? leaveDate;
+  int leaveHours = 0;
+  int leaveMinutes = 0;
+  String remarks = "";
+  int userId = 55; // Set this based on logged-in user
+
+
+  String formatDate(DateTime date) {
+    return DateFormat('MM/dd/yyyy').format(date);
+  }
+
+  String formatTimeOfDay(TimeOfDay tod) {
+    final now = DateTime.now();
+    final dt = DateTime(now.year, now.month, now.day, tod.hour, tod.minute);
+    return DateFormat('HH:mm').format(dt);
+  }
+
+
 
   void loadDynamicColorsFromApi(List<String> dayColors) {
     _dayColorHexes.clear();
@@ -118,6 +146,7 @@ class timesheet_provider extends ChangeNotifier {
 
   void showSelectDateBottomSheet(
       BuildContext context, String status, DateTime focusedDay, double height) {
+    print("showNoTaskBottomSheet3333");
     showNoTaskBottomSheet(context, status, focusedDay, height);
     notifyListeners();
   }
@@ -130,7 +159,11 @@ class timesheet_provider extends ChangeNotifier {
 
   void showNoTaskBottomSheet(
       BuildContext context, String type, DateTime date, double getHeight) {
+    print("showNoTaskBottomSheet5555");
     leaveType = "Half Day";
+    final _formKey = GlobalKey<FormState>();
+    final TextEditingController remarksController = TextEditingController();
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -270,23 +303,12 @@ class timesheet_provider extends ChangeNotifier {
                       ),
                     ),
                   ),
+                  // visible: type == "Add Leave" ? true : false,
                   Visibility(
                       visible: type == "Add Leave" ? true : false,
-                      // child: SingleChildScrollView(
-                      // child: Padding(
-                      //     padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          borderRadius:
-                              BorderRadius.vertical(top: Radius.circular(24)),
-                        ),
-                        padding: EdgeInsets.only(
-                          left: 20,
-                          right: 20,
-                          top: 0,
-                          bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-                        ),
+
+                      child: Form(
+                        key: _formKey,
                         child: SingleChildScrollView(
                           child: ConstrainedBox(
                             constraints: BoxConstraints(
@@ -332,22 +354,18 @@ class timesheet_provider extends ChangeNotifier {
                                     icon: const SizedBox.shrink(),
                                     decoration: InputDecoration(
                                       filled: true,
-                                      fillColor: Color(0xFFF5F9FE),
-                                      // labelText: "Leave Type",
-                                      labelStyle:
-                                          TextStyle(color: Color(0xFF25507C)),
+                                      fillColor: const Color(0xFFF5F9FE),
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
-                                        borderSide:
-                                            BorderSide.none, // No border
+                                        borderSide: BorderSide.none,
                                       ),
-                                      suffixIcon: Icon(
+                                      suffixIcon: const Icon(
                                         Icons.arrow_drop_down,
-                                        size: 30, // ✅ Increase arrow size
+                                        size: 30,
                                         color: Color(0xFF25507C),
                                       ),
                                     ),
-                                    items: ["Half Day", "Full Day"]
+                                    items: ["Half Day", "Full Day", "Early Going", "Late Coming"]
                                         .map((type) => DropdownMenuItem(
                                               value: type,
                                               child: Text(type),
@@ -360,28 +378,45 @@ class timesheet_provider extends ChangeNotifier {
                                         setState(() {});
                                       }
                                     },
+                                    validator: (val) =>
+                                    (val == null || val.isEmpty)
+                                        ? 'Please select leave type'
+                                        : null,
                                   ),
 
                                   const SizedBox(height: 16),
-                                  if (leaveType == "Half Day") ...[
+                                  if (leaveType == "Half Day" || leaveType == "Early Going" ||
+                                      leaveType == "Late Coming") ...[
                                     Row(
                                       children: [
-                                        _timeInfo("Start Time", "10:00 AM"),
+                                        Expanded(
+                                          child: GestureDetector(
+                                            onTap: () => selectTime(context, true, setState),
+                                            child: _timeInfo("Start Time", startTime!.format(context)),
+                                          ),
+                                        ),
                                         const SizedBox(width: 12),
-                                        _timeInfo("End Time", "7:30 PM"),
+                                        Expanded(
+                                          child: GestureDetector(
+                                            onTap: () => selectTime(context, false, setState),
+                                            child: _timeInfo("End Time", endTime!.format(context)),
+                                          ),
+                                        ),
                                       ],
                                     ),
                                     const SizedBox(height: 12),
                                     Row(
                                       children: [
-                                        _timeInfo("Leave Hour", "4"),
+                                        _timeInfo("Leave Hour", leaveHour),
                                         const SizedBox(width: 12),
-                                        _timeInfo("Leave Minute", "50"),
+                                        _timeInfo("Leave Minute", leaveMinute),
                                       ],
                                     ),
                                     const SizedBox(height: 16),
                                   ],
+
                                   TextFormField(
+                                    controller: remarksController,
                                     maxLines: 4,
                                     decoration: InputDecoration(
                                       hintText: 'Description',
@@ -400,7 +435,12 @@ class timesheet_provider extends ChangeNotifier {
                                             color: Color(0xFF2196F3),
                                             width: 2), // Blue border on focus
                                       ),
+
                                     ),
+              validator: (val) => (val == null || val.isEmpty)
+              ? 'Please enter a description'
+                  : null,
+
                                   ),
                                   const SizedBox(height: 20),
                                   Row(
@@ -418,7 +458,7 @@ class timesheet_provider extends ChangeNotifier {
                                             borderRadius:
                                                 BorderRadius.circular(12),
                                           ),
-                                          padding: EdgeInsets.symmetric(
+                                          padding: const EdgeInsets.symmetric(
                                               horizontal: 24, vertical: 10),
                                         ),
                                         child: Text(
@@ -432,17 +472,56 @@ class timesheet_provider extends ChangeNotifier {
                                       SizedBox(width: 12),
                                       // Space between buttons
                                       ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                          // Navigator.pop(context);
-                                          // showModalBottomSheet(
-                                          //   context: context,
-                                          //   isScrollControlled: true,
-                                          //   backgroundColor: Colors.transparent,
-                                          //   builder: (_) =>
-                                          //   const ApprovalModalPopup(),
-                                          // );
+                                        onPressed: () async {
+                                          leaveDate = date;
+                                          debugPrint("leaveType: $leaveType");
+                                          debugPrint("leaveDate: $leaveDate");
+                                          debugPrint("startTime: $startTime");
+                                          debugPrint("endTime: $endTime");
+
+
+                                          if (leaveType == null || leaveDate == null || startTime == null || endTime == null) {
+                                            debugPrint("❌ Required fields missing");
+                                            return;
+                                          }
+
+                                          try {
+                                            final start = DateTime(leaveDate!.year, leaveDate!.month, leaveDate!.day, startTime!.hour, startTime!.minute);
+                                            final end = DateTime(leaveDate!.year, leaveDate!.month, leaveDate!.day, endTime!.hour, endTime!.minute);
+
+                                            final duration = end.difference(start);
+                                            leaveHours = duration.inHours;
+                                            leaveMinutes = duration.inMinutes % 60;
+                                            final totalMinutes = duration.inMinutes;
+
+                                            final formattedDate = formatDate(leaveDate!);
+                                            final formattedStart = formatTimeOfDay(startTime!);
+                                            final formattedEnd = formatTimeOfDay(endTime!);
+                                            final remarks = remarksController.text.trim();
+
+                                            await submitLeaveRequest(
+                                              context: context,
+                                              leaveType: leaveType,
+                                              leaveDate: formattedDate,
+                                              startTime: formattedStart,
+                                              endTime: formattedEnd,
+                                              leaveHours: leaveHours,
+                                              leaveMinutes: leaveMinutes,
+                                              leaveTimeInMinutes: totalMinutes,
+                                              remarks: remarks,
+                                              userId: 55,
+                                            );
+
+                                            // ✅ Refresh leave summary and timesheet
+                                            await fetchLeaveSummary(focusedDay, userId);
+                                            await fetchTimesheetData(context, focusedDay.month, focusedDay.year);
+
+                                            Navigator.pop(context);
+                                          } catch (e) {
+                                            debugPrint("❌ Save button error: $e");
+                                          }
                                         },
+
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: Color(0xFF25507C),
                                           // Save button color
@@ -521,6 +600,35 @@ class timesheet_provider extends ChangeNotifier {
         ),
       ),
     );
+  }
+
+  Future<void> selectTime(BuildContext context, bool isStart, StateSetter setState) async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: isStart ? startTime! : endTime!,
+    );
+
+    if (picked != null) {
+      setState(() {
+        if (isStart) {
+          startTime = picked;
+        } else {
+          endTime = picked;
+        }
+
+        final startMinutes = startTime!.hour * 60 + startTime!.minute;
+        final endMinutes = endTime!.hour * 60 + endTime!.minute;
+
+        if (endMinutes > startMinutes) {
+          final diff = endMinutes - startMinutes;
+          leaveHour = (diff ~/ 60).toString();
+          leaveMinute = (diff % 60).toString();
+        } else {
+          leaveHour = "0";
+          leaveMinute = "0";
+        }
+      });
+    }
   }
 
   Future<void> fetchTimesheetData(BuildContext context,   int month, int year) async {
@@ -639,8 +747,8 @@ class timesheet_provider extends ChangeNotifier {
       HttpService http = HttpService('https://optimanageapi.devitsandbox.com');
 
       final body = {
-        "LeaveMonth": 5,
-        "LeaveYear": 2025,
+        "LeaveMonth": date.month,
+        "LeaveYear": date.year,
         "UserId": 55
       };
 
@@ -669,118 +777,54 @@ class timesheet_provider extends ChangeNotifier {
     }
   }
 
+  Future<void> submitLeaveRequest({
+    required BuildContext context,
+    required String leaveType,
+    required String leaveDate,
+    required String startTime,
+    required String endTime,
+    required int leaveHours,
+    required int leaveMinutes,
+    required int leaveTimeInMinutes,
+    required String remarks,
+    required int userId,
+  }) async {
+    try {
+      final body = {
+        "LeaveType": leaveType,
+        "LeaveDate": leaveDate,
+        "StartTime": startTime,
+        "EndTime": endTime,
+        "LeaveHours": leaveHours,
+        "LeaveMinutes": leaveMinutes,
+        "LeaveTimeInMinutes": leaveTimeInMinutes,
+        "Remarks": remarks,
+        "UserId": userId,
+      };
 
-  // void showtaskSummaryBottomSheet(BuildContext context, String type,
-  //     DateTime date, double getHeight, List<TaskSummaryModalPopup> summaries) {
-  //   leaveType = "Half Day";
-  //
-  //   showModalBottomSheet(
-  //     context: context,
-  //     isScrollControlled: true,
-  //     shape: const RoundedRectangleBorder(
-  //       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-  //     ),
-  //     builder: (context) {
-  //       return FractionallySizedBox(
-  //         heightFactor: getHeight, // Adjust as needed
-  //         child: Container(
-  //           decoration: const BoxDecoration(
-  //             color: Colors.white, // Set background to white
-  //             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-  //           ),
-  //           padding: const EdgeInsets.all(16),
-  //           child: SingleChildScrollView(
-  //             child: Column(
-  //               crossAxisAlignment: CrossAxisAlignment.start,
-  //               children: [
-  //                 const Center(
-  //                   child: Text(
-  //                     "View Hour Summary",
-  //                     style:
-  //                         TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-  //                   ),
-  //                 ),
-  //                 const SizedBox(height: 10),
-  //                 const Text(
-  //                   "Date: 01/04/2025 and Resource: undefined",
-  //                   style: TextStyle(
-  //                     fontSize: 14,
-  //                     fontWeight: FontWeight.bold,
-  //                   ),
-  //                 ),
-  //                 const SizedBox(height: 12),
-  //                 Container(
-  //                   width: double.infinity,
-  //                   padding: const EdgeInsets.all(12),
-  //                   decoration: BoxDecoration(
-  //                     color: Color(0xFFF5F9FE),
-  //                     borderRadius: BorderRadius.circular(12),
-  //                   ),
-  //                   child: Column(
-  //                     crossAxisAlignment: CrossAxisAlignment.start,
-  //                     children: [
-  //                       const Text(
-  //                         "RajKisan_2024_25",
-  //                         style: TextStyle(
-  //                           fontWeight: FontWeight.w600,
-  //                           fontSize: 16,
-  //                           height: 1.6,
-  //                         ),
-  //                       ),
-  //                       const SizedBox(height: 10),
-  //                       _buildRow("Timesheet Date", "01-04-2025"),
-  //                       const Divider(
-  //                         color: Color(0xFFE2E2E2), // light grey line
-  //                         thickness: 1,
-  //                         height: 20,
-  //                       ),
-  //                       _buildRow("Start Time", "10:00 AM"),
-  //                       const Divider(
-  //                         color: Color(0xFFE2E2E2), // light grey line
-  //                         thickness: 1,
-  //                         height: 20,
-  //                       ),
-  //                       _buildRow("End Time", "07:00 PM"),
-  //                       const Divider(
-  //                         color: Color(0xFFE2E2E2), // light grey line
-  //                         thickness: 1,
-  //                         height: 20,
-  //                       ),
-  //                       _buildRow("Task Time", "9 Hr 0 Min"),
-  //                       const Divider(
-  //                         color: Color(0xFFE2E2E2), // light grey line
-  //                         thickness: 1,
-  //                         height: 20,
-  //                       ),
-  //                       _buildRow("Status", "Completed",
-  //                           valueColor: Colors.green),
-  //                       const Divider(
-  //                         color: Color(0xFFE2E2E2), // light grey line
-  //                         thickness: 1,
-  //                         height: 20,
-  //                       ),
-  //                       _buildRow("Entry Date/Time", "04-04-2025, 11:02 AM"),
-  //                       const SizedBox(height: 12),
-  //                       const Text(
-  //                         "Task Description",
-  //                         style: TextStyle(fontWeight: FontWeight.w600),
-  //                       ),
-  //                       const SizedBox(height: 4),
-  //                       const Text(
-  //                         "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s....",
-  //                         style: TextStyle(color: Colors.black54),
-  //                       ),
-  //                     ],
-  //                   ),
-  //                 ),
-  //               ],
-  //             ),
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
+      HttpService http = HttpService('https://optimanageapi.devitsandbox.com');
+      final response = await http.postRequest("/api/Timesheet/AddLeave", body);
+
+      final message = response.data['Message'] ?? "Leave added";
+      final success = response.data['State'] == 1;
+
+      if (success) {
+        UtilityClass.showSnackBar(context, message, kPrimaryDark);
+
+        // Refresh calendar + timesheet data
+        await fetchLeaveSummary(focusedDay, userId);
+        await fetchTimesheetData(context, focusedDay.month, focusedDay.year);
+
+        Navigator.pop(context); // Close modal
+      } else {
+        UtilityClass.showSnackBar(context, "Failed to add leave", Colors.red);
+      }
+    } catch (e) {
+      debugPrint("❌ Submit leave error: $e");
+      UtilityClass.showSnackBar(context, "Error occurred", Colors.red);
+    }
+  }
+
 
   void showtaskSummaryBottomSheet(
       BuildContext context,
