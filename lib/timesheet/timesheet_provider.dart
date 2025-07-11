@@ -473,6 +473,11 @@ class timesheet_provider extends ChangeNotifier {
                                       // Space between buttons
                                       ElevatedButton(
                                         onPressed: () async {
+                                          if (!_formKey.currentState!.validate()) {
+                                            debugPrint("❌ Form validation failed");
+                                            return;
+                                          }
+
                                           leaveDate = date;
                                           debugPrint("leaveType: $leaveType");
                                           debugPrint("leaveDate: $leaveDate");
@@ -791,6 +796,7 @@ class timesheet_provider extends ChangeNotifier {
   }) async {
     try {
       final body = {
+        "LeaveID": 0,
         "LeaveType": leaveType,
         "LeaveDate": leaveDate,
         "StartTime": startTime,
@@ -799,11 +805,16 @@ class timesheet_provider extends ChangeNotifier {
         "LeaveMinutes": leaveMinutes,
         "LeaveTimeInMinutes": leaveTimeInMinutes,
         "Remarks": remarks,
+        "IsApproved": 0,
         "UserId": userId,
       };
 
+      print("📤 Request body: $body");
+
       HttpService http = HttpService('https://optimanageapi.devitsandbox.com');
-      final response = await http.postRequest("/api/Timesheet/AddLeave", body);
+      final response = await http.postRequest("/api/Timesheet/AddResourceLeave", body);
+
+      print("✅ Response: ${response.data}");
 
       final message = response.data['Message'] ?? "Leave added";
       final success = response.data['State'] == 1;
