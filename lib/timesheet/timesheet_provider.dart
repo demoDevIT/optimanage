@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:optimanage/timesheet/CalendraModel.dart';
 
+import '../notaskassign/notaskassign_provider.dart';
 import '../notaskassign/notaskassign_sceen.dart';
 import '../utils/UtilityClass.dart';
 import 'ApprovalModalPopup.dart';
@@ -146,6 +147,7 @@ class timesheet_provider extends ChangeNotifier {
 
   void showSelectDateBottomSheet(
       BuildContext context, String status, DateTime focusedDay, double height) {
+    print("00Selected Date: $focusedDay");
     print("showNoTaskBottomSheet3333");
     showNoTaskBottomSheet(context, status, focusedDay, height);
     notifyListeners();
@@ -159,6 +161,7 @@ class timesheet_provider extends ChangeNotifier {
 
   void showNoTaskBottomSheet(
       BuildContext context, String type, DateTime date, double getHeight) {
+    print("11Selected Date: $date");
     print("showNoTaskBottomSheet5555");
     leaveType = "Half Day";
     final _formKey = GlobalKey<FormState>();
@@ -242,43 +245,26 @@ class timesheet_provider extends ChangeNotifier {
                             mainAxisAlignment: MainAxisAlignment.end,
                             // Right align
                             children: [
-                              // OutlinedButton(
-                              //   onPressed: () {
-                              //     Navigator.pop(context); // Close the modal
-                              //     Navigator.push(
-                              //       context,
-                              //       MaterialPageRoute(
-                              //           builder: (context) =>
-                              //           const NoTaskAssignScreen()),
-                              //     );
-                              //   },
-                              //   style: OutlinedButton.styleFrom(
-                              //     side: BorderSide(color: Color(0xFF25507C)),
-                              //     shape: RoundedRectangleBorder(
-                              //       borderRadius: BorderRadius.circular(12),
-                              //     ),
-                              //     padding: EdgeInsets.symmetric(
-                              //         horizontal: 24, vertical: 10),
-                              //   ),
-                              //   child: Text(
-                              //     'Close',
-                              //     style: TextStyle(
-                              //       color: Color(0xFF25507C),
-                              //       fontWeight: FontWeight.w500,
-                              //     ),
-                              //   ),
-                              // ),
                               SizedBox(width: 12),
                               // Space between buttons
                               ElevatedButton(
                                 onPressed: () {
+                                  print("22Selected Date: $date");
+
                                   Navigator.pop(context); // Close the modal
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) =>
-                                            const NoTaskAssignScreen()),
+                                      builder: (_) => ChangeNotifierProvider(
+                                        create: (_) => NoTaskAssignProvider(),
+                                        child: NoTaskAssignScreen(
+                                          selectedDate: DateTime.now(),
+                                          userId: 0,
+                                        ),
+                                      ),
+                                    ),
                                   );
+
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Color(0xFF25507C),
