@@ -203,6 +203,8 @@ class _NoTaskAssignScreenState extends State<NoTaskAssignScreen> {
 
     // ✅ Format EntryDate as MM/dd/yyyy
     final String formattedEntryDate = DateFormat('MM/dd/yyyy').format(widget.selectedDate);
+    print("entry date==>");
+    print(formattedEntryDate);
 
     await provider.submitNoTask(
       context: context,
