@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../utils/UtilityClass.dart';
 import 'package:optimanage/services/HttpService.dart';
 import 'package:optimanage/constant/colors.dart';
+import 'package:optimanage/constant/Constants.dart';
 //import 'timesheet_provider.dart'; // If fetchTimesheetData is in there
 
 class NoTaskAssignProvider extends ChangeNotifier {
@@ -65,7 +66,7 @@ class NoTaskAssignProvider extends ChangeNotifier {
         "UserId": userId,
       };
 
-      HttpService http = HttpService('https://optimanageapi.devitsandbox.com');
+      HttpService http = HttpService(Constants.baseurl);
       final response = await http.postRequest("/api/Timesheet/CreateTimesheet", body);
 
       final success = response.data['State'] == 1;

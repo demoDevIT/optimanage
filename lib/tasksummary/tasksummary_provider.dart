@@ -3,6 +3,7 @@ import '../services/HttpService.dart';
 import '../tasksummary//task_summary_model.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:optimanage/constant/Constants.dart';
 
 class TaskSummaryProvider extends ChangeNotifier {
   List<TaskSummary> taskSummaries = [];
@@ -10,7 +11,7 @@ class TaskSummaryProvider extends ChangeNotifier {
 
   Future<void> fetchTaskSummary(DateTime date, int userId) async {
     try {
-      HttpService http = HttpService('https://optimanageapi.devitsandbox.com');
+      HttpService http = HttpService(Constants.baseurl);
 
       final formattedDate = "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
 

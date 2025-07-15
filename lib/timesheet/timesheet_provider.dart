@@ -626,7 +626,7 @@ class timesheet_provider extends ChangeNotifier {
     try {
       UtilityClass.showProgressDialog(context, 'Please wait...');
 
-      HttpService http = HttpService('https://optimanageapi.devitsandbox.com');
+      HttpService http = HttpService(Constants.baseurl);
 
       Map<String, dynamic> inputText = {
         "MonthId": month,
@@ -698,7 +698,7 @@ class timesheet_provider extends ChangeNotifier {
   Future<void> fetchTaskSummary(DateTime date, int userId) async
   {
     try {
-      HttpService http = HttpService('https://optimanageapi.devitsandbox.com');
+      HttpService http = HttpService(Constants.baseurl);
 
       final body = {
         "FromDate": "2025-06-18",
@@ -735,7 +735,7 @@ class timesheet_provider extends ChangeNotifier {
 
   Future<void> fetchLeaveSummary(DateTime date, int userId) async {
     try {
-      HttpService http = HttpService('https://optimanageapi.devitsandbox.com');
+      HttpService http = HttpService(Constants.baseurl);
 
       final body = {
         "LeaveMonth": date.month,
@@ -797,7 +797,7 @@ class timesheet_provider extends ChangeNotifier {
 
       print("📤 Request body: $body");
 
-      HttpService http = HttpService('https://optimanageapi.devitsandbox.com');
+      HttpService http = HttpService(Constants.baseurl);
       final response = await http.postRequest("/api/Timesheet/AddResourceLeave", body);
 
       print("✅ Response: ${response.data}");

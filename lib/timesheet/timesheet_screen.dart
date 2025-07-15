@@ -464,8 +464,10 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => RdScreen(),
-                // Make sure this matches your import
+                builder: (context) => RdScreen(
+                  selectedDate: provider.selectedDay!, // or any selected date
+                  userId: 0,   // pass actual user ID here
+                ),
               ),
             );
           } else if (label == 'Assigned Task') {
