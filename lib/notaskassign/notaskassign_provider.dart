@@ -74,7 +74,7 @@ class NoTaskAssignProvider extends ChangeNotifier {
 
       if (success) {
         UtilityClass.showSnackBar(context, message, Colors.green);
-        Navigator.pop(context);
+        Navigator.pop(context, true);
       } else {
         UtilityClass.showSnackBar(context, message, Colors.red);
       }

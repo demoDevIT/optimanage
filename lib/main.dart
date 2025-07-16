@@ -4,6 +4,7 @@ import 'package:optimanage/tasksummary/tasksummary_provider.dart';
 import 'package:optimanage/timesheet/timesheet_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:optimanage/RD/rd_provider.dart';
+import 'package:optimanage/profile/profile_provider.dart';
 import 'SignIn/signinprovider.dart';
 import 'onboarding/onboarding_screen.dart';
 
@@ -17,7 +18,8 @@ void main() {
           ChangeNotifierProvider(create: (_) => signinprovider()),
           ChangeNotifierProvider(create: (_) => TaskSummaryProvider()),
           ChangeNotifierProvider(create: (_) => NoTaskAssignProvider()),
-          ChangeNotifierProvider(create: (_) => RdProvider())
+          ChangeNotifierProvider(create: (_) => RdProvider()),
+          ChangeNotifierProvider(create: (_) => ProfileProvider())
         ],
         child: MyApp(),
       )
