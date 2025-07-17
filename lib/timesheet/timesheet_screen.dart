@@ -365,8 +365,9 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              Expanded(
-                child: Column(
+             // Expanded(
+               // child:
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
@@ -381,7 +382,7 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                         style: const TextStyle(color: Colors.grey)),
                   ],
                 ),
-              ),
+              //),
               const Icon(
                 Icons.chevron_right,
                 size: 28,

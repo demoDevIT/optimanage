@@ -299,9 +299,9 @@ class timesheet_provider extends ChangeNotifier {
                           child: ConstrainedBox(
                             constraints: BoxConstraints(
                               maxHeight: MediaQuery.of(context).size.height *
-                                  0.85, // Adjust modal height
+                                  0.6, // Adjust modal height
                             ),
-                            child: IntrinsicHeight(
+                          //  child: IntrinsicHeight(
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -535,7 +535,7 @@ class timesheet_provider extends ChangeNotifier {
                                   )
                                 ],
                               ),
-                            ),
+                            //),
                           ),
                         ),
                       )
@@ -859,7 +859,7 @@ class timesheet_provider extends ChangeNotifier {
                 const SizedBox(height: 10),
 
                 Text(
-                  "Date: ${DateFormat("dd/MM/yyyy").format(date)} and Resource: undefined",
+                  "Date: ${DateFormat("dd/MM/yyyy").format(date)}",
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,

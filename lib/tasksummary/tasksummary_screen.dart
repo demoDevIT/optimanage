@@ -60,7 +60,7 @@ class _TaskSummaryScreenState extends State<TaskSummaryScreen> {
               const SizedBox(height: 12),
 
               Text(
-                'Date: ${task.createdDate} and Resource: undefined',
+                'Date: ${task.createdDate}',
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
