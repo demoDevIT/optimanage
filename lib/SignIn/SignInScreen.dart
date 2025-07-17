@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../Home/home_screen.dart';
 import '../forget/forget_screen.dart';
 import '../utils/UtilityClass.dart';
+import '../forget/forget_provider.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -172,7 +173,11 @@ class _SignInScreenState extends State<SignInScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const ForgetScreen()),
+                              builder: (context) => ChangeNotifierProvider(
+                                create: (_) => ForgetProvider(), // 👈 Provide the ForgotProvider
+                                child: const ForgetScreen(),
+                              ),
+                            ),
                           );
                         },
                         child: const Text(
@@ -181,6 +186,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
                       ),
                     ),
+
 
                     const SizedBox(height: 24),
 

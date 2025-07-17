@@ -118,44 +118,105 @@ class _TaskSummaryScreenState extends State<TaskSummaryScreen> {
                       width: double.infinity,
                       height: 46,
                       child: ElevatedButton(
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            barrierDismissible: false,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                backgroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                title: const Text('Optimanage Says', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
-                                content: const Text(
-                                  'Please clear our previous/pending daily timesheet entries till to last 10 days.',
-                                  style: TextStyle(fontSize: 14, height: 1.5),
-                                ),
-                                actionsPadding: const EdgeInsets.only(bottom: 16),
-                                actionsAlignment: MainAxisAlignment.center,
-                                actions: [
-                                  SizedBox(
-                                    width: 120,
-                                    height: 40,
-                                    child: ElevatedButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                        Navigator.push(context, MaterialPageRoute(builder: (_) => const DailyTaskScreen()));
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(0xFF25507C),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                      ),
-                                      child: const Text('Ok', style: TextStyle(color: Colors.white)),
-                                    ),
+                        onPressed: () async {
+                          final provider = Provider.of<TaskSummaryProvider>(context, listen: false);
+                          final notEntryCount = await provider.validateTimesheetEntry(widget.selectedDate, widget.userId);
+
+                          if (notEntryCount == null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Something went wrong.')),
+                            );
+                            return;
+                          }
+
+                          if (notEntryCount > 6) {
+                            // Show the popup
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  backgroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                  title: const Text('Optimanage Says', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                                  content: const Text(
+                                    'Please clear our previous/pending daily timesheet entries till to last 6 days.',
+                                    style: TextStyle(fontSize: 14, height: 1.5),
                                   ),
-                                ],
-                              );
-                            },
-                          );
+                                  actionsPadding: const EdgeInsets.only(bottom: 16),
+                                  actionsAlignment: MainAxisAlignment.center,
+                                  actions: [
+                                    SizedBox(
+                                      width: 120,
+                                      height: 40,
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                          // Navigator.push(
+                                          //   context,
+                                          //   MaterialPageRoute(builder: (_) => const DailyTaskScreen()),
+                                          // );
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(0xFF25507C),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                        ),
+                                        child: const Text('Ok', style: TextStyle(color: Colors.white)),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          } else {
+                            // Navigate directly
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const DailyTaskScreen()),
+                            );
+                          }
                         },
+
+                        // onPressed: () {
+                        //   showDialog(
+                        //     context: context,
+                        //     barrierDismissible: false,
+                        //     builder: (BuildContext context) {
+                        //       return AlertDialog(
+                        //         backgroundColor: Colors.white,
+                        //         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        //         title: const Text('Optimanage Says', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+                        //         content: const Text(
+                        //           'Please clear our previous/pending daily timesheet entries till to last 10 days.',
+                        //           style: TextStyle(fontSize: 14, height: 1.5),
+                        //         ),
+                        //         actionsPadding: const EdgeInsets.only(bottom: 16),
+                        //         actionsAlignment: MainAxisAlignment.center,
+                        //         actions: [
+                        //           SizedBox(
+                        //             width: 120,
+                        //             height: 40,
+                        //             child: ElevatedButton(
+                        //               onPressed: () {
+                        //                 Navigator.pop(context);
+                        //                 Navigator.push(context, MaterialPageRoute(builder: (_) => const DailyTaskScreen()));
+                        //               },
+                        //               style: ElevatedButton.styleFrom(
+                        //                 backgroundColor: const Color(0xFF25507C),
+                        //                 shape: RoundedRectangleBorder(
+                        //                   borderRadius: BorderRadius.circular(10),
+                        //                 ),
+                        //               ),
+                        //               child: const Text('Ok', style: TextStyle(color: Colors.white)),
+                        //             ),
+                        //           ),
+                        //         ],
+                        //       );
+                        //     },
+                        //   );
+                        // },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF25507C),
                           shape: RoundedRectangleBorder(

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:optimanage/assignedtask/assignedtask_provider.dart';
+import 'package:optimanage/forget/forget_provider.dart';
 import 'package:optimanage/notaskassign/notaskassign_provider.dart';
 import 'package:optimanage/tasksummary/tasksummary_provider.dart';
 import 'package:optimanage/timesheet/timesheet_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:optimanage/RD/rd_provider.dart';
 import 'package:optimanage/profile/profile_provider.dart';
-import 'package:optimanage/assignedtask/assignedtask_provider.dart';
+// // import 'package:optimanage/forget/forget_provider.dart';
+// import 'package:optimanage/assignedtask/assignedtask_provider.dart';
 import 'SignIn/signinprovider.dart';
 import 'onboarding/onboarding_screen.dart';
 
@@ -22,7 +24,8 @@ void main() {
           ChangeNotifierProvider(create: (_) => NoTaskAssignProvider()),
           ChangeNotifierProvider(create: (_) => RdProvider()),
           ChangeNotifierProvider(create: (_) => ProfileProvider()),
-          ChangeNotifierProvider(create: (_) => AssignedTaskProvider())
+          ChangeNotifierProvider(create: (_) => AssignedTaskProvider()),
+          ChangeNotifierProvider(create: (_) => ForgetProvider())
         ],
         child: MyApp(),
       )

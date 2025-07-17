@@ -5,6 +5,8 @@ import '../tasksummary/tasksummary_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:optimanage/assignedtask/assignedtask_provider.dart';
 
+import 'AssignedTaskModel.dart';
+
 class AssignedTaskScreen extends StatefulWidget {
   final DateTime selectedDate;
   final int userId;
@@ -21,7 +23,7 @@ class AssignedTaskScreen extends StatefulWidget {
 }
 
 class _AssignedTaskScreenState extends State<AssignedTaskScreen> {
-  String? selectedTask;
+  AssignedTaskModel? selectedTask;
   int? expandedIndex;
   String? selectedTaskKey;
 
@@ -173,18 +175,25 @@ class _AssignedTaskScreenState extends State<AssignedTaskScreen> {
                             onChanged: (value) {
                               setState(() {
                                 selectedTaskKey = value;
+                                selectedTask = task; // Save the selected task
                               });
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => TaskSummaryScreen(
-                                    task: task,
-                                    selectedDate: widget.selectedDate,
-                                    userId: widget.userId,
-                                  ),
-                                ),
-                              );
                             },
+
+                            // onChanged: (value) {
+                            //   setState(() {
+                            //     selectedTaskKey = value;
+                            //   });
+                            //   Navigator.push(
+                            //     context,
+                            //     MaterialPageRoute(
+                            //       builder: (context) => TaskSummaryScreen(
+                            //         task: task,
+                            //         selectedDate: widget.selectedDate,
+                            //         userId: widget.userId,
+                            //       ),
+                            //     ),
+                            //   );
+                            // },
                             contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                             title: Text(
                               task.taskName,
@@ -206,8 +215,27 @@ class _AssignedTaskScreenState extends State<AssignedTaskScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  // Handle submit
+                  if (selectedTask != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TaskSummaryScreen(
+                          task: selectedTask!, // 👈 ensure it's not null
+                          selectedDate: widget.selectedDate,
+                          userId: widget.userId,
+                        ),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Please select a task first"),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
                 },
+
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF25507C),
                   padding: const EdgeInsets.symmetric(vertical: 16),

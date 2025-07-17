@@ -46,5 +46,38 @@ class TaskSummaryProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<int?> validateTimesheetEntry(DateTime date, int userId) async {
+    try {
+      final http = HttpService(Constants.baseurl);
+      final formattedDate =
+          "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+
+      final body = {
+        "FromDate": formattedDate,
+        "ToDate": formattedDate,
+        "UserId": userId,
+      };
+
+      final response = await http.postRequest(
+        "/api/Timesheet/GetValidateTimesheetEntry",
+        body,
+      );
+
+      final resultString = response.data['Result'];
+      if (resultString != null && resultString.isNotEmpty) {
+        final List<dynamic> resultList = jsonDecode(resultString);
+        if (resultList.isNotEmpty) {
+          return resultList[0]['NotEntryCount'];
+        }
+      }
+
+      return null;
+    } catch (e) {
+      debugPrint("❌ Error validating timesheet entry: $e");
+      return null;
+    }
+  }
+
 }
 
