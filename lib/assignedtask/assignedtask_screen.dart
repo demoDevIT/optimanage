@@ -2,9 +2,19 @@ import 'package:flutter/material.dart';
 
 import '../constant/common.dart';
 import '../tasksummary/tasksummary_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:optimanage/assignedtask/assignedtask_provider.dart';
 
 class AssignedTaskScreen extends StatefulWidget {
-  const AssignedTaskScreen({super.key});
+  final DateTime selectedDate;
+  final int userId;
+
+  const AssignedTaskScreen({
+    super.key,
+    required this.selectedDate,
+    required this.userId,
+  });
+
 
   @override
   State<AssignedTaskScreen> createState() => _AssignedTaskScreenState();
@@ -14,6 +24,24 @@ class _AssignedTaskScreenState extends State<AssignedTaskScreen> {
   String? selectedTask;
   int? expandedIndex;
   String? selectedTaskKey;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = Provider.of<AssignedTaskProvider>(context, listen: false);
+      provider.fetchAssignedTasks(
+        context: context,
+        fromDate: _formatDate(widget.selectedDate),
+        toDate: _formatDate(widget.selectedDate),
+        userId: widget.userId,
+      );
+    });
+  }
+
+  String _formatDate(DateTime date) {
+    return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+  }
 
   final List<Map<String, dynamic>> projectData = [
     {
@@ -65,6 +93,8 @@ class _AssignedTaskScreenState extends State<AssignedTaskScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final assignedProjects = Provider.of<AssignedTaskProvider>(context).assignedProjects;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: common.Appbar(
@@ -87,9 +117,9 @@ class _AssignedTaskScreenState extends State<AssignedTaskScreen> {
           children: [
             Expanded(
               child: ListView.builder(
-                itemCount: projectData.length,
+                itemCount: assignedProjects.length,
                 itemBuilder: (context, index) {
-                  final project = projectData[index]; // ✅ Define project here
+                  final project = assignedProjects[index]; // ✅ Define project here
 
                   return Container(
                     margin: const EdgeInsets.symmetric(vertical: 6),
@@ -110,7 +140,7 @@ class _AssignedTaskScreenState extends State<AssignedTaskScreen> {
                       childrenPadding: EdgeInsets.zero,
                       shape: const RoundedRectangleBorder(), // You can keep this if needed
                       title: Text(
-                        project['title'],
+                        "${project.projectName} (${project.taskData.length})",
                         style: const TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 16,
@@ -132,10 +162,10 @@ class _AssignedTaskScreenState extends State<AssignedTaskScreen> {
                           indent: 0,
                           endIndent: 0,
                         ),
-                        ...List.generate(project['tasks'].length, (taskIndex) {
+                        ...List.generate(project.taskData.length, (taskIndex) {
                           // final task = project['tasks'][taskIndex];
                           final taskKey = '$index-$taskIndex';
-                          final task = project['tasks'][taskIndex];
+                          final task = project.taskData[taskIndex];
 
                           return RadioListTile<String>(
                             value: taskKey,
@@ -147,13 +177,17 @@ class _AssignedTaskScreenState extends State<AssignedTaskScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => TaskSummaryScreen(taskTitle: task),
+                                  builder: (context) => TaskSummaryScreen(
+                                    task: task,
+                                    selectedDate: widget.selectedDate,
+                                    userId: widget.userId,
+                                  ),
                                 ),
                               );
                             },
                             contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                             title: Text(
-                              task,
+                              task.taskName,
                               style: const TextStyle(fontSize: 13.5, height: 1.3),
                             ),
                             activeColor: const Color(0xFF25507C),
@@ -182,7 +216,7 @@ class _AssignedTaskScreenState extends State<AssignedTaskScreen> {
                   ),
                 ),
                 child: const Text(
-                  'Add Daily Task Details',
+                  'View Task Summary',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,

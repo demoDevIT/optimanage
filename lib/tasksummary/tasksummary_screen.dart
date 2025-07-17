@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:optimanage/tasksummary/tasksummary_provider.dart';
+import '../assignedtask/AssignedTaskModel.dart';
 import '../constant/common.dart';
 import '../dailytask/dailytask_screen.dart';
 import 'package:provider/provider.dart';
 
 class TaskSummaryScreen extends StatefulWidget {
-  final String taskTitle;
-  const TaskSummaryScreen({super.key, required this.taskTitle});
+  final AssignedTaskModel task;
+  final DateTime selectedDate;
+  final int userId;
+  const TaskSummaryScreen({
+    super.key,
+    required this.task,
+    required this.selectedDate,
+    required this.userId,
+  });
 
   @override
   State<TaskSummaryScreen> createState() => _TaskSummaryScreenState();
@@ -20,7 +28,7 @@ class _TaskSummaryScreenState extends State<TaskSummaryScreen> {
     // Call API on load
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = Provider.of<TaskSummaryProvider>(context, listen: false);
-      provider.fetchTaskSummary(DateTime(2025, 6, 18), 55); // Call with date/userId
+      provider.fetchTaskSummary(widget.selectedDate, widget.userId); // Call with date/userId
     });
   }
 

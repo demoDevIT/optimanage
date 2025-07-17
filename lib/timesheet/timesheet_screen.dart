@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'dart:ui';
 
+import '../assignedtask/assignedtask_provider.dart';
 import '../assignedtask/assignedtask_screen.dart';
 import '../constant/common.dart';
 import '../notaskassign/notaskassign_sceen.dart';
@@ -474,10 +475,16 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => AssignedTaskScreen(),
-                // Make sure this matches your import
+                builder: (context) => ChangeNotifierProvider(
+                  create: (_) => AssignedTaskProvider(),
+                  child: AssignedTaskScreen(
+                    selectedDate: provider.selectedDay!,
+                    userId: 55,
+                  ),
+                ),
               ),
             );
+
           }
           // or _selectedDay
         },

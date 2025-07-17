@@ -16,8 +16,8 @@ class TaskSummaryProvider extends ChangeNotifier {
       final formattedDate = "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
 
       final body = {
-        "FromDate": "2025-06-18", //formattedDate,
-        "ToDate": "2025-06-18", //formattedDate,
+        "FromDate": formattedDate, //"2025-06-18", //formattedDate,
+        "ToDate": formattedDate, //"2025-06-18", //formattedDate,
         "UserId": 55, //userId,
       };
 
