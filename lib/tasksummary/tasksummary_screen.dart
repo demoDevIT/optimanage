@@ -28,7 +28,7 @@ class _TaskSummaryScreenState extends State<TaskSummaryScreen> {
     // Call API on load
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = Provider.of<TaskSummaryProvider>(context, listen: false);
-      provider.fetchTaskSummary(widget.selectedDate, widget.userId); // Call with date/userId
+      provider.fetchTaskSummary(1098); // new param
     });
   }
 
@@ -129,7 +129,7 @@ class _TaskSummaryScreenState extends State<TaskSummaryScreen> {
                             return;
                           }
 
-                          if (notEntryCount > 6) {
+                          if (notEntryCount < 6) {
                             // Show the popup
                             showDialog(
                               context: context,

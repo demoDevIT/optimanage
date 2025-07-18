@@ -9,16 +9,12 @@ class TaskSummaryProvider extends ChangeNotifier {
   List<TaskSummary> taskSummaries = [];
   TaskSummary? taskSummary;
 
-  Future<void> fetchTaskSummary(DateTime date, int userId) async {
+  Future<void> fetchTaskSummary(int taskId) async {
     try {
       HttpService http = HttpService(Constants.baseurl);
 
-      final formattedDate = "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
-
       final body = {
-        "FromDate": formattedDate, //"2025-06-18", //formattedDate,
-        "ToDate": formattedDate, //"2025-06-18", //formattedDate,
-        "UserId": userId, //55, //userId,
+        "TaskId": taskId,
       };
 
       final response = await http.postRequest(
@@ -42,10 +38,11 @@ class TaskSummaryProvider extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       debugPrint("❌ Error fetching task summary: $e");
-      taskSummaries = [];
+      taskSummary = null;
       notifyListeners();
     }
   }
+
 
   Future<int?> validateTimesheetEntry(DateTime date, int userId) async {
     try {

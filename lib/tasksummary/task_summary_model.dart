@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class TaskSummary {
   final String projectName;
   final String createdDate;
@@ -16,13 +18,23 @@ class TaskSummary {
   });
 
   factory TaskSummary.fromJson(Map<String, dynamic> json) {
+    String formatActionDate(String? rawDate) {
+      if (rawDate == null || rawDate.isEmpty) return '';
+      try {
+        final parsedDate = DateTime.parse(rawDate);
+        return DateFormat('dd-MM-yyyy').format(parsedDate);
+      } catch (e) {
+        return rawDate; // fallback to original if parsing fails
+      }
+    }
+
     return TaskSummary(
       projectName: json['ProjectName'] ?? '',
-      createdDate: json['CreatedDate'] ?? '',
+      createdDate: json['CreatedOn'] ?? '',
       estimateTime: json['EstimateTime'] ?? '',
-      actionDate: json['Action_Date_DDMMYYYY'] ?? '',
+      actionDate: formatActionDate(json['TaskCompleteDate']),
       moduleName: json['ModuleName'] ?? '',
-      description: json['IssueTaskDescription'] ?? '',
+      description: json['TaskDesc'] ?? '',
     );
   }
 }

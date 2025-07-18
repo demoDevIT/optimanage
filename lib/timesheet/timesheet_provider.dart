@@ -308,6 +308,7 @@ class timesheet_provider extends ChangeNotifier {
                                   Row(
                                     children: [
                                       Expanded(
+                                        flex: 8,
                                         child: Text(
                                           "Mark Leave (${date.toIso8601String().split('T').first})",
                                           style: const TextStyle(
@@ -317,10 +318,13 @@ class timesheet_provider extends ChangeNotifier {
                                           ),
                                         ),
                                       ),
-                                      IconButton(
-                                        icon: const Icon(Icons.close),
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(),
+                                      Expanded(
+                                        flex: 2,
+                                        child: IconButton(
+                                          icon: const Icon(Icons.close),
+                                          onPressed: () =>
+                                              Navigator.of(context).pop(),
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -376,6 +380,7 @@ class timesheet_provider extends ChangeNotifier {
                                     Row(
                                       children: [
                                         Expanded(
+                                          flex: 5,
                                           child: GestureDetector(
                                             onTap: () => selectTime(context, true, setState),
                                             child: _timeInfo("Start Time", startTime!.format(context)),
@@ -383,6 +388,7 @@ class timesheet_provider extends ChangeNotifier {
                                         ),
                                         const SizedBox(width: 12),
                                         Expanded(
+                                          flex: 5,
                                           child: GestureDetector(
                                             onTap: () => selectTime(context, false, setState),
                                             child: _timeInfo("End Time", endTime!.format(context)),
@@ -393,9 +399,13 @@ class timesheet_provider extends ChangeNotifier {
                                     const SizedBox(height: 12),
                                     Row(
                                       children: [
-                                        _timeInfo("Leave Hour", leaveHour),
+                                        Expanded(
+                                            flex: 5,
+                                            child: _timeInfo("Leave Hour", leaveHour)),
                                         const SizedBox(width: 12),
-                                        _timeInfo("Leave Minute", leaveMinute),
+                                        Expanded(
+                                            flex: 5,
+                                            child: _timeInfo("Leave Minute", leaveMinute)),
                                       ],
                                     ),
                                     const SizedBox(height: 16),
@@ -552,30 +562,31 @@ class timesheet_provider extends ChangeNotifier {
   }
 
   Widget _timeInfo(String label, String value) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-        decoration: BoxDecoration(
-          color: Color(0xFFF5F9FE), // ✅ Match dropdown background
-          borderRadius: BorderRadius.circular(12), // Rounded corners
-          // Removed border
-        ),
-        child: Row(
-          children: [
-            Image.asset(
-              'assets/icons/clock.png',
-              width: 20,
-              height: 20,
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
+    return Wrap(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+          decoration: BoxDecoration(
+            color: Color(0xFFF5F9FE), // ✅ Match dropdown background
+            borderRadius: BorderRadius.circular(12), // Rounded corners
+            // Removed border
+          ),
+          child: Row(
+            children: [
+              Image.asset(
+                'assets/icons/clock.png',
+                width: 20,
+                height: 20,
+              ),
+              const SizedBox(width: 8),
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     label,
                     style: const TextStyle(fontSize: 10, color: Colors.grey),
                   ),
+                  const SizedBox(width: 20),
                   Text(
                     value,
                     style: const TextStyle(
@@ -586,10 +597,10 @@ class timesheet_provider extends ChangeNotifier {
                   ),
                 ],
               ),
-            ),
-          ],
-        ),
-      ),
+            ],
+          ),
+        )
+      ],
     );
   }
 
@@ -804,6 +815,7 @@ class timesheet_provider extends ChangeNotifier {
 
       final message = response.data['Message'] ?? "Leave added";
       final success = response.data['State'] == 1;
+      final errorMessage = response.data['ErrorMessage'] ?? "Failed to add leave";
 
       if (success) {
         UtilityClass.showSnackBar(context, message, kPrimaryDark);
@@ -814,7 +826,7 @@ class timesheet_provider extends ChangeNotifier {
 
         Navigator.pop(context); // Close modal
       } else {
-        UtilityClass.showSnackBar(context, "Failed to add leave", Colors.red);
+        UtilityClass.showSnackBar(context, errorMessage, Colors.red);
       }
     } catch (e) {
       debugPrint("❌ Submit leave error: $e");
@@ -829,7 +841,6 @@ class timesheet_provider extends ChangeNotifier {
       DateTime date,
       double getHeight,
       List<TaskSummaryModalPopup> summaries) {
-
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -840,160 +851,130 @@ class timesheet_provider extends ChangeNotifier {
         final screenHeight = MediaQuery.of(context).size.height;
 
         return Container(
+          height: 500,
           decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
           padding: const EdgeInsets.all(16),
-          child: SizedBox(
-            height: screenHeight * 0.5, // ✅ Half screen height
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          child: SingleChildScrollView(
+            child: Wrap(
               children: [
-                const Center(
-                  child: Text(
-                    "View Hour Summary",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                  ),
-                ),
-                const SizedBox(height: 10),
-
-                Text(
-                  "Date: ${DateFormat("dd/MM/yyyy").format(date)}",
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-
-                const SizedBox(height: 10),
-
-                // ✅ Scrollable content
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: summaries.map((task) => Container(
-                        width: double.infinity,
-                        margin: const EdgeInsets.only(bottom: 12),
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF5F9FE),
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 6,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              task.ProjectName,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Column(
-                              children: [
-                                _buildRow("Timesheet Date", task.EntryDate),
-                                const Divider(
-                                  thickness: 1,
-                                  height: 1,
-                                  color: Color(0xFFE2E2E2),
-                                ),
-                              ],
-                            ),
-
-                            Column(
-                              children: [
-                                _buildRow("Start Time", task.StartTime),
-                                const Divider(
-                                  thickness: 1,
-                                  height: 1,
-                                  color: Color(0xFFE2E2E2),
-                                ),
-                              ],
-                            ),
-
-                            Column(
-                              children: [
-                                _buildRow("End Time", task.EndTime),
-                                const Divider(
-                                  thickness: 1,
-                                  height: 1,
-                                  color: Color(0xFFE2E2E2),
-                                ),
-                              ],
-                            ),
-
-                            Column(
-                              children: [
-                                _buildRow("Task Time", task.TaskTime),
-                                const Divider(
-                                  thickness: 1,
-                                  height: 1,
-                                  color: Color(0xFFE2E2E2),
-                                ),
-                              ],
-                            ),
-
-
-                            Column(
-                              children: [
-                                _buildRow(
-                                  "Status",
-                                  task.strTaskStauts,
-                                  valueColor: task.strTaskStauts.toLowerCase() == "completed"
-                                      ? Colors.green
-                                      : Colors.black,
-                                ),
-                                const Divider(
-                                  thickness: 1,
-                                  height: 1,
-                                  color: Color(0xFFE2E2E2),
-                                ),
-                              ],
-                            ),
-
-                            Column(
-                              children: [
-                                _buildRow("Entry Date/Time", "${task.CreatedDate}, ${task.CreatedTime}"),
-                                const Divider(
-                                  thickness: 1,
-                                  height: 1,
-                                  color: Color(0xFFE2E2E2),
-                                ),
-                              ],
-                            ),
-
-
-                            const SizedBox(height: 8),
-                            const Text(
-                              "Task Description",
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              task.TaskShortDescription,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black87,
-                              ),
-                            ),
-                          ],
-                        ),
-                      )).toList(),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Center(
+                      child: Text(
+                        "View Hour Summary",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 10),
+                    Text(
+                      "Date: ${DateFormat("dd/MM/yyyy").format(date)}",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    ...summaries.map((task) => Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF5F9FE),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 6,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            task.ProjectName,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          _buildRow("Timesheet Date", task.EntryDate),
+                          const Divider(
+                            thickness: 1,
+                            height: 1,
+                            color: Color(0xFFE2E2E2),
+                          ),
+                          const SizedBox(height: 10),
+
+                          _buildRow("Start Time", task.StartTime),
+                          const Divider(
+                            thickness: 1,
+                            height: 1,
+                            color: Color(0xFFE2E2E2),
+                          ),
+                          const SizedBox(height: 10),
+                          _buildRow("End Time", task.EndTime),
+                          const Divider(
+                            thickness: 1,
+                            height: 1,
+                            color: Color(0xFFE2E2E2),
+                          ),
+                          const SizedBox(height: 10),
+                          _buildRow("Task Time", task.TaskTime),
+                          const Divider(
+                            thickness: 1,
+                            height: 1,
+                            color: Color(0xFFE2E2E2),
+                          ),
+                          _buildRow(
+                            "Status",
+                            task.strTaskStauts,
+                            valueColor: task.strTaskStauts.toLowerCase() == "completed"
+                                ? Colors.green
+                                : Colors.black,
+                          ),
+                          const Divider(
+                            thickness: 1,
+                            height: 1,
+                            color: Color(0xFFE2E2E2),
+                          ),
+                          const SizedBox(height: 8),
+
+                          _buildRow("Entry Date/Time", "${task.CreatedDate}, ${task.CreatedTime}"),
+                          const Divider(
+                            thickness: 1,
+                            height: 1,
+                            color: Color(0xFFE2E2E2),
+                          ),
+
+                          const SizedBox(height: 8),
+                          const Text(
+                            "Task Description",
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            task.TaskShortDescription,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )).toList()
+
+                  ],
                 ),
               ],
             ),
@@ -1014,8 +995,7 @@ class timesheet_provider extends ChangeNotifier {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
-            child: Text(
+        Text(
               label,
               style: const TextStyle(
                 fontSize: 13,
@@ -1023,7 +1003,7 @@ class timesheet_provider extends ChangeNotifier {
                 color: Colors.black87,
               ),
             ),
-          ),
+
           const SizedBox(width: 12),
           Text(
             value,

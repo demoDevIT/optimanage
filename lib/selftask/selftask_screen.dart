@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../selftask/selftask_provider.dart';
 
 class SelfTaskScreen extends StatefulWidget {
   const SelfTaskScreen({Key? key}) : super(key: key);
@@ -21,6 +23,14 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
 
   DateTime startDate = DateTime(2025, 4, 1);
   DateTime endDate = DateTime(2025, 4, 1);
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      Provider.of<SelfTaskProvider>(context, listen: false).fetchProjectList(context);
+    });
+  }
 
   Future<void> _selectDate(BuildContext context, bool isStart) async {
     final DateTime? picked = await showDatePicker(
@@ -163,6 +173,7 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<SelfTaskProvider>(context);
     return Scaffold(
       backgroundColor: const Color(0xFFFDFDFD),
       appBar: AppBar(
@@ -184,14 +195,40 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
         child: Column(
           children: [
             _buildDropdown(
-                'Project Name', ['Project A', 'Project B'], selectedProject,
-                (val) {
-              setState(() => selectedProject = val);
-            }),
-            _buildDropdown('Task Type', ['Bug', 'Feature'], selectedTaskType,
-                (val) {
-              setState(() => selectedTaskType = val);
-            }),
+              'Project Name',
+              provider.projects.map((e) => e.name).toList(),
+              provider.selectedProjectId == null
+                  ? null
+                  : provider.projects.firstWhere((p) => p.id == provider.selectedProjectId).name,
+                  (val) {
+                final selected = provider.projects.firstWhere((e) => e.name == val);
+                provider.setSelectedProject(selected.id);
+                provider.fetchModuleList(context, selected.id);
+              },
+            ),
+            _buildDropdown(
+              'Module Name',
+              provider.modules.map((e) => e.name).toList(),
+              provider.selectedModuleId == null
+                  ? null
+                  : provider.modules.firstWhere((m) => m.id == provider.selectedModuleId).name,
+                  (val) {
+                final selected = provider.modules.firstWhere((e) => e.name == val);
+                provider.setSelectedModule(selected.id);
+                provider.fetchTaskTypeList(context, provider.selectedProjectId!, selected.id);
+              },
+            ),
+            _buildDropdown(
+              'Task Type',
+              provider.taskTypes.map((e) => e.name).toList(),
+              provider.selectedTaskTypeId == null
+                  ? null
+                  : provider.taskTypes.firstWhere((t) => t.id == provider.selectedTaskTypeId).name,
+                  (val) {
+                final selected = provider.taskTypes.firstWhere((e) => e.name == val);
+                provider.setSelectedTaskType(selected.id);
+              },
+            ),
             _buildTextField('Task Name', taskNameController),
             _buildTextField('Description', descriptionController, maxLines: 3),
             Row(

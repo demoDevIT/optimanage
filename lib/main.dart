@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:optimanage/assignedtask/assignedtask_provider.dart';
 import 'package:optimanage/forget/forget_provider.dart';
 import 'package:optimanage/notaskassign/notaskassign_provider.dart';
+import 'package:optimanage/selftask/selftask_provider.dart';
 import 'package:optimanage/tasksummary/tasksummary_provider.dart';
 import 'package:optimanage/timesheet/timesheet_provider.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +26,8 @@ void main() {
           ChangeNotifierProvider(create: (_) => RdProvider()),
           ChangeNotifierProvider(create: (_) => ProfileProvider()),
           ChangeNotifierProvider(create: (_) => AssignedTaskProvider()),
-          ChangeNotifierProvider(create: (_) => ForgetProvider())
+          ChangeNotifierProvider(create: (_) => ForgetProvider()),
+          ChangeNotifierProvider(create: (_) => SelfTaskProvider())
         ],
         child: MyApp(),
       )
