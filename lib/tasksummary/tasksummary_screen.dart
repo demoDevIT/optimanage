@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:optimanage/tasksummary/tasksummary_provider.dart';
 import '../assignedtask/AssignedTaskModel.dart';
 import '../constant/common.dart';
+import '../dailytask/dailytask_provider.dart';
 import '../dailytask/dailytask_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -174,7 +175,12 @@ class _TaskSummaryScreenState extends State<TaskSummaryScreen> {
                             // Navigate directly
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (_) => const DailyTaskScreen()),
+                              MaterialPageRoute(
+                                builder: (_) => ChangeNotifierProvider(
+                                  create: (_) => DailyTaskProvider(),
+                                  child: DailyTaskScreen(task: widget.task!), // 👈 Pass task
+                                ),
+                              ),
                             );
                           }
                         },
