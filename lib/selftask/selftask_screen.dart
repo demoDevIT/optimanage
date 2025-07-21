@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../selftask/selftask_provider.dart';
+import 'package:file_picker/file_picker.dart';
 
 class SelfTaskScreen extends StatefulWidget {
   const SelfTaskScreen({Key? key}) : super(key: key);
@@ -10,10 +11,15 @@ class SelfTaskScreen extends StatefulWidget {
 }
 
 class _SelfTaskScreenState extends State<SelfTaskScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   String? selectedProject;
+  String? selectedSubModule;
   String? selectedTaskType;
   String? selectedAssignee;
   bool isPriority = false;
+
+  //XFile? selectedFile;
 
   final TextEditingController taskNameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
@@ -21,14 +27,19 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
   final TextEditingController notesController = TextEditingController();
   final TextEditingController documentController = TextEditingController();
 
-  DateTime startDate = DateTime(2025, 4, 1);
-  DateTime endDate = DateTime(2025, 4, 1);
+  DateTime startDate = DateTime(DateTime.now().year, DateTime.now().month, 1);
+  DateTime endDate = DateTime(
+    DateTime.now().year,
+    DateTime.now().month + 1,
+    0,
+  );
 
   @override
   void initState() {
     super.initState();
     Future.microtask(() {
-      Provider.of<SelfTaskProvider>(context, listen: false).fetchProjectList(context);
+      Provider.of<SelfTaskProvider>(context, listen: false)
+          .fetchProjectList(context);
     });
   }
 
@@ -50,24 +61,29 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
     }
   }
 
-  Widget _buildDropdown(String hint, List<String> items, String? value,
-      void Function(String?) onChanged) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: const Color(0xFFF5F8FF),
-      ),
+  Widget _buildValidatedDropdown({
+    required String hint,
+    required List<String> items,
+    required String? selectedValue,
+    required Function(String?) onChanged,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: DropdownButtonFormField<String>(
-        value: value,
+        value: selectedValue,
+        validator: (value) => value == null ? 'Please select $hint' : null,
         onChanged: onChanged,
-        decoration: const InputDecoration(border: InputBorder.none),
-        hint: Text(hint, style: const TextStyle(color: Color(0xFF6E6A7C))),
-        icon: const Icon(
-          Icons.arrow_drop_down,
-          size: 30,
-          color: Colors.black87,
+        decoration: InputDecoration(
+          hintText: hint,
+          filled: true,
+          fillColor: const Color(0xFFF5F8FF),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          errorStyle: TextStyle(color: Colors.red.shade700, fontSize: 13),
         ),
         items: items
             .map((e) => DropdownMenuItem(value: e, child: Text(e)))
@@ -76,23 +92,44 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
     );
   }
 
-  Widget _buildTextField(String hint, TextEditingController controller,
-      {int maxLines = 1}) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: const Color(0xFFF5F8FF),
-      ),
+  Widget _buildTextField(
+    String hint,
+    TextEditingController controller, {
+    bool isRequired = false,
+    int maxLines = 1,
+    TextInputType keyboardType = TextInputType.text,
+    bool readOnly = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: TextFormField(
         controller: controller,
+        readOnly: readOnly,
         maxLines: maxLines,
+        keyboardType: keyboardType,
+        validator: isRequired
+            ? (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'This field is required';
+                }
+                return null;
+              }
+            : null,
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: const TextStyle(
-              color: Color(0xFF6E6A7C), fontWeight: FontWeight.w500),
-          border: InputBorder.none,
+          hintStyle:
+              TextStyle(color: Color(0xFF6E6A7C), fontWeight: FontWeight.w500),
+          filled: true,
+          fillColor: Color(0xFFF5F8FF),
+          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          errorStyle: TextStyle(
+            color: Colors.red.shade700,
+            fontSize: 13,
+          ),
         ),
       ),
     );
@@ -151,8 +188,6 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
     );
   }
 
-
-
   String _monthName(int month) {
     const List<String> months = [
       "January",
@@ -192,103 +227,198 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            _buildDropdown(
-              'Project Name',
-              provider.projects.map((e) => e.name).toList(),
-              provider.selectedProjectId == null
-                  ? null
-                  : provider.projects.firstWhere((p) => p.id == provider.selectedProjectId).name,
-                  (val) {
-                final selected = provider.projects.firstWhere((e) => e.name == val);
-                provider.setSelectedProject(selected.id);
-                provider.fetchModuleList(context, selected.id);
-              },
-            ),
-            _buildDropdown(
-              'Module Name',
-              provider.modules.map((e) => e.name).toList(),
-              provider.selectedModuleId == null
-                  ? null
-                  : provider.modules.firstWhere((m) => m.id == provider.selectedModuleId).name,
-                  (val) {
-                final selected = provider.modules.firstWhere((e) => e.name == val);
-                provider.setSelectedModule(selected.id);
-                provider.fetchTaskTypeList(context, provider.selectedProjectId!, selected.id);
-              },
-            ),
-            _buildDropdown(
-              'Task Type',
-              provider.taskTypes.map((e) => e.name).toList(),
-              provider.selectedTaskTypeId == null
-                  ? null
-                  : provider.taskTypes.firstWhere((t) => t.id == provider.selectedTaskTypeId).name,
-                  (val) {
-                final selected = provider.taskTypes.firstWhere((e) => e.name == val);
-                provider.setSelectedTaskType(selected.id);
-              },
-            ),
-            _buildTextField('Task Name', taskNameController),
-            _buildTextField('Description', descriptionController, maxLines: 3),
-            Row(
-              children: [
-                _buildDateField('Start Date', startDate, () => _selectDate(context, true)),
-                _buildDateField('End Date', endDate, () => _selectDate(context, false)),
-              ],
-            ),
-
-            _buildTextField(
-                'Estimated Time (In Hours)', estimatedTimeController),
-            _buildTextField('Notes', notesController),
-            Stack(
-              children: [
-                _buildTextField('Upload Document', documentController),
-                const Positioned(
-                  right: 16,
-                  top: 20,
-                  child: Icon(Icons.upload_rounded, size: 20),
-                )
-              ],
-            ),
-            _buildDropdown(
-                'Assign To', ['Member A', 'Member B'], selectedAssignee, (val) {
-              setState(() => selectedAssignee = val);
-            }),
-            CheckboxListTile(
-              contentPadding: EdgeInsets.zero,
-              controlAffinity: ListTileControlAffinity.leading,
-              title:
-                  const Text('Higher Priority', style: TextStyle(fontSize: 14)),
-              value: isPriority,
-              onChanged: (val) => setState(() => isPriority = val ?? false),
-              activeColor: const Color(0xFF25507C),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  // Handle submit logic
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              _buildValidatedDropdown(
+                hint: 'Project Name',
+                items: provider.projects.map((e) => e.name).toList(),
+                selectedValue: provider.selectedProjectId == null
+                    ? null
+                    : provider.projects
+                        .firstWhere((p) => p.id == provider.selectedProjectId)
+                        .name,
+                onChanged: (val) {
+                  final selected =
+                      provider.projects.firstWhere((e) => e.name == val);
+                  provider.setSelectedProject(selected.id);
+                  provider.fetchModuleList(context, selected.id);
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF25507C),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                ),
-                child: const Text(
-                  'Submit',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600),
-                ),
               ),
-            )
-          ],
+              _buildValidatedDropdown(
+                hint: 'Module Name',
+                items: provider.modules.map((e) => e.name).toList(),
+                selectedValue: provider.selectedModuleId == null
+                    ? null
+                    : provider.modules
+                        .firstWhere((m) => m.id == provider.selectedModuleId)
+                        .name,
+                onChanged: (val) {
+                  final selected =
+                      provider.modules.firstWhere((e) => e.name == val);
+                  provider.setSelectedModule(selected.id);
+                  provider.fetchTaskTypeList(
+                      context, provider.selectedProjectId!, selected.id);
+                  provider.fetchSubModuleList(context, selected.id);
+                },
+              ),
+              if (provider.subModules.isNotEmpty)
+                _buildValidatedDropdown(
+                  hint: 'Submodule Name',
+                  items: provider.subModules.map((e) => e.name).toList(),
+                  selectedValue: provider.selectedSubModuleId == null
+                      ? null
+                      : provider.subModules
+                          .firstWhere(
+                              (s) => s.id == provider.selectedSubModuleId)
+                          .name,
+                  onChanged: (val) {
+                    final selected =
+                        provider.subModules.firstWhere((e) => e.name == val);
+                    provider.setSelectedSubModule(selected.id);
+                  },
+                ),
+
+              _buildValidatedDropdown(
+                hint: 'Task Type',
+                items: provider.taskTypes.map((e) => e.name).toList(),
+                selectedValue: provider.selectedTaskTypeId == null
+                    ? null
+                    : provider.taskTypes
+                        .firstWhere((t) => t.id == provider.selectedTaskTypeId)
+                        .name,
+                onChanged: (val) {
+                  final selected =
+                      provider.taskTypes.firstWhere((e) => e.name == val);
+                  provider.setSelectedTaskType(selected.id);
+                },
+              ),
+              _buildTextField('Task Name', taskNameController,
+                  isRequired: true),
+              _buildTextField('Description', descriptionController,
+                  maxLines: 3, isRequired: true),
+              Row(
+                children: [
+                  _buildDateField('Start Date', startDate,
+                      () => _selectDate(context, true)),
+                  _buildDateField(
+                      'End Date', endDate, () => _selectDate(context, false)),
+                ],
+              ),
+
+              _buildTextField(
+                  'Estimated Time (In Hours)', estimatedTimeController,
+                  isRequired: true, keyboardType: TextInputType.number),
+              _buildTextField('Notes', notesController),
+              Stack(
+                children: [
+                  GestureDetector(
+                    onTap: () =>
+                        Provider.of<SelfTaskProvider>(context, listen: false)
+                            .pickDocument(context),
+                    child: AbsorbPointer(
+                      child: _buildTextField(
+                        provider.selectedFile?.name ?? 'Upload Document',
+                        documentController,
+                        readOnly: true,
+                      ),
+                    ),
+                  ),
+                  const Positioned(
+                    right: 16,
+                    top: 20,
+                    child: Icon(Icons.upload_rounded, size: 20),
+                  )
+                ],
+              ),
+
+              // _buildValidatedDropdown(
+              //   hint: 'Assign To',
+              //   items: ['Member A', 'Member B'],
+              //   selectedValue: selectedAssignee,
+              //   onChanged: (val) => setState(() => selectedAssignee = val),
+              // ),
+              CheckboxListTile(
+                contentPadding: EdgeInsets.zero,
+                controlAffinity: ListTileControlAffinity.leading,
+                title: const Text('Higher Priority',
+                    style: TextStyle(fontSize: 14)),
+                value: isPriority,
+                onChanged: (val) => setState(() => isPriority = val ?? false),
+                activeColor: const Color(0xFF25507C),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _submitSelfTaskForm,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF25507C),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: const Text(
+                    'Submit',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600),
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Future<void> _submitSelfTaskForm() async {
+    if (!_formKey.currentState!.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all required fields')),
+      );
+      return;
+    }
+
+    final provider = Provider.of<SelfTaskProvider>(context, listen: false);
+
+    if (provider.selectedProjectId == null ||
+        provider.selectedModuleId == null ||
+        provider.selectedTaskTypeId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select all dropdowns')),
+      );
+      return;
+    }
+
+    final String formattedStartDate =
+        "${startDate.month}/${startDate.day}/${startDate.year}";
+    final String formattedEndDate =
+        "${endDate.month}/${endDate.day}/${endDate.year}";
+
+    final int taskDuration =
+        int.tryParse(estimatedTimeController.text.trim()) ?? 0;
+
+    await provider.submitSelfTask(
+      context: context,
+      projectId: provider.selectedProjectId!,
+      moduleId: provider.selectedModuleId!,
+      taskTypeId: provider.selectedTaskTypeId!,
+      taskName: taskNameController.text.trim(),
+      taskDescription: descriptionController.text.trim(),
+      userId: 55,
+      // 🔁 Replace with actual user ID
+      startDate: formattedStartDate,
+      endDate: formattedEndDate,
+      taskDuration: taskDuration,
+      notes: notesController.text.trim(),
+      document: provider.selectedFile?.name ?? 'https://example.com/demo.pdf',
+      // or some placeholder if required
+      remarks: documentController.text.trim(),
+      isHigherPriority: isPriority ? 1 : 0,
     );
   }
 }

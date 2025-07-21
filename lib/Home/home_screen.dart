@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../profile/profile_screen.dart';
 import '../timesheet/timesheet_screen.dart';
+import 'home_provider.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -189,31 +191,20 @@ class HomeScreen extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return Dialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           backgroundColor: Colors.white,
           child: Padding(
             padding: const EdgeInsets.all(24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Image.asset(
-                  'assets/icons/logout_icon.png',
-                  // Replace with your logout icon path
-                  height: 48,
-                ),
+                Image.asset('assets/icons/logout_icon.png', height: 48),
                 const SizedBox(height: 16),
-                const Text(
-                  'Logout',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
+                const Text('Logout', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
                 const SizedBox(height: 8),
                 const Text(
                   'Are you sure you want to log out?',
-                  style: TextStyle(fontSize: 20, color: Colors.black54),
+                  style: TextStyle(fontSize: 16, color: Colors.black54),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),
@@ -223,12 +214,10 @@ class HomeScreen extends StatelessWidget {
                     OutlinedButton(
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: Color(0xFF1C355E)),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        Navigator.of(context).pop(); // Close dialog
                       },
                       child: const Text('Cancel'),
                     ),
@@ -236,13 +225,11 @@ class HomeScreen extends StatelessWidget {
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF1C355E),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
-                      onPressed: () {
-                        // TODO: Add logout logic
-                        Navigator.of(context).pop();
+                      onPressed: () async {
+                        Navigator.of(context).pop(); // Close dialog
+                        await Provider.of<HomeProvider>(context, listen: false).logoutUser(context);
                       },
                       child: const Text('Logout'),
                     ),
@@ -255,6 +242,8 @@ class HomeScreen extends StatelessWidget {
       },
     );
   }
+
+
 }
 
 class AppDrawer extends StatelessWidget {

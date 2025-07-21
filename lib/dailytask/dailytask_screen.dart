@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../assignedtask/AssignedTaskModel.dart';
 import 'dailytask_provider.dart';
+import '../utils/UtilityClass.dart';
 
 class DailyTaskScreen extends StatefulWidget {
   final AssignedTaskModel task;
@@ -13,6 +14,8 @@ class DailyTaskScreen extends StatefulWidget {
 }
 
 class _DailyTaskScreenState extends State<DailyTaskScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   late int projectId;
 
   final taskDetailsController = TextEditingController();
@@ -108,233 +111,93 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            _buildTextField("PROJECT NAME", value: widget.task.projectName),
-            const SizedBox(height: 12),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6),
-              child: TextFormField(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildTextField("PROJECT NAME", value: widget.task.projectName),
+              const SizedBox(height: 12),
+
+              // 🔻 Task Description Field
+              _textInput(
+                hint: 'Daily Task Details',
                 controller: taskDetailsController,
                 maxLines: 3,
-                decoration: InputDecoration(
-                  hintText: 'Daily Task Details',
-                  hintStyle: TextStyle(color: Color(0xFF6E6A7C), fontWeight: FontWeight.w500),
-                  filled: true,
-                  fillColor: Color(0xFFF5F8FF),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  errorStyle: TextStyle(
-                    color: Colors.red.shade700,
-                    fontSize: 13,
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Please enter task details';
-                  }
-                  return null;
-                },
               ),
-            ),
 
+              const SizedBox(height: 12),
 
-            const SizedBox(height: 12),
-            _buildDropdown(),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: FormField<TimeOfDay>(
-                    validator: (value) {
-                      if (_startTime == null) return 'Select Start Time';
-                      return null;
-                    },
-                    builder: (state) {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          GestureDetector(
-                            onTap: () => _selectTime(true),
-                            child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                color: Color(0xFFF5F8FF),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.access_time, size: 20),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    _startTime != null ? _startTime!.format(context) : 'Select Start Time',
-                                    style: TextStyle(fontSize: 14),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          if (state.hasError)
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8.0, top: 4),
-                              child: Text(
-                                state.errorText!,
-                                style: TextStyle(color: Colors.red.shade700, fontSize: 13),
-                              ),
-                            )
-                        ],
-                      );
+              // 🔻 Dropdown Field
+              _dropdownInput(),
+
+              const SizedBox(height: 12),
+
+              // 🔻 Start & End Time
+              Row(
+                children: [
+                  _timePickerField(
+                    label: "Start Time",
+                    time: _startTime,
+                    onTimePicked: (picked) {
+                      setState(() {
+                        _startTime = picked;
+                        _calculateDuration();
+                      });
                     },
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: FormField<TimeOfDay>(
-                    validator: (value) {
-                      if (_endTime == null) return 'Select End Time';
-                      return null;
-                    },
-                    builder: (state) {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          GestureDetector(
-                            onTap: () => _selectTime(false),
-                            child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                color: Color(0xFFF5F8FF),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.access_time, size: 20),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    _endTime != null ? _endTime!.format(context) : 'Select End Time',
-                                    style: TextStyle(fontSize: 14),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          if (state.hasError)
-                            Padding(
-                              padding: const EdgeInsets.only(left: 8.0, top: 4),
-                              child: Text(
-                                state.errorText!,
-                                style: TextStyle(color: Colors.red.shade700, fontSize: 13),
-                              ),
-                            )
-                        ],
-                      );
+                  const SizedBox(width: 12),
+                  _timePickerField(
+                    label: "End Time",
+                    time: _endTime,
+                    onTimePicked: (picked) {
+                      setState(() {
+                        _endTime = picked;
+                        _calculateDuration();
+                      });
                     },
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
 
-            SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6),
-              child: TextFormField(
+              _textInput(
+                hint: 'Task Hour',
                 controller: taskHourController,
                 keyboardType: TextInputType.number,
                 readOnly: true,
-                decoration: InputDecoration(
-                  hintText: 'Task Hour',
-                  hintStyle: TextStyle(color: Color(0xFF6E6A7C), fontWeight: FontWeight.w500),
-                  filled: true,
-                  fillColor: Color(0xFFF5F8FF),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  errorStyle: TextStyle(color: Colors.red.shade700, fontSize: 13),
-                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6),
-              child: TextFormField(
+              _textInput(
+                hint: 'Task Minute',
                 controller: taskMinuteController,
                 keyboardType: TextInputType.number,
                 readOnly: true,
-                decoration: InputDecoration(
-                  hintText: 'Task Minute',
-                  hintStyle: TextStyle(color: Color(0xFF6E6A7C), fontWeight: FontWeight.w500),
-                  filled: true,
-                  fillColor: Color(0xFFF5F8FF),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  errorStyle: TextStyle(color: Colors.red.shade700, fontSize: 13),
-                ),
               ),
-            ),
 
+              const Spacer(),
 
-            const Spacer(),
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton(
-                  onPressed: () async {
-                    // final provider = Provider.of<DailyTaskProvider>(context, listen: false);
-                    //
-                    // final description = taskDetailsController.text.trim();
-                    // final taskStatus = int.tryParse(_selectedStatus ?? '0') ?? 0;
-                    // final taskHour = int.tryParse(taskHourController.text.trim()) ?? 0;
-                    // final taskMinute = int.tryParse(taskMinuteController.text.trim()) ?? 0;
-                    //
-                    // if (description.isEmpty || _startTime == null || _endTime == null || taskStatus == 0) {
-                    //   UtilityClass.showSnackBar(context, "Please fill all required fields", Colors.red);
-                    //   return;
-                    // }
-                    //
-                    // final startTimeFormatted = _startTime!.format(context);
-                    // final endTimeFormatted = _endTime!.format(context);
-                    //
-                    // await provider.submitRdTask(
-                    //   context: context,
-                    //   description: description,
-                    //   startTime: startTimeFormatted,
-                    //   endTime: endTimeFormatted,
-                    //   taskHour: taskHour,
-                    //   taskMinutes: taskMinute,
-                    //   taskStatus: taskStatus,
-                    //   projectId: projectId,
-                    //   userId: 1,      // Replace with actual user ID (e.g., from shared prefs)
-                    //   moduleId: 0,    // Replace with actual module ID if available
-                    // );
-                  },
-                  // print("Project ID: $projectId");
-                  // print("Project Name: ${widget.task.projectName}");
-                  // Navigator.pop(context); // back to task summary
-                  // Navigator.pop(context); // back to assigned task
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF25507C),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: _submitForm,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF25507C),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
-                ),
-                child: const Text(
-                  "Submit",
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
+                  child: const Text(
+                    "Submit",
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
-            )
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -396,8 +259,161 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
     );
   }
 
+  Widget _textInput({
+    required String hint,
+    required TextEditingController controller,
+    int maxLines = 1,
+    TextInputType? keyboardType,
+    bool isRequired = true,
+    bool readOnly = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: TextFormField(
+        controller: controller,
+        maxLines: maxLines,
+        keyboardType: keyboardType,
+        readOnly: readOnly,
+        validator: isRequired
+            ? (value) {
+          if (value == null || value.trim().isEmpty) {
+            return 'This field is required';
+          }
+          return null;
+        }
+            : null,
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: TextStyle(color: Color(0xFF6E6A7C), fontWeight: FontWeight.w500),
+          filled: true,
+          fillColor: Color(0xFFF5F8FF),
+          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          errorStyle: TextStyle(color: Colors.red.shade700, fontSize: 13),
+        ),
+      ),
+    );
+  }
 
+  Widget _dropdownInput() {
+    final provider = Provider.of<DailyTaskProvider>(context);
 
+    return DropdownButtonFormField<String>(
+      value: _selectedStatus,
+      validator: (value) => value == null ? 'Please select Daily Task Status' : null,
+      onChanged: (val) => setState(() => _selectedStatus = val),
+      items: provider.statusList,
+      decoration: InputDecoration(
+        hintText: "Daily Task Status",
+        hintStyle: TextStyle(color: Color(0xFF6E6A7C), fontWeight: FontWeight.w500),
+        filled: true,
+        fillColor: Color(0xFFF5F8FF),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        errorStyle: TextStyle(color: Colors.red.shade700, fontSize: 13),
+      ),
+    );
+  }
+
+  Widget _timePickerField({
+    required String label,
+    required TimeOfDay? time,
+    required void Function(TimeOfDay) onTimePicked,
+  }) {
+    return Expanded(
+      child: FormField<TimeOfDay>(
+        validator: (value) => time == null ? 'Select $label' : null,
+        builder: (state) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              GestureDetector(
+                onTap: () async {
+                  final picked = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay.now(),
+                  );
+                  if (picked != null) {
+                    onTimePicked(picked);
+                    state.didChange(picked);
+                  }
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: Color(0xFFF5F8FF),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.access_time, size: 20),
+                      SizedBox(width: 8),
+                      Text(
+                        time != null ? time.format(context) : 'Select $label',
+                        style: TextStyle(fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              if (state.hasError)
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0, top: 4),
+                  child: Text(
+                    state.errorText!,
+                    style: TextStyle(color: Colors.red.shade700, fontSize: 13),
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Future<void> _submitForm() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    final provider = Provider.of<DailyTaskProvider>(context, listen: false);
+
+    final description = taskDetailsController.text.trim();
+    final taskHour = int.tryParse(taskHourController.text.trim()) ?? 0;
+    final taskMinute = int.tryParse(taskMinuteController.text.trim()) ?? 0;
+    final taskStatus = int.tryParse(_selectedStatus ?? '0') ?? 0;
+
+    final now = DateTime.now();
+    final entryDate = "${now.month.toString().padLeft(2, '0')}/${now.day.toString().padLeft(2, '0')}/${now.year}";
+    final duration = (taskHour * 60) + taskMinute;
+
+    final String startStr = _startTime != null
+        ? _startTime!.hour.toString().padLeft(2, '0') + ':' + _startTime!.minute.toString().padLeft(2, '0')
+        : '';
+
+    final String endStr = _endTime != null
+        ? _endTime!.hour.toString().padLeft(2, '0') + ':' + _endTime!.minute.toString().padLeft(2, '0')
+        : '';
+
+    await provider.submitDailyTask(
+      context: context,
+      description: description,
+      startTime: startStr,
+      endTime: endStr,
+      taskHour: taskHour,
+      taskMinutes: taskMinute,
+      taskStatus: taskStatus,
+      projectId: projectId,
+      moduleId: 0,     // Replace with actual moduleId if needed
+      userId: 55,       // Replace with actual userId
+    );
+  }
 
   Widget _buildTimePicker({required String label, required TimeOfDay time, required VoidCallback onTap}) {
     return InkWell(

@@ -1,5 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+
 class PrefUtil {
   static String UserId ="UserId";
   static String TitleId ="TitleId";
@@ -376,5 +377,11 @@ class PrefUtil {
     final sp = await SharedPreferences.getInstance();
     sp.setString(IsResetPassword, value);
   }
+
+  static Future<void> clearAll() async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.clear();
+  }
+
 
 }
