@@ -42,4 +42,64 @@ class DailyTaskProvider with ChangeNotifier {
       UtilityClass.askForInput('Error', 'Failed to load task status.', 'OK', '', true);
     }
   }
+
+  // Future<void> submitDailyTask({
+  //   required BuildContext context,
+  //   required String description,
+  //   required String startTime,
+  //   required String endTime,
+  //   required int taskHour,
+  //   required int taskMinutes,
+  //   required int taskStatus,
+  //   required int projectId,
+  //   required int userId,
+  //   required int moduleId,
+  // }) async {
+  //   try {
+  //     UtilityClass.showProgressDialog(context, 'Submitting Daily Task...');
+  //
+  //     final now = DateTime.now();
+  //     final entryDate = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+  //     final taskDuration = (taskHour * 60) + taskMinutes;
+  //
+  //     final body = {
+  //       "TaskType": 4,
+  //       "TaskId": 0,
+  //       "TaskDescription": description,
+  //       "TaskStatus": taskStatus,
+  //       "EntryDate": entryDate,
+  //       "TaskHour": taskHour,
+  //       "TaskMinutes": taskMinutes,
+  //       "TaskDuration": taskDuration,
+  //       "StartTime": startTime,
+  //       "EndTime": endTime,
+  //       "ProjectId": projectId,
+  //       "TaskTypeId": 0,
+  //       "ModuleId": moduleId,
+  //       "UserId": userId,
+  //     };
+  //
+  //     print('📤 Sending Timesheet data: $body');
+  //
+  //     HttpService http = HttpService(Constants.baseurl);
+  //     final response = await http.postRequest("/api/Timesheet/CreateTimesheet", body);
+  //
+  //     UtilityClass.dismissProgressDialog();
+  //
+  //     final success = response.data['State'] == 1;
+  //     final message = response.data['Message'] ?? "Submission successful";
+  //
+  //     if (success) {
+  //       UtilityClass.showSnackBar(context, message, Colors.green);
+  //       Navigator.pop(context, true);
+  //     } else {
+  //       UtilityClass.showSnackBar(context, message, Colors.red);
+  //     }
+  //   } catch (e) {
+  //     UtilityClass.dismissProgressDialog();
+  //     debugPrint("❌ Submit error: $e");
+  //     UtilityClass.showSnackBar(context, "Something went wrong", Colors.red);
+  //   }
+  // }
+
 }

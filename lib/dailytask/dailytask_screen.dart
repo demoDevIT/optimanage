@@ -50,11 +50,7 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
     );
     if (picked != null) {
       setState(() {
-        if (isStart) {
-          _startTime = picked;
-        } else {
-          _endTime = picked;
-        }
+        isStart ? _startTime = picked : _endTime = picked;
         _calculateDuration();
       });
     }
@@ -68,7 +64,7 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
     final end = DateTime(now.year, now.month, now.day, _endTime!.hour, _endTime!.minute);
 
     Duration duration = end.difference(start);
-    if (duration.isNegative) duration += const Duration(days: 1);
+    if (duration.isNegative) duration += Duration(days: 1);
 
     final hours = duration.inHours;
     final minutes = duration.inMinutes % 60;
@@ -289,13 +285,39 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
               width: double.infinity,
               height: 48,
               child: ElevatedButton(
-                onPressed: () {
-                 // print("Selected Status ID: $_selectedStatus");
-                  print("Project ID: $projectId");
-                  print("Project Name: ${widget.task.projectName}");
-                  Navigator.pop(context); // back to task summary
-                  Navigator.pop(context); // back to assigned task
-                },
+                  onPressed: () async {
+                    // final provider = Provider.of<DailyTaskProvider>(context, listen: false);
+                    //
+                    // final description = taskDetailsController.text.trim();
+                    // final taskStatus = int.tryParse(_selectedStatus ?? '0') ?? 0;
+                    // final taskHour = int.tryParse(taskHourController.text.trim()) ?? 0;
+                    // final taskMinute = int.tryParse(taskMinuteController.text.trim()) ?? 0;
+                    //
+                    // if (description.isEmpty || _startTime == null || _endTime == null || taskStatus == 0) {
+                    //   UtilityClass.showSnackBar(context, "Please fill all required fields", Colors.red);
+                    //   return;
+                    // }
+                    //
+                    // final startTimeFormatted = _startTime!.format(context);
+                    // final endTimeFormatted = _endTime!.format(context);
+                    //
+                    // await provider.submitRdTask(
+                    //   context: context,
+                    //   description: description,
+                    //   startTime: startTimeFormatted,
+                    //   endTime: endTimeFormatted,
+                    //   taskHour: taskHour,
+                    //   taskMinutes: taskMinute,
+                    //   taskStatus: taskStatus,
+                    //   projectId: projectId,
+                    //   userId: 1,      // Replace with actual user ID (e.g., from shared prefs)
+                    //   moduleId: 0,    // Replace with actual module ID if available
+                    // );
+                  },
+                  // print("Project ID: $projectId");
+                  // print("Project Name: ${widget.task.projectName}");
+                  // Navigator.pop(context); // back to task summary
+                  // Navigator.pop(context); // back to assigned task
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF25507C),
                   shape: RoundedRectangleBorder(
