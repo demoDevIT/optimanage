@@ -125,71 +125,85 @@ class UtilityClass {
       String message,
       String positiveButton,
       String negativeButton,
-      bool showOnlyOneButton) async {
-    return await showCupertinoDialog(
+      bool showOnlyOneButton,
+      ) async {
+    return await showDialog(
       context: navigatorKey.currentState!.context,
-      // Use the global navigator key
-      builder: (context) => AlertDialog(
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-         // side: BorderSide(width: 3.0, color: Colors.red[200]!),
-        ),
-        title: Text(title),
-        content: Text(message),
-        actions: [
-          Row(
-            mainAxisAlignment: !showOnlyOneButton
-                ? MainAxisAlignment.spaceEvenly
-                : MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              GestureDetector(
-                onTap: () => Navigator.of(context).pop(true),
-                child: Container(
-                  alignment: Alignment.center,
-                  width: 90,
-                  padding: const EdgeInsets.all(10),
-                  margin: const EdgeInsets.symmetric(horizontal: 10),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF25507C),
-                    //border: Border.all(color: Colors.green[400]!, width: 2),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    positiveButton,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
+              Image.asset('assets/logos/logout.png', width: 50, height: 50), // 👈 Your icon
               const SizedBox(height: 16),
-              if (!showOnlyOneButton)
-                GestureDetector(
-                  onTap: () => Navigator.of(context).pop(true),
-                  child: Container(
-                    alignment: Alignment.center,
-                    width: 100,
-                    padding: const EdgeInsets.all(10),
-                    margin: const EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                     // border: Border.all(color: Colors.red[300]!, width: 2),
-                      borderRadius: BorderRadius.circular(10),
+              Text(
+                title,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                message,
+                style: const TextStyle(fontSize: 16, color: Colors.black54),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (!showOnlyOneButton)
+                    SizedBox(
+                      width: 100,
+                      height: 40,
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Color(0xFF1C355E)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).pop(false); // 👈 Cancel returns false
+                        },
+                        child: Text(
+                          negativeButton,
+                          style: const TextStyle(color: Color(0xFF1C355E)),
+                        ),
+                      ),
                     ),
-                    child: Text(
-                      positiveButton,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                  if (!showOnlyOneButton) const SizedBox(width: 16),
+                  SizedBox(
+                    width: 100,
+                    height: 40,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF1C355E),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop(true); // 👈 Logout returns true
+                      },
+                      child: Text(
+                        positiveButton,
+                        style: const TextStyle(color: Colors.white), // Ensures white text on red
+                      ),
                     ),
                   ),
-                ),
+                ],
+              ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
+
+
 
   // static Future<bool> showAlert(BuildContext context, String title,
   //     String message, String buttonText) async {

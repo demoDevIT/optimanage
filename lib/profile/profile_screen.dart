@@ -1,9 +1,14 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../SignIn/SignInScreen.dart';
 import '../constant/common.dart';
 import 'package:optimanage/profile/profile_provider.dart';
 import 'package:optimanage/profile/change_password_dialog.dart';
+
+import '../main.dart';
+import '../utils/RightToLeftRoute.dart';
+import '../utils/UtilityClass.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -55,7 +60,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   shape: BoxShape.circle,
                 ),
                 child: ClipOval(
-                  child: Image.asset(
+                  child: profile.UserImagePath != null && profile.UserImagePath.isNotEmpty
+                      ? Image.network(
+                    profile.UserImagePath,
+                    fit: BoxFit.cover,
+                    width: 100,
+                    height: 100,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Image.asset(
+                        'assets/logos/avatar2.png',
+                        fit: BoxFit.cover,
+                        width: 100,
+                        height: 100,
+                      );
+                    },
+                  )
+                      : Image.asset(
                     'assets/logos/avatar2.png',
                     fit: BoxFit.cover,
                     width: 100,
@@ -105,7 +125,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
       children: [
         Expanded(
           child: OutlinedButton(
-            onPressed: () => showLogoutDialog(context),
+            onPressed: () async {
+              bool check = await UtilityClass.askForInput(
+                "Logout",
+                "Are you sure you want to logout?",
+                "Logout", // Red button
+                "Cancel", // Outline button
+                false,    // Show both buttons
+              );
+
+              if (check) {
+                print("✅ Logout button pressed");
+
+                navigatorKey.currentState?.pushReplacement(
+                  RightToLeftRoute(
+                    page: SignInScreen(),
+                    duration: const Duration(milliseconds: 500),
+                    startOffset: const Offset(-1.0, 0.0),
+                  ),
+                );
+              }
+            },
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 15),
               side: const BorderSide(color: Color(0xFF25507C), width: 2),
@@ -115,9 +155,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             child: const Text(
               'Logout',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Color(0xFF25507C)),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF25507C),
+              ),
             ),
           ),
+
         ),
         const SizedBox(width: 16),
         Expanded(

@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:optimanage/utils/UtilityClass.dart';
 import 'package:provider/provider.dart';
+import '../SignIn/SignInScreen.dart';
+import '../main.dart';
 import '../profile/profile_screen.dart';
 import '../timesheet/timesheet_screen.dart';
+import '../utils/PrefUtil.dart';
+import '../utils/RightToLeftRoute.dart';
 import 'home_provider.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -11,7 +16,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF6F9FF),
-      drawer: const AppDrawer(),
+      drawer:  AppDrawer(),
       appBar: AppBar(
         // backgroundColor: Colors.transparent,
         elevation: 0,
@@ -185,55 +190,190 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
+}
 
-  void showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+void showLogoutDialog(BuildContext context, HomeProvider provider) {
+  print("🔔 Logout dialog triggered");
+
+  showDialog(
+    context: context,
+    builder: (BuildContext dialogContext) {
+      return AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to log out?'),
+        actions: [
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+            },
+          ),
+          ElevatedButton(
+            child: const Text('Logout'),
+            onPressed: () {
+              Navigator.of(dialogContext).pop(); // Close dialog first
+
+            },
+          ),
+
+        ],
+      );
+    },
+  );
+}
+
+class AppDrawer extends StatefulWidget {
+  AppDrawer({key}):super();
+  _AppDrawer createState() => _AppDrawer();
+
+}
+
+class _AppDrawer extends State<AppDrawer> {
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Map<String, String?>>(
+      future: _loadUserInfo(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final userInfo = snapshot.data ?? {
+          'NameEn': 'User name',
+          'UserEmail': 'yourmail@gmail.com',
+          'UserImagePath': ''
+        };
+
+        return Drawer(
           backgroundColor: Colors.white,
-          child: Padding(
-            padding: const EdgeInsets.all(24),
+          child: SafeArea(
             child: Column(
-              mainAxisSize: MainAxisSize.min,
               children: [
-                Image.asset('assets/icons/logout_icon.png', height: 48),
-                const SizedBox(height: 16),
-                const Text('Logout', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                const SizedBox(height: 8),
-                const Text(
-                  'Are you sure you want to log out?',
-                  style: TextStyle(fontSize: 16, color: Colors.black54),
-                  textAlign: TextAlign.center,
+                /// 👤 Top user header
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      /// 👤 Avatar
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ProfileScreen(),
+                            ),
+                          );
+                        },
+                        child: CircleAvatar(
+                          radius: 24,
+                          backgroundImage: userInfo['UserImagePath'] != null &&
+                              userInfo['UserImagePath']!.isNotEmpty
+                              ? NetworkImage(userInfo['UserImagePath']!)
+                          as ImageProvider
+                              : const AssetImage('assets/logos/avatar.png'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+
+                      /// 🧑 Username + Email
+                      Expanded(
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ProfileScreen(),
+                              ),
+                            );
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                userInfo['NameEn'] ?? '',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                userInfo['UserEmail'] ?? '',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Color(0xFF1C355E)),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+
+                const Divider(),
+
+                /// Drawer items
+                drawerItem(
+                  'assets/icons/dashboard.png',
+                  'Daily Timesheets',
+                  context,
+                      () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            TimeSheetScreen(status: "daily"),
                       ),
-                      onPressed: () {
-                        Navigator.of(context).pop(); // Close dialog
-                      },
-                      child: const Text('Cancel'),
+                    );
+                  },
+                ),
+                drawerItem('assets/icons/project.png', 'Leave', context, () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TimeSheetScreen(status: "live"),
                     ),
-                    const SizedBox(width: 16),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF1C355E),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      ),
-                      onPressed: () async {
-                        Navigator.of(context).pop(); // Close dialog
-                        await Provider.of<HomeProvider>(context, listen: false).logoutUser(context);
-                      },
-                      child: const Text('Logout'),
-                    ),
-                  ],
+                  );
+                }),
+                ListTile(
+                  leading: Image.asset('assets/icons/recruit.png',
+                      width: 24, height: 24),
+                  title: const Text('Profile'),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ProfileScreen()),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: Image.asset('assets/icons/logout.png',
+                      width: 24, height: 24),
+                  title: const Text('Logout'),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    bool check = await UtilityClass.askForInput(
+                      "Logout",
+                      "Are you sure you want to logout?",
+                      "Logout",
+                      "Cancel",
+                      false,
+                    );
+                    if (check) {
+                      await PrefUtil.clearAll();
+                      navigatorKey.currentState?.pushReplacement(
+                        RightToLeftRoute(
+                          page: SignInScreen(),
+                          duration: const Duration(milliseconds: 500),
+                          startOffset: const Offset(-1.0, 0.0),
+                        ),
+                      );
+                    }
+                  },
                 ),
               ],
             ),
@@ -244,119 +384,6 @@ class HomeScreen extends StatelessWidget {
   }
 
 
-}
-
-class AppDrawer extends StatelessWidget {
-  const AppDrawer({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Drawer(
-      backgroundColor: Colors.white,
-      child: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  /// 👤 Avatar (clickable)
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const ProfileScreen()),
-                      );
-                    },
-                    child: const CircleAvatar(
-                      radius: 24,
-                      backgroundImage: AssetImage('assets/logos/avatar.png'),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-
-                  /// 🧑 Username + Email (clickable)
-                  Expanded(
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      // Makes full area clickable
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const ProfileScreen()),
-                        );
-                      },
-                      child: const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'User name',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            'yourmail@gmail.com',
-                            style: TextStyle(fontSize: 12, color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  /// ✏️ Edit icon (not clickable)
-                  Image.asset('assets/icons/edit.png', width: 16, height: 16),
-                ],
-              ),
-            ),
-
-            const Divider(),
-            drawerItem(
-                'assets/icons/dashboard.png', 'Daily Timesheets', context, () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => TimeSheetScreen(status: "daily"),
-                ),
-              );
-            },),
-            drawerItem('assets/icons/project.png', 'Leave', context, () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => TimeSheetScreen(status: "live"),
-                ),
-              );
-            },),
-            // drawerItem('assets/icons/recruit.png', 'Profile', context),
-            ListTile(
-              leading: Image.asset('assets/icons/recruit.png',
-                  width: 24, height: 24),
-              title: const Text('Profile'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const ProfileScreen()),
-                );
-              },
-            ),
-            ListTile(
-              leading:
-                  Image.asset('assets/icons/logout.png', width: 24, height: 24),
-              title: const Text('Logout'),
-              onTap: () {
-                Navigator.pop(context);
-                showLogoutDialog(context);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget drawerItem(String imagePath, String title, BuildContext context, VoidCallback onTap) {
     return ListTile(
       leading: Image.asset(imagePath, width: 24, height: 24),
@@ -364,4 +391,12 @@ class AppDrawer extends StatelessWidget {
       onTap: onTap,
     );
   }
+}
+
+Future<Map<String, String?>> _loadUserInfo() async {
+  return {
+    'NameEn': await PrefUtil.getNameEn(),
+    'UserEmail': await PrefUtil.getUserEmail(),
+    'UserImagePath': await PrefUtil.getUserImagePath(),
+  };
 }

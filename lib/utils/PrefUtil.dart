@@ -379,8 +379,9 @@ class PrefUtil {
   }
 
   static Future<void> clearAll() async {
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.clear();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    print("✅ Preferences cleared");
   }
 
 

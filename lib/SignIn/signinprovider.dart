@@ -12,6 +12,9 @@ import '../../utils/PrefUtil.dart';
 import 'package:optimanage/constant/colors.dart';
 import 'package:optimanage/utils/RightToLeftRoute.dart';
 import 'package:optimanage/Home/home_screen.dart';
+import 'package:provider/provider.dart';
+
+import '../Home/home_provider.dart';
 
 class signinprovider with ChangeNotifier {
   TextEditingController _empIDController = TextEditingController();
@@ -113,12 +116,24 @@ class signinprovider with ChangeNotifier {
     await PrefUtil.setUserLoggedWay("true");
     UtilityClass.showSnackBar(
         buildContext, "Login successfully", kPrimaryDark);
-    Navigator.of(buildContext).push(RightToLeftRoute(
-      page: HomeScreen(),
-      duration: const Duration(milliseconds: 500),
-      startOffset: const Offset(1.0, 0.0),
-    ));
+    Navigator.of(buildContext).pushAndRemoveUntil(
+      RightToLeftRoute(
+        page: ChangeNotifierProvider(
+          create: (_) => HomeProvider(),
+          child: const HomeScreen(),
+        ),
+        duration: const Duration(milliseconds: 500),
+        startOffset: const Offset(1.0, 0.0),
+      ),
+          (Route<dynamic> route) => false,
+    );
+
     notifyListeners();
+  }
+
+  void clearControllers() {
+    _empIDController.clear();
+    _passwordController.clear();
   }
 
 
