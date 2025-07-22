@@ -46,6 +46,8 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
         'UserId': widget.userId,
       };
 
+      print("✅ change password Request: ${body}");
+
       final response = await http.postRequest("/api/Employee/GetResetPassword", body);
 
       if (response.data["Status"] == true) {

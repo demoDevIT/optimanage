@@ -6,6 +6,7 @@ import 'package:optimanage/timesheet/CalendraModel.dart';
 
 import '../notaskassign/notaskassign_provider.dart';
 import '../notaskassign/notaskassign_sceen.dart';
+import '../utils/PrefUtil.dart';
 import '../utils/UtilityClass.dart';
 import 'ApprovalModalPopup.dart';
 import 'package:optimanage/services/HttpService.dart';
@@ -94,7 +95,7 @@ class timesheet_provider extends ChangeNotifier {
   int leaveHours = 0;
   int leaveMinutes = 0;
   String remarks = "";
-  int userId = 55; // Set this based on logged-in user
+  //int userId = 55; // Set this based on logged-in user
 
 
   String formatDate(DateTime date) {
@@ -248,10 +249,11 @@ class timesheet_provider extends ChangeNotifier {
                               SizedBox(width: 12),
                               // Space between buttons
                               ElevatedButton(
-                                onPressed: () {
+                                onPressed: () async {
                                   print("22Selected Date: $date");
 
                                   Navigator.pop(context); // Close the modal
+                                  int userId = await PrefUtil.getPrefUserId() ?? 0;
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -259,7 +261,7 @@ class timesheet_provider extends ChangeNotifier {
                                         create: (_) => NoTaskAssignProvider(),
                                         child: NoTaskAssignScreen(
                                           selectedDate: DateTime.now(),
-                                          userId: 0,
+                                          userId: userId,
                                         ),
                                       ),
                                     ),
@@ -500,6 +502,8 @@ class timesheet_provider extends ChangeNotifier {
                                             final formattedEnd = formatTimeOfDay(endTime!);
                                             final remarks = remarksController.text.trim();
 
+                                            final userId = await PrefUtil.getPrefUserId() ?? 0;
+
                                             await submitLeaveRequest(
                                               context: context,
                                               leaveType: leaveType,
@@ -510,7 +514,7 @@ class timesheet_provider extends ChangeNotifier {
                                               leaveMinutes: leaveMinutes,
                                               leaveTimeInMinutes: totalMinutes,
                                               remarks: remarks,
-                                              userId: 55,
+                                              userId: userId,
                                             );
 
                                             // ✅ Refresh leave summary and timesheet
@@ -711,10 +715,14 @@ class timesheet_provider extends ChangeNotifier {
     try {
       HttpService http = HttpService(Constants.baseurl);
 
+      print("✅ GetHourSummaryList request date: ${date}");
+
+      final formattedDate = DateFormat('yyyy-MM-dd').format(date);
+
       final body = {
-        "FromDate": "2025-06-18",
-        "ToDate": "2025-06-18",
-        "UserId": 55
+        "FromDate": formattedDate, //"2025-06-18",
+        "ToDate": formattedDate, //"2025-06-18",
+        "UserId": userId // 55
       };
 
       final response = await http.postRequest(
@@ -751,7 +759,7 @@ class timesheet_provider extends ChangeNotifier {
       final body = {
         "LeaveMonth": date.month,
         "LeaveYear": date.year,
-        "UserId": 55
+        "UserId": userId
       };
 
       final response = await http.postRequest(

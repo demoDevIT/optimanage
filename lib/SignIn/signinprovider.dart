@@ -74,7 +74,7 @@ class signinprovider with ChangeNotifier {
   }
 
   checkAndMoveForward(BuildContext buildContext, UserInfoModel? data) async {
-    await PrefUtil.setPrefUserId(data!.UserId!);
+    await PrefUtil.setPrefUserId(int.parse(data!.UserId!));
     await PrefUtil.setTitleId(data.TitleId!);
     await PrefUtil.setNameEn(data.NameEn!);
     await PrefUtil.setNameHi(data.NameHi!);
@@ -108,7 +108,7 @@ class signinprovider with ChangeNotifier {
     await PrefUtil.setCreateDateTime(data.CreateDateTime!);
     await PrefUtil.setUpdateBy(data.UpdateBy!);
     await PrefUtil.setUpdateDateTime(data.UpdateDateTime.toString());
-    await PrefUtil.setRoleId(data.RoleId!);
+    await PrefUtil.setRoleId(int.parse(data!.RoleId!));
     await PrefUtil.setRoleNameEn(data.RoleNameEn!);
     await PrefUtil.setIsResetPassword(data.IsResetPassword!);
 

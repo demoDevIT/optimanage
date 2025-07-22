@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../profile/profile_model.dart';// Adjust path accordingly
 import 'package:optimanage/services/HttpService.dart';
 import 'package:optimanage/constant/Constants.dart';
+import '../utils/PrefUtil.dart';
 import '../utils/UtilityClass.dart';
 
 class ProfileProvider with ChangeNotifier {
@@ -16,10 +17,20 @@ class ProfileProvider with ChangeNotifier {
       UtilityClass.showProgressDialog(context, 'Fetching Profile...');
       HttpService http = HttpService(Constants.baseurl);
 
-      final Map<String, dynamic> body = {
-        "UserId": 55, // Replace with actual user ID
-      };
+      // ✅ Dynamically get UserId from PrefUtil
+      int? userId = await PrefUtil.getPrefUserId();
 
+      if (userId == null || userId == 0) {
+        UtilityClass.dismissProgressDialog();
+        print("❌ User ID not found in preferences.");
+        UtilityClass.askForInput('Error', 'User ID not found.', 'OK', '', true);
+        return;
+      }
+
+      final Map<String, dynamic> body = {
+        "UserId": userId,
+      };
+      print("✅ Profile Request: ${body}");
       final response = await http.postRequest("/api/Employee/GetEmployeeProfile", body);
       UtilityClass.dismissProgressDialog();
 

@@ -68,15 +68,16 @@ class PrefUtil {
   }
 
 
-  static Future<String?> getPrefUserId() async {
+  static Future<void> setPrefUserId(int value) async {
     final sp = await SharedPreferences.getInstance();
-    return sp.getString(UserId);
+    await sp.setInt(UserId, value);
   }
 
-  static Future setPrefUserId(String value) async {
+  static Future<int?> getPrefUserId() async {
     final sp = await SharedPreferences.getInstance();
-    sp.setString(UserId, value);
+    return sp.getInt(UserId);
   }
+
 
   static Future<String?> getTitleId() async {
     final sp = await SharedPreferences.getInstance();
@@ -348,14 +349,14 @@ class PrefUtil {
     sp.setString(UpdateDateTime, value);
   }
 
-  static Future<String?> getRoleId() async {
+  static Future<void> setRoleId(int value) async {
     final sp = await SharedPreferences.getInstance();
-    return sp.getString(RoleId);
+    await sp.setInt(RoleId, value);
   }
 
-  static Future setRoleId(String value) async {
+  static Future<int?> getRoleId() async {
     final sp = await SharedPreferences.getInstance();
-    sp.setString(RoleId, value);
+    return sp.getInt(RoleId);
   }
 
   static Future<String?> getRoleNameEn() async {
@@ -381,7 +382,6 @@ class PrefUtil {
   static Future<void> clearAll() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
-    print("✅ Preferences cleared");
   }
 
 

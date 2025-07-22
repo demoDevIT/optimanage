@@ -10,16 +10,18 @@ class TaskSummaryScreen extends StatefulWidget {
   final AssignedTaskModel task;
   final DateTime selectedDate;
   final int userId;
+
   const TaskSummaryScreen({
-    super.key,
+    Key? key,
     required this.task,
     required this.selectedDate,
     required this.userId,
-  });
+  }) : super(key: key);
 
   @override
   State<TaskSummaryScreen> createState() => _TaskSummaryScreenState();
 }
+
 
 class _TaskSummaryScreenState extends State<TaskSummaryScreen> {
   @override
@@ -29,7 +31,7 @@ class _TaskSummaryScreenState extends State<TaskSummaryScreen> {
     // Call API on load
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = Provider.of<TaskSummaryProvider>(context, listen: false);
-      provider.fetchTaskSummary(1098); // new param
+      provider.fetchTaskSummary(widget.task.taskIssueID); // new param
     });
   }
 

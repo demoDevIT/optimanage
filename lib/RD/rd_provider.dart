@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../RD/project_model.dart';
 import '../RD/module_model.dart';
+import '../utils/PrefUtil.dart';
 import '../utils/UtilityClass.dart';
 import 'package:optimanage/services/HttpService.dart';
 import 'package:optimanage/constant/Constants.dart';
@@ -21,12 +22,17 @@ class RdProvider with ChangeNotifier {
 
       HttpService http = HttpService(Constants.baseurl);
 
+      final int userId = await PrefUtil.getPrefUserId() ?? 0;
+      final int roleId = await PrefUtil.getRoleId() ?? 0; // fallback if null
+
       Map<String, dynamic> body = {
-        "UserId": 55,
-        "RoleId": 4,
+        "UserId": userId,
+        "RoleId": roleId,
         "ProjectId": 0,
         "ModuleId": 0,
       };
+
+      print("✅ RD Project List Request: ${body}");
 
       final response = await http.postRequest("/api/Dropdown/GetProjectList", body);
       UtilityClass.dismissProgressDialog();
@@ -54,12 +60,17 @@ class RdProvider with ChangeNotifier {
 
       HttpService http = HttpService(Constants.baseurl);
 
+      final int userId = await PrefUtil.getPrefUserId() ?? 0;
+      final int roleId = await PrefUtil.getRoleId() ?? 0; // fallback if null
+
       Map<String, dynamic> body = {
-        "UserId": 0,
-        "RoleId": 0,
+        "UserId": userId,
+        "RoleId": roleId,
         "ProjectId": projectId,
         "ModuleId": 0,
       };
+
+      print("✅ RD Module List Request: ${body}");
 
       final response = await http.postRequest("/api/Dropdown/GetModuleList", body);
       UtilityClass.dismissProgressDialog();
@@ -83,18 +94,23 @@ class RdProvider with ChangeNotifier {
   List<ModuleModel> _subModules = [];
   List<ModuleModel> get subModules => _subModules;
 
-  Future<void> fetchSubModuleList(BuildContext context, int moduleId) async {
+  Future<void> fetchSubModuleList(BuildContext context, int moduleId, int projectId) async {
     try {
       UtilityClass.showProgressDialog(context, 'Fetching Submodules...');
 
       HttpService http = HttpService(Constants.baseurl);
 
+      final int userId = await PrefUtil.getPrefUserId() ?? 0;
+      final int roleId = await PrefUtil.getRoleId() ?? 0; // fallback if null
+
       Map<String, dynamic> body = {
-        "UserId": 0,
-        "RoleId": 0,
-        "ProjectId": 0,
+        "UserId": userId,
+        "RoleId": roleId,
+        "ProjectId": projectId,
         "ModuleId": moduleId,
       };
+
+      print("✅ RD SUB-Module List Request: ${body}");
 
       final response = await http.postRequest("/api/Dropdown/GetSubModuleList", body);
       UtilityClass.dismissProgressDialog();

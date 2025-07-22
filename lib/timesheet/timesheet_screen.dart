@@ -12,6 +12,7 @@ import '../constant/common.dart';
 import '../notaskassign/notaskassign_sceen.dart';
 import '../selftask/selftask_provider.dart';
 import '../selftask/selftask_screen.dart';
+import '../utils/PrefUtil.dart';
 import '../utils/UtilityClass.dart';
 
 class TimeSheetScreen extends StatefulWidget {
@@ -25,6 +26,7 @@ class TimeSheetScreen extends StatefulWidget {
 
 class _TimeSheetScreenState extends State<TimeSheetScreen> {
   var provider;
+  int userId = 0; // default fallback
 
   // @override
   // void initState() {
@@ -42,16 +44,19 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       provider = Provider.of<timesheet_provider>(context, listen: false);
 
       final now = DateTime.now(); // 👈 Get current date
+
+      userId = await PrefUtil.getPrefUserId() ?? 0;
+
       provider.focusedDay = now;
       provider.selectedDay = now;
 
       provider.fetchTimesheetData(context, now.month, now.year);
       //provider.fetchTimesheetData(context);
-      provider.fetchLeaveSummary(now, 55);
+      provider.fetchLeaveSummary(now, userId);
 
 
       if (widget.status == "daily") {
@@ -109,7 +114,7 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                     provider.focusedDay = focusedDay;
                     provider.selectedDay = DateTime(focusedDay.year, focusedDay.month, 1);
                     provider.fetchTimesheetData(context, focusedDay.month, focusedDay.year);
-                    provider.fetchLeaveSummary(focusedDay, 55);
+                    provider.fetchLeaveSummary(focusedDay, userId);
                   },
                   selectedDayPredicate: (day) =>
                       isSameDay(provider.selectedDay, day),
@@ -147,7 +152,7 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                         );
                       } else if (widget.status == "daily" && !isWeekend) {
                         UtilityClass.showProgressDialog(context, 'Please wait...');
-                        provider.fetchTaskSummary(provider.selectedDay!, 55);
+                        provider.fetchTaskSummary(provider.selectedDay!, userId);
                         Navigator.pop(context); // close progress dialog
 
                         if (provider.taskSummaries.isNotEmpty) {
@@ -468,7 +473,7 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
               MaterialPageRoute(
                 builder: (context) => RdScreen(
                   selectedDate: provider.selectedDay!, // or any selected date
-                  userId: 0,   // pass actual user ID here
+                  userId: userId,   // pass actual user ID here
                 ),
               ),
             );
@@ -480,7 +485,7 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                   create: (_) => AssignedTaskProvider(),
                   child: AssignedTaskScreen(
                     selectedDate: provider.selectedDay!,
-                    userId: 55,
+                    userId: userId,
                   ),
                 ),
               ),

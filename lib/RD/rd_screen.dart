@@ -337,8 +337,9 @@ class _RdScreenState extends State<RdScreen> {
                     onChanged: (val) async {
                       setState(() => selectedModule = val);
                       final module = rdProvider.modules.firstWhere((m) => m.text == val);
+                      final project = rdProvider.projects.firstWhere((p) => p.fieldName == selectedProject);
                       selectedSubModule = null;
-                      await rdProvider.fetchSubModuleList(context, module.value);
+                      await rdProvider.fetchSubModuleList(context, module.value, project.fieldId);
                     },
                   ),
                   if (rdProvider.subModules.isNotEmpty)

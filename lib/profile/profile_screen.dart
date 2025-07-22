@@ -7,6 +7,7 @@ import 'package:optimanage/profile/profile_provider.dart';
 import 'package:optimanage/profile/change_password_dialog.dart';
 
 import '../main.dart';
+import '../utils/PrefUtil.dart';
 import '../utils/RightToLeftRoute.dart';
 import '../utils/UtilityClass.dart';
 
@@ -199,26 +200,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-void showChangePasswordDialog(BuildContext context) {
-  showGeneralDialog(
-    context: context,
-    barrierDismissible: true,
-    barrierLabel: "Change Password",
-    pageBuilder: (context, _, __) => const SizedBox.shrink(),
-    transitionBuilder: (context, animation, _, child) {
-      return BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-        child: Opacity(
-          opacity: animation.value,
-          child: const Center(
-            child: ChangePasswordDialog(userId: 44),
+  void showChangePasswordDialog(BuildContext context) async {
+    final userId = await PrefUtil.getPrefUserId(); // 👈 Fetch dynamic ID
+
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: "Change Password",
+      pageBuilder: (context, _, __) => const SizedBox.shrink(),
+      transitionBuilder: (context, animation, _, child) {
+        return BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+          child: Opacity(
+            opacity: animation.value,
+            child: Center(
+              child: ChangePasswordDialog(userId: userId!), // 👈 Set dynamically
+            ),
           ),
-        ),
-      );
-    },
-    transitionDuration: const Duration(milliseconds: 300),
-  );
-}
+        );
+      },
+      transitionDuration: const Duration(milliseconds: 300),
+    );
+  }
+
 }
 
 void showLogoutDialog(BuildContext context) {
