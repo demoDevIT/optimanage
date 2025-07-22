@@ -226,50 +226,28 @@ class _RdScreenState extends State<RdScreen> {
       return;
     }
 
+    final now = DateTime.now();
+    final startDateTime = DateTime(now.year, now.month, now.day, _startTime!.hour, _startTime!.minute);
+    final endDateTime = DateTime(now.year, now.month, now.day, _endTime!.hour, _endTime!.minute);
+
+    // 🔒 Validation: End time should be after Start time
+    if (endDateTime.isBefore(startDateTime) || endDateTime.isAtSameMomentAs(startDateTime)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('End time must be after start time')),
+      );
+      return;
+    }
+
     final rdProvider = Provider.of<RdProvider>(context, listen: false);
 
     final project = rdProvider.projects.firstWhere((p) => p.fieldName == selectedProject);
     final module = rdProvider.modules.firstWhere((m) => m.text == selectedModule);
 
-    final now = DateTime.now();
-    final dateStr = DateFormat('yyyy-MM-dd').format(now);
-    // final startStr = _startTime!.format(context);
-    // final endStr = _endTime!.format(context);
-
-    final String startStr = _startTime != null
-        ? _startTime!.hour.toString().padLeft(2, '0') + ':' + _startTime!.minute.toString().padLeft(2, '0')
-        : '';
-
-    final String endStr = _endTime != null
-        ? _endTime!.hour.toString().padLeft(2, '0') + ':' + _endTime!.minute.toString().padLeft(2, '0')
-        : '';
-
-    final duration = int.parse(taskHourController.text) * 60 + int.parse(taskMinuteController.text);
-
+    final String startStr = _startTime!.hour.toString().padLeft(2, '0') + ':' + _startTime!.minute.toString().padLeft(2, '0');
+    final String endStr = _endTime!.hour.toString().padLeft(2, '0') + ':' + _endTime!.minute.toString().padLeft(2, '0');
+    final int duration = int.parse(taskHourController.text) * 60 + int.parse(taskMinuteController.text);
     final String formattedEntryDate = DateFormat('MM/dd/yyyy').format(widget.selectedDate);
 
-    final body = {
-      "TaskType": 4,
-      "TaskId": 0,
-      "TaskDescription": taskDetailsController.text.trim(),
-      "TaskStatus": 0,
-      "EntryDate": formattedEntryDate, //dateStr,
-      "TaskHour": int.parse(taskHourController.text),
-      "TaskMinutes": int.parse(taskMinuteController.text),
-      "TaskDuration": duration,
-      "StartTime": startStr,
-      "EndTime": endStr,
-      "ProjectId": project.fieldId,
-      "TaskTypeId": 0,
-      "ModuleId": module.value,
-      "UserId": 0, // Replace with actual logged-in user ID
-    };
-
-    print('📤 Sending data to API: $body');
-
-    // TODO: Call API here using http or dio package
-    // final response = await http.post(Uri.parse('your_api_url'), body: jsonEncode(body));
-    // ✅ Submit using provider
     await rdProvider.submitRdTask(
       context: context,
       description: taskDetailsController.text.trim(),
@@ -281,13 +259,10 @@ class _RdScreenState extends State<RdScreen> {
       entryDate: formattedEntryDate,
       projectId: project.fieldId,
       moduleId: module.value,
-      userId: widget.userId, // Replace with actual user ID
+      userId: widget.userId,
     );
-
-    // ScaffoldMessenger.of(context).showSnackBar(
-    //   SnackBar(content: Text('Form submitted (mock)!')),
-    // );
   }
+
 
   @override
   Widget build(BuildContext context) {

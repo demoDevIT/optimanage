@@ -76,7 +76,7 @@ class NoTaskAssignProvider extends ChangeNotifier {
         UtilityClass.showSnackBar(context, message, Colors.green);
         Navigator.pop(context, true);
       } else {
-        UtilityClass.showSnackBar(context, message, Colors.red);
+        UtilityClass.showSnackBar(context, response.data['ErrorMessage'], Colors.red);
       }
     } catch (e) {
       debugPrint("❌ Submit error: $e");

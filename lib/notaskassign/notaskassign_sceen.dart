@@ -186,22 +186,38 @@ class _NoTaskAssignScreenState extends State<NoTaskAssignScreen> {
   Future<void> _handleSubmit() async {
     if (_formKey.currentState?.validate() != true) return;
 
+    // Check if both times are selected
+    if (_startTime == null || _endTime == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please select both start and end time')),
+      );
+      return;
+    }
+
+    // Validate: End time must be after start time
+    final now = DateTime.now();
+    final startDateTime = DateTime(now.year, now.month, now.day, _startTime!.hour, _startTime!.minute);
+    final endDateTime = DateTime(now.year, now.month, now.day, _endTime!.hour, _endTime!.minute);
+
+    if (endDateTime.isBefore(startDateTime) || endDateTime.isAtSameMomentAs(startDateTime)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('End time must be after start time')),
+      );
+      return;
+    }
+
     final provider = Provider.of<NoTaskAssignProvider>(context, listen: false);
 
     final int taskHour = int.tryParse(_taskHourController.text) ?? 0;
     final int taskMinute = int.tryParse(_taskMinuteController.text) ?? 0;
     final int taskDuration = (taskHour * 60) + taskMinute;
 
-    // ✅ Format StartTime and EndTime as "HH:mm"
-    final String formattedStartTime = _startTime != null
-        ? _startTime!.hour.toString().padLeft(2, '0') + ':' + _startTime!.minute.toString().padLeft(2, '0')
-        : '';
+    final String formattedStartTime =
+        _startTime!.hour.toString().padLeft(2, '0') + ':' + _startTime!.minute.toString().padLeft(2, '0');
 
-    final String formattedEndTime = _endTime != null
-        ? _endTime!.hour.toString().padLeft(2, '0') + ':' + _endTime!.minute.toString().padLeft(2, '0')
-        : '';
+    final String formattedEndTime =
+        _endTime!.hour.toString().padLeft(2, '0') + ':' + _endTime!.minute.toString().padLeft(2, '0');
 
-    // ✅ Format EntryDate as MM/dd/yyyy
     final String formattedEntryDate = DateFormat('MM/dd/yyyy').format(widget.selectedDate);
 
     await provider.submitNoTask(
@@ -216,5 +232,6 @@ class _NoTaskAssignScreenState extends State<NoTaskAssignScreen> {
       userId: widget.userId,
     );
   }
+
 
 }
