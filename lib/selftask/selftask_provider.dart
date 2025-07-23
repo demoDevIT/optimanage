@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../selftask/project_model.dart';
 import '../selftask/module_model.dart';
@@ -29,6 +30,15 @@ class SelfTaskProvider with ChangeNotifier {
   List<ModuleModel> get subModules => _subModules;
   List<TaskTypeModel> get taskTypes => _taskTypes;
   //PlatformFile? get selectedFile => _selectedFile;
+
+  List<PlatformFile> selectedFiles = []; // ✅ multiple file support
+  List<String> uploadedFilePaths = []; // ✅ store uploaded file paths
+
+  void clearFiles() {
+    selectedFiles.clear();
+    uploadedFilePaths.clear();
+    notifyListeners();
+  }
 
   /// Fetch Projects
   Future<void> fetchProjectList(BuildContext context) async {
@@ -161,8 +171,7 @@ class SelfTaskProvider with ChangeNotifier {
     }
   }
 
-
-  Future<void> pickDocument(BuildContext context) async {
+  Future<void> pickDocuments(BuildContext context) async {
     showModalBottomSheet(
       context: context,
       builder: (ctx) => Wrap(
@@ -173,11 +182,11 @@ class SelfTaskProvider with ChangeNotifier {
             onTap: () async {
               final picked = await ImagePicker().pickImage(source: ImageSource.camera);
               if (picked != null) {
-                selectedFile = PlatformFile(
+                selectedFiles.add(PlatformFile(
                   name: picked.name,
                   path: picked.path,
                   size: File(picked.path).lengthSync(),
-                );
+                ));
                 notifyListeners();
               }
               Navigator.pop(context);
@@ -189,10 +198,11 @@ class SelfTaskProvider with ChangeNotifier {
             onTap: () async {
               final result = await FilePicker.platform.pickFiles(
                 type: FileType.custom,
-                allowedExtensions: ['pdf', 'jpg', 'png', 'doc', 'docx'],
+                allowMultiple: true,
+                allowedExtensions: ['pdf', 'jpg', 'png', 'doc', 'docx', 'jpeg'],
               );
               if (result != null && result.files.isNotEmpty) {
-                selectedFile = result.files.first;
+                selectedFiles.addAll(result.files);
                 notifyListeners();
               }
               Navigator.pop(context);
@@ -203,9 +213,66 @@ class SelfTaskProvider with ChangeNotifier {
     );
   }
 
+  Future<void> uploadFiles() async {
+    uploadedFilePaths.clear();
+
+    HttpService http = HttpService(Constants.baseurl);
+
+    for (var file in selectedFiles) {
+      final filePath = file.path;
+      if (filePath == null) {
+        print("⚠️ File path is null for file: ${file.name}");
+        continue;
+      }
+
+      // ⬇️ Debug: print file info before uploading
+      final fileObject = File(filePath);
+      final fileExists = await fileObject.exists();
+      final fileSize = await fileObject.length();
+
+      print("📁 Uploading File: ${file.name}");
+      print("📍 File path: $filePath");
+      print("✅ File exists: $fileExists");
+      print("📏 File size: $fileSize bytes");
+
+      if (!fileExists || fileSize == 0) {
+        print("🚫 Skipping upload: File is missing or empty.");
+        continue;
+      }
+
+      FormData formData = FormData.fromMap({
+        'file': await MultipartFile.fromFile(
+          filePath,
+          filename: filePath.split('/').last,
+        ),
+      });
+
+      print("📤 Sending FormData: $formData");
+
+      final response = await http.MultipartFilePostRequest(
+        "/api/Timesheet/UploadFiles",
+        formData,
+      );
+
+      print("✅ Upload response: ${response}");
+
+      // ✅ Correct way to extract and convert the file path
+      String fullPath = response.data['FilePath'] ?? '';
+      if (fullPath.isNotEmpty) {
+        String fileName = fullPath.split('\\').last;
+        String urlPath = 'https://optimanageapi.devitsandbox.com/StaticFiles/$fileName';
+        uploadedFilePaths.add(urlPath);
+      }
+      debugPrint("📂 Uploaded File URLs: $uploadedFilePaths");
+
+    }
+  }
+
+
   bool isLoading = false;
 
-  Future<void> submitSelfTask({
+  // update submit task method to include TaskDocuments
+  Future<bool> submitSelfTask({
     required BuildContext context,
     required int projectId,
     required int moduleId,
@@ -213,17 +280,26 @@ class SelfTaskProvider with ChangeNotifier {
     required String taskName,
     required String taskDescription,
     required int userId,
-    required String startDate,  // Format: MM/dd/yyyy
-    required String endDate,    // Format: MM/dd/yyyy
+    required String startDate,
+    required String endDate,
     required int taskDuration,
     String notes = '',
-    String document = 'https://example.com/demo.pdf', // Demo URL
     String remarks = '',
     int isHigherPriority = 0,
   }) async {
     try {
       isLoading = true;
       notifyListeners();
+
+      await uploadFiles(); // 🚀 Upload files first
+
+      List<Map<String, dynamic>> documents = uploadedFilePaths.map((path) => {
+        "TaskId": 0,
+        "DocPath": path,
+        "UserId": userId
+      }).toList();
+
+      print("✅ upload file documents: ${documents}");
 
       final body = {
         "ProjectId": projectId,
@@ -236,12 +312,10 @@ class SelfTaskProvider with ChangeNotifier {
         "EndDate": endDate,
         "TaskDuration": taskDuration,
         "Notes": notes,
-        "Document": document,
         "Remarks": remarks,
         "IsHigherPriority": isHigherPriority,
+        "TaskDocuments": documents, // ✅ New field
       };
-
-      print('📤 Sending Self Task Payload: $body');
 
       HttpService http = HttpService(Constants.baseurl);
       final response = await http.postRequest("/api/Timesheet/AddSelfTask", body);
@@ -252,18 +326,30 @@ class SelfTaskProvider with ChangeNotifier {
       if (success) {
         UtilityClass.showSnackBar(context, message, Colors.green);
         Navigator.pop(context, true);
+        return true;
       } else {
         UtilityClass.showSnackBar(context, message, Colors.red);
+        return false;
       }
     } catch (e) {
-      debugPrint("❌ Self Task Submit Error: $e");
+      debugPrint("❌ Submit Error: $e");
       UtilityClass.showSnackBar(context, "Something went wrong", Colors.red);
+      return false;
     } finally {
       isLoading = false;
       notifyListeners();
     }
   }
 
+  void clearSelections() {
+    selectedProjectId = null;
+    selectedModuleId = null;
+    selectedSubModuleId = null;
+    selectedTaskTypeId = null;
+    selectedFiles.clear();
+    uploadedFilePaths.clear();
+    notifyListeners();
+  }
 
 
   void setSelectedProject(int? id) {

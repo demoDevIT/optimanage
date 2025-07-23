@@ -37,11 +37,29 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
   @override
   void initState() {
     super.initState();
+
     Future.microtask(() {
-      Provider.of<SelfTaskProvider>(context, listen: false)
-          .fetchProjectList(context);
+      final provider = Provider.of<SelfTaskProvider>(context, listen: false);
+
+      // 🔄 Clear all dropdowns and files
+      provider.clearSelections();
+
+      // 🧹 Clear all text fields
+      taskNameController.clear();
+      descriptionController.clear();
+      estimatedTimeController.clear();
+      notesController.clear();
+      documentController.clear();
+
+      // 📆 Reset dates
+      startDate = DateTime(DateTime.now().year, DateTime.now().month, 1);
+      endDate = DateTime(DateTime.now().year, DateTime.now().month + 1, 0);
+
+      // 🔄 Re-fetch fresh project list
+      provider.fetchProjectList(context);
     });
   }
+
 
   Future<void> _selectDate(BuildContext context, bool isStart) async {
     final DateTime? picked = await showDatePicker(
@@ -313,18 +331,43 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
               _buildTextField('Notes', notesController),
               Stack(
                 children: [
-                  GestureDetector(
-                    onTap: () =>
-                        Provider.of<SelfTaskProvider>(context, listen: false)
-                            .pickDocument(context),
-                    child: AbsorbPointer(
-                      child: _buildTextField(
-                        provider.selectedFile?.name ?? 'Upload Document',
-                        documentController,
-                        readOnly: true,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          Provider.of<SelfTaskProvider>(context, listen: false)
+                              .pickDocuments(context);
+                        },
+                        icon: const Icon(
+                          Icons.upload_file,
+                          color: Colors.white, // ✅ white icon
+                        ),
+                        label: const Text(
+                          "Upload Documents",
+                          style: TextStyle(color: Colors.white), // ✅ white text
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF25507C),
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 8),
+                      ...provider.selectedFiles.map((file) => ListTile(
+                        dense: true,
+                        leading: const Icon(Icons.insert_drive_file),
+                        title: Text(file.name),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.clear, size: 20),
+                          onPressed: () {
+                            setState(() {
+                              provider.selectedFiles.remove(file);
+                            });
+                          },
+                        ),
+                      )),
+                    ],
                   ),
+
                   const Positioned(
                     right: 16,
                     top: 20,
@@ -398,11 +441,10 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
         "${startDate.month}/${startDate.day}/${startDate.year}";
     final String formattedEndDate =
         "${endDate.month}/${endDate.day}/${endDate.year}";
-
     final int taskDuration =
         int.tryParse(estimatedTimeController.text.trim()) ?? 0;
 
-    await provider.submitSelfTask(
+    bool success = await provider.submitSelfTask(
       context: context,
       projectId: provider.selectedProjectId!,
       moduleId: provider.selectedModuleId!,
@@ -410,15 +452,50 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
       taskName: taskNameController.text.trim(),
       taskDescription: descriptionController.text.trim(),
       userId: 55,
-      // 🔁 Replace with actual user ID
       startDate: formattedStartDate,
       endDate: formattedEndDate,
       taskDuration: taskDuration,
       notes: notesController.text.trim(),
-      document: provider.selectedFile?.name ?? 'https://example.com/demo.pdf',
-      // or some placeholder if required
       remarks: documentController.text.trim(),
       isHigherPriority: isPriority ? 1 : 0,
     );
+
+    if (success) {
+      // ✅ Clear form
+      _formKey.currentState?.reset();
+
+      taskNameController.clear();
+      descriptionController.clear();
+      estimatedTimeController.clear();
+      notesController.clear();
+      documentController.clear();
+
+      setState(() {
+        selectedProject = null;
+        selectedSubModule = null;
+        selectedTaskType = null;
+        isPriority = false;
+        startDate = DateTime(DateTime.now().year, DateTime.now().month, 1);
+        endDate = DateTime(DateTime.now().year, DateTime.now().month + 1, 0);
+      });
+
+      provider.clearSelections(); // 👉 Add this method in the provider to clear dropdown values and selected files
+    }
   }
+  @override
+  void dispose() {
+    // Clear all controllers
+    taskNameController.dispose();
+    descriptionController.dispose();
+    estimatedTimeController.dispose();
+    notesController.dispose();
+    documentController.dispose();
+
+    // Clear provider state
+    Provider.of<SelfTaskProvider>(context, listen: false).clearSelections();
+
+    super.dispose();
+  }
+
+
 }
