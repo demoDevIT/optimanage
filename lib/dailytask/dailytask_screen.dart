@@ -6,8 +6,13 @@ import '../utils/UtilityClass.dart';
 
 class DailyTaskScreen extends StatefulWidget {
   final AssignedTaskModel task;
+  final int userId;
 
-  const DailyTaskScreen({super.key, required this.task});
+  const DailyTaskScreen({
+    super.key,
+    required this.task,
+    required this.userId, // 🔹 Add this line
+  });
 
   @override
   State<DailyTaskScreen> createState() => _DailyTaskScreenState();
@@ -328,7 +333,12 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
   }) {
     return Expanded(
       child: FormField<TimeOfDay>(
-        validator: (value) => time == null ? 'Select $label' : null,
+        validator: (value) {
+          if (time == null) {
+            return 'Select $label';
+          }
+          return null;
+        },
         builder: (state) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -378,7 +388,22 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
   }
 
   Future<void> _submitForm() async {
-    if (!_formKey.currentState!.validate()) {
+    if (!_formKey.currentState!.validate() || _startTime == null || _endTime == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all required fields including time')),
+      );
+      return;
+    }
+
+    final now = DateTime.now();
+    final startDateTime = DateTime(now.year, now.month, now.day, _startTime!.hour, _startTime!.minute);
+    final endDateTime = DateTime(now.year, now.month, now.day, _endTime!.hour, _endTime!.minute);
+
+    // 🔐 Same validation as R&D screen
+    if (endDateTime.isBefore(startDateTime) || endDateTime.isAtSameMomentAs(startDateTime)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('End time must be after start time')),
+      );
       return;
     }
 
@@ -389,17 +414,11 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
     final taskMinute = int.tryParse(taskMinuteController.text.trim()) ?? 0;
     final taskStatus = int.tryParse(_selectedStatus ?? '0') ?? 0;
 
-    final now = DateTime.now();
     final entryDate = "${now.month.toString().padLeft(2, '0')}/${now.day.toString().padLeft(2, '0')}/${now.year}";
     final duration = (taskHour * 60) + taskMinute;
 
-    final String startStr = _startTime != null
-        ? _startTime!.hour.toString().padLeft(2, '0') + ':' + _startTime!.minute.toString().padLeft(2, '0')
-        : '';
-
-    final String endStr = _endTime != null
-        ? _endTime!.hour.toString().padLeft(2, '0') + ':' + _endTime!.minute.toString().padLeft(2, '0')
-        : '';
+    final String startStr = _startTime!.hour.toString().padLeft(2, '0') + ':' + _startTime!.minute.toString().padLeft(2, '0');
+    final String endStr = _endTime!.hour.toString().padLeft(2, '0') + ':' + _endTime!.minute.toString().padLeft(2, '0');
 
     await provider.submitDailyTask(
       context: context,
@@ -410,10 +429,11 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
       taskMinutes: taskMinute,
       taskStatus: taskStatus,
       projectId: projectId,
-      moduleId: 0,     // Replace with actual moduleId if needed
-      userId: 55,       // Replace with actual userId
+      moduleId: 0, // Replace with actual moduleId if needed
+      userId: widget.userId,  // Replace with actual userId
     );
   }
+
 
   Widget _buildTimePicker({required String label, required TimeOfDay time, required VoidCallback onTap}) {
     return InkWell(

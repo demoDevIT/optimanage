@@ -95,8 +95,8 @@ class timesheet_provider extends ChangeNotifier {
   int leaveHours = 0;
   int leaveMinutes = 0;
   String remarks = "";
-  //int userId = 55; // Set this based on logged-in user
 
+  //int userId = 55; // Set this based on logged-in user
 
   String formatDate(DateTime date) {
     return DateFormat('MM/dd/yyyy').format(date);
@@ -108,17 +108,12 @@ class timesheet_provider extends ChangeNotifier {
     return DateFormat('HH:mm').format(dt);
   }
 
-
-
   void loadDynamicColorsFromApi(List<String> dayColors) {
     _dayColorHexes.clear();
     statuses.clear();
     final RegExp dayKeyPattern = RegExp(r'^Day(\d+)$');
     print("APIDATA");
     print("Api response${dayColors}");
-
-
-
 
     // result?.forEach((key, value) {
     //   final match = dayKeyPattern.firstMatch(key);
@@ -164,9 +159,13 @@ class timesheet_provider extends ChangeNotifier {
       BuildContext context, String type, DateTime date, double getHeight) {
     print("11Selected Date: $date");
     print("showNoTaskBottomSheet5555");
+    resetLeaveForm();
     leaveType = "Half Day";
     final _formKey = GlobalKey<FormState>();
     final TextEditingController remarksController = TextEditingController();
+
+   // final parentContext = context;
+    String? timeError;
 
     showModalBottomSheet(
       context: context,
@@ -178,6 +177,7 @@ class timesheet_provider extends ChangeNotifier {
       builder: (context) {
         return StatefulBuilder(// You need this, notice the parameters below:
             builder: (BuildContext context, StateSetter setState) {
+              //String? timeError;
           return Padding(
             padding: MediaQuery.of(context).viewInsets,
             child: Container(
@@ -253,7 +253,8 @@ class timesheet_provider extends ChangeNotifier {
                                   print("22Selected Date: $date");
 
                                   Navigator.pop(context); // Close the modal
-                                  int userId = await PrefUtil.getPrefUserId() ?? 0;
+                                  int userId =
+                                      await PrefUtil.getPrefUserId() ?? 0;
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -266,7 +267,6 @@ class timesheet_provider extends ChangeNotifier {
                                       ),
                                     ),
                                   );
-
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Color(0xFF25507C),
@@ -294,7 +294,6 @@ class timesheet_provider extends ChangeNotifier {
                   // visible: type == "Add Leave" ? true : false,
                   Visibility(
                       visible: type == "Add Leave" ? true : false,
-
                       child: Form(
                         key: _formKey,
                         child: SingleChildScrollView(
@@ -303,252 +302,285 @@ class timesheet_provider extends ChangeNotifier {
                               maxHeight: MediaQuery.of(context).size.height *
                                   0.6, // Adjust modal height
                             ),
-                          //  child: IntrinsicHeight(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        flex: 8,
-                                        child: Text(
-                                          "Mark Leave (${date.toIso8601String().split('T').first})",
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: Color(0xFF000000),
-                                          ),
+                            //  child: IntrinsicHeight(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 8,
+                                      child: Text(
+                                        "Mark Leave (${date.toIso8601String().split('T').first})",
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFF000000),
                                         ),
                                       ),
-                                      Expanded(
-                                        flex: 2,
-                                        child: IconButton(
-                                          icon: const Icon(Icons.close),
-                                          onPressed: () =>
-                                              Navigator.of(context).pop(),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  // ✅ Add horizontal line below title
-                                  const Divider(
-                                    color: Color(0xFFE6E6E6),
-                                    thickness: 1,
-                                    height: 1,
-                                    indent: 0,
-                                    // ✅ No left margin
-                                    endIndent: 0, // ✅ No right margin
-                                  ),
-
-                                  const SizedBox(height: 12),
-                                  DropdownButtonFormField<String>(
-                                    value: leaveType,
-                                    icon: const SizedBox.shrink(),
-                                    decoration: InputDecoration(
-                                      filled: true,
-                                      fillColor: const Color(0xFFF5F9FE),
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                        borderSide: BorderSide.none,
-                                      ),
-                                      suffixIcon: const Icon(
-                                        Icons.arrow_drop_down,
-                                        size: 30,
-                                        color: Color(0xFF25507C),
-                                      ),
                                     ),
-                                    items: ["Half Day", "Full Day", "Early Going", "Late Coming"]
-                                        .map((type) => DropdownMenuItem(
-                                              value: type,
-                                              child: Text(type),
-                                            ))
-                                        .toList(),
-                                    onChanged: (val) {
-                                      if (val != null) {
-                                        leaveType = val;
-                                        notifyListeners();
-                                        setState(() {});
-                                      }
-                                    },
-                                    validator: (val) =>
-                                    (val == null || val.isEmpty)
-                                        ? 'Please select leave type'
-                                        : null,
-                                  ),
-
-                                  const SizedBox(height: 16),
-                                  if (leaveType == "Half Day" || leaveType == "Early Going" ||
-                                      leaveType == "Late Coming") ...[
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          flex: 5,
-                                          child: GestureDetector(
-                                            onTap: () => selectTime(context, true, setState),
-                                            child: _timeInfo("Start Time", startTime!.format(context)),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                          flex: 5,
-                                          child: GestureDetector(
-                                            onTap: () => selectTime(context, false, setState),
-                                            child: _timeInfo("End Time", endTime!.format(context)),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                            flex: 5,
-                                            child: _timeInfo("Leave Hour", leaveHour)),
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                            flex: 5,
-                                            child: _timeInfo("Leave Minute", leaveMinute)),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 16),
-                                  ],
-
-                                  TextFormField(
-                                    controller: remarksController,
-                                    maxLines: 4,
-                                    decoration: InputDecoration(
-                                      hintText: 'Description',
-                                      filled: true,
-                                      fillColor: Color(0xFFF5F9FE),
-                                      // Light fill background
-                                      contentPadding: const EdgeInsets.all(10),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                        borderSide:
-                                            BorderSide.none, // No border
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                        borderSide: BorderSide(
-                                            color: Color(0xFF2196F3),
-                                            width: 2), // Blue border on focus
-                                      ),
-
-                                    ),
-              validator: (val) => (val == null || val.isEmpty)
-              ? 'Please enter a description'
-                  : null,
-
-                                  ),
-                                  const SizedBox(height: 20),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    // Right align
-                                    children: [
-                                      OutlinedButton(
+                                    Expanded(
+                                      flex: 2,
+                                      child: IconButton(
+                                        icon: const Icon(Icons.close),
                                         onPressed: () {
+                                          resetLeaveForm(); // 🧹 optional second cleanup
                                           Navigator.pop(context);
                                         },
-                                        style: OutlinedButton.styleFrom(
-                                          side: BorderSide(
-                                              color: Color(0xFF25507C)),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 24, vertical: 10),
-                                        ),
-                                        child: Text(
-                                          'Close',
-                                          style: TextStyle(
-                                            color: Color(0xFF25507C),
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                // ✅ Add horizontal line below title
+                                const Divider(
+                                  color: Color(0xFFE6E6E6),
+                                  thickness: 1,
+                                  height: 1,
+                                  indent: 0,
+                                  // ✅ No left margin
+                                  endIndent: 0, // ✅ No right margin
+                                ),
+
+                                const SizedBox(height: 12),
+                                DropdownButtonFormField<String>(
+                                  value: leaveType,
+                                  icon: const SizedBox.shrink(),
+                                  decoration: InputDecoration(
+                                    filled: true,
+                                    fillColor: const Color(0xFFF5F9FE),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    suffixIcon: const Icon(
+                                      Icons.arrow_drop_down,
+                                      size: 30,
+                                      color: Color(0xFF25507C),
+                                    ),
+                                  ),
+                                  items: [
+                                    "Half Day",
+                                    "Full Day",
+                                    "Early Going",
+                                    "Late Coming"
+                                  ]
+                                      .map((type) => DropdownMenuItem(
+                                            value: type,
+                                            child: Text(type),
+                                          ))
+                                      .toList(),
+                                  onChanged: (val) {
+                                    if (val != null) {
+                                      leaveType = val;
+                                      notifyListeners();
+                                      setState(() {});
+                                    }
+                                  },
+                                  validator: (val) =>
+                                      (val == null || val.isEmpty)
+                                          ? 'Please select leave type'
+                                          : null,
+                                ),
+
+                                const SizedBox(height: 16),
+                                if (leaveType == "Half Day" ||
+                                    leaveType == "Early Going" ||
+                                    leaveType == "Late Coming") ...[
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        flex: 5,
+                                        child: GestureDetector(
+                                          onTap: () => selectTime(context, true, setState),
+                                          child: _timeInfo("Start Time", startTime!.format(context)),
                                         ),
                                       ),
-                                      SizedBox(width: 12),
-                                      // Space between buttons
-                                      ElevatedButton(
-                                        onPressed: () async {
-                                          if (!_formKey.currentState!.validate()) {
-                                            debugPrint("❌ Form validation failed");
-                                            return;
-                                          }
-
-                                          leaveDate = date;
-                                          debugPrint("leaveType: $leaveType");
-                                          debugPrint("leaveDate: $leaveDate");
-                                          debugPrint("startTime: $startTime");
-                                          debugPrint("endTime: $endTime");
-
-
-                                          if (leaveType == null || leaveDate == null || startTime == null || endTime == null) {
-                                            debugPrint("❌ Required fields missing");
-                                            return;
-                                          }
-
-                                          try {
-                                            final start = DateTime(leaveDate!.year, leaveDate!.month, leaveDate!.day, startTime!.hour, startTime!.minute);
-                                            final end = DateTime(leaveDate!.year, leaveDate!.month, leaveDate!.day, endTime!.hour, endTime!.minute);
-
-                                            final duration = end.difference(start);
-                                            leaveHours = duration.inHours;
-                                            leaveMinutes = duration.inMinutes % 60;
-                                            final totalMinutes = duration.inMinutes;
-
-                                            final formattedDate = formatDate(leaveDate!);
-                                            final formattedStart = formatTimeOfDay(startTime!);
-                                            final formattedEnd = formatTimeOfDay(endTime!);
-                                            final remarks = remarksController.text.trim();
-
-                                            final userId = await PrefUtil.getPrefUserId() ?? 0;
-
-                                            await submitLeaveRequest(
-                                              context: context,
-                                              leaveType: leaveType,
-                                              leaveDate: formattedDate,
-                                              startTime: formattedStart,
-                                              endTime: formattedEnd,
-                                              leaveHours: leaveHours,
-                                              leaveMinutes: leaveMinutes,
-                                              leaveTimeInMinutes: totalMinutes,
-                                              remarks: remarks,
-                                              userId: userId,
-                                            );
-
-                                            // ✅ Refresh leave summary and timesheet
-                                            await fetchLeaveSummary(focusedDay, userId);
-                                            await fetchTimesheetData(context, focusedDay.month, focusedDay.year);
-
-                                            Navigator.pop(context);
-                                          } catch (e) {
-                                            debugPrint("❌ Save button error: $e");
-                                          }
-                                        },
-
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Color(0xFF25507C),
-                                          // Save button color
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 24, vertical: 10),
-                                        ),
-                                        child: Text(
-                                          'Save',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        flex: 5,
+                                        child: GestureDetector(
+                                          onTap: () => selectTime(context, false, setState),
+                                          child: _timeInfo("End Time", endTime!.format(context)),
                                         ),
                                       ),
                                     ],
-                                  )
+                                  ),
+
+                                  if (timeError != null)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 6, left: 4),
+                                      child: Text(
+                                        timeError!,
+                                        style: const TextStyle(
+                                          color: Colors.red,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                    ),
+
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                          flex: 5,
+                                          child: _timeInfo(
+                                              "Leave Hour", leaveHour)),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                          flex: 5,
+                                          child: _timeInfo(
+                                              "Leave Minute", leaveMinute)),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
                                 ],
-                              ),
+
+                                TextFormField(
+                                  controller: remarksController,
+                                  maxLines: 4,
+                                  decoration: InputDecoration(
+                                    hintText: 'Description',
+                                    filled: true,
+                                    fillColor: Color(0xFFF5F9FE),
+                                    // Light fill background
+                                    contentPadding: const EdgeInsets.all(10),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide.none, // No border
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                          color: Color(0xFF2196F3),
+                                          width: 2), // Blue border on focus
+                                    ),
+                                  ),
+                                  validator: (val) =>
+                                      (val == null || val.isEmpty)
+                                          ? 'Please enter a description'
+                                          : null,
+                                ),
+                                const SizedBox(height: 20),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  // Right align
+                                  children: [
+                                    OutlinedButton(
+                                      onPressed: () {
+                                        resetLeaveForm(); // 🧹 optional second cleanup
+                                        Navigator.pop(context);
+                                      },
+                                      style: OutlinedButton.styleFrom(
+                                        side: BorderSide(
+                                            color: Color(0xFF25507C)),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 24, vertical: 10),
+                                      ),
+                                      child: Text(
+                                        'Close',
+                                        style: TextStyle(
+                                          color: Color(0xFF25507C),
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: 12),
+                                    // Space between buttons
+                                    ElevatedButton(
+                                      onPressed: () async {
+
+
+
+                                        if (!_formKey.currentState!.validate()) {
+                                          debugPrint("❌ Form validation failed");
+                                          return;
+                                        }
+
+                                        // Start-End Time Validation
+                                        final startMinutes = startTime!.hour * 60 + startTime!.minute;
+                                        final endMinutes = endTime!.hour * 60 + endTime!.minute;
+
+                                        if (startMinutes >= endMinutes) {
+                                          setState(() {
+                                            timeError = 'Start time must be before end time';
+                                          });
+                                          return;
+                                        } else {
+                                          setState(() {
+                                            timeError = null;
+                                          });
+                                        }
+
+
+
+                                        leaveDate = date;
+
+                                        try {
+                                          final start = DateTime(leaveDate!.year, leaveDate!.month, leaveDate!.day, startTime!.hour, startTime!.minute);
+                                          final end = DateTime(leaveDate!.year, leaveDate!.month, leaveDate!.day, endTime!.hour, endTime!.minute);
+
+                                          final duration = end.difference(start);
+                                          leaveHours = duration.inHours;
+                                          leaveMinutes = duration.inMinutes % 60;
+                                          final totalMinutes = duration.inMinutes;
+
+                                          final formattedDate = formatDate(leaveDate!);
+                                          final formattedStart = formatTimeOfDay(startTime!);
+                                          final formattedEnd = formatTimeOfDay(endTime!);
+                                          final remarks = remarksController.text.trim();
+
+                                          final userId = await PrefUtil.getPrefUserId() ?? 0;
+
+                                          await submitLeaveRequest(
+                                            context: context,
+                                            leaveType: leaveType,
+                                            leaveDate: formattedDate,
+                                            startTime: formattedStart,
+                                            endTime: formattedEnd,
+                                            leaveHours: leaveHours,
+                                            leaveMinutes: leaveMinutes,
+                                            leaveTimeInMinutes: totalMinutes,
+                                            remarks: remarks,
+                                            userId: userId,
+                                          );
+
+                                          await fetchLeaveSummary(focusedDay, userId);
+                                          await fetchTimesheetData(context, focusedDay.month, focusedDay.year, userId);
+
+                                          Navigator.pop(context);
+                                          resetLeaveForm();
+                                        } catch (e) {
+                                          debugPrint("❌ Save button error: $e");
+                                        }
+                                      },
+
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Color(0xFF25507C),
+                                        // Save button color
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 24, vertical: 10),
+                                      ),
+                                      child: Text(
+                                        'Save',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
                             //),
                           ),
                         ),
@@ -563,6 +595,16 @@ class timesheet_provider extends ChangeNotifier {
         });
       },
     );
+  }
+
+  void resetLeaveForm() {
+    leaveType = "Half Day";
+    startTime = TimeOfDay(hour: 10, minute: 0);
+    endTime = TimeOfDay(hour: 19, minute: 30);
+    leaveHour = "0";
+    leaveMinute = "0";
+    remarks = "";
+    notifyListeners();
   }
 
   Widget _timeInfo(String label, String value) {
@@ -608,7 +650,8 @@ class timesheet_provider extends ChangeNotifier {
     );
   }
 
-  Future<void> selectTime(BuildContext context, bool isStart, StateSetter setState) async {
+  Future<void> selectTime(
+      BuildContext context, bool isStart, StateSetter setState) async {
     final picked = await showTimePicker(
       context: context,
       initialTime: isStart ? startTime! : endTime!,
@@ -637,7 +680,8 @@ class timesheet_provider extends ChangeNotifier {
     }
   }
 
-  Future<void> fetchTimesheetData(BuildContext context,   int month, int year) async {
+  Future<void> fetchTimesheetData(
+      BuildContext context, int month, int year, int userId) async {
     try {
       UtilityClass.showProgressDialog(context, 'Please wait...');
 
@@ -646,8 +690,8 @@ class timesheet_provider extends ChangeNotifier {
       Map<String, dynamic> inputText = {
         "MonthId": month,
         "YearId": year,
-        "UserId": 44,
-      //  "RoleId": 5,
+        "UserId": userId,
+        //  "RoleId": 5,
       };
 
       final response = await http.postRequest(
@@ -671,9 +715,15 @@ class timesheet_provider extends ChangeNotifier {
           String dayKey = 'Day$i';
           String dateKey = 'Date$i';
 
-          if (employeeData.containsKey(dayKey) && employeeData.containsKey(dateKey)) {
-            String colorHex = employeeData[dayKey].toString().replaceAll('#', '');
-            String dateStr = employeeData[dateKey].toString().replaceAll('[', '').replaceAll(']', '').trim();
+          if (employeeData.containsKey(dayKey) &&
+              employeeData.containsKey(dateKey)) {
+            String colorHex =
+                employeeData[dayKey].toString().replaceAll('#', '');
+            String dateStr = employeeData[dateKey]
+                .toString()
+                .replaceAll('[', '')
+                .replaceAll(']', '')
+                .trim();
 
             try {
               final date = DateTime.parse(dateStr);
@@ -690,10 +740,6 @@ class timesheet_provider extends ChangeNotifier {
       } else {
         print("❌ No data found in Result.");
       }
-
-
-
-
     } catch (e) {
       UtilityClass.dismissProgressDialog();
       print("❌ Exception while calling API: $e");
@@ -710,8 +756,7 @@ class timesheet_provider extends ChangeNotifier {
 
   List<TaskSummaryModalPopup> taskSummaries = [];
 
-  Future<void> fetchTaskSummary(DateTime date, int userId) async
-  {
+  Future<void> fetchTaskSummary(DateTime date, int userId) async {
     try {
       HttpService http = HttpService(Constants.baseurl);
 
@@ -817,20 +862,23 @@ class timesheet_provider extends ChangeNotifier {
       print("📤 Request body: $body");
 
       HttpService http = HttpService(Constants.baseurl);
-      final response = await http.postRequest("/api/Timesheet/AddResourceLeave", body);
+      final response =
+          await http.postRequest("/api/Timesheet/AddResourceLeave", body);
 
       print("✅ Response: ${response.data}");
 
       final message = response.data['Message'] ?? "Leave added";
       final success = response.data['State'] == 1;
-      final errorMessage = response.data['ErrorMessage'] ?? "Failed to add leave";
+      final errorMessage =
+          response.data['ErrorMessage'] ?? "Failed to add leave";
 
       if (success) {
         UtilityClass.showSnackBar(context, message, kPrimaryDark);
 
         // Refresh calendar + timesheet data
         await fetchLeaveSummary(focusedDay, userId);
-        await fetchTimesheetData(context, focusedDay.month, focusedDay.year);
+        await fetchTimesheetData(
+            context, focusedDay.month, focusedDay.year, userId);
 
         Navigator.pop(context); // Close modal
       } else {
@@ -842,13 +890,8 @@ class timesheet_provider extends ChangeNotifier {
     }
   }
 
-
-  void showtaskSummaryBottomSheet(
-      BuildContext context,
-      String type,
-      DateTime date,
-      double getHeight,
-      List<TaskSummaryModalPopup> summaries) {
+  void showtaskSummaryBottomSheet(BuildContext context, String type,
+      DateTime date, double getHeight, List<TaskSummaryModalPopup> summaries) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -874,7 +917,8 @@ class timesheet_provider extends ChangeNotifier {
                     const Center(
                       child: Text(
                         "View Hour Summary",
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w600),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -886,102 +930,103 @@ class timesheet_provider extends ChangeNotifier {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    ...summaries.map((task) => Container(
-                      width: double.infinity,
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF5F9FE),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black12,
-                            blurRadius: 6,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            task.ProjectName,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 16,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          _buildRow("Timesheet Date", task.EntryDate),
-                          const Divider(
-                            thickness: 1,
-                            height: 1,
-                            color: Color(0xFFE2E2E2),
-                          ),
-                          const SizedBox(height: 10),
-
-                          _buildRow("Start Time", task.StartTime),
-                          const Divider(
-                            thickness: 1,
-                            height: 1,
-                            color: Color(0xFFE2E2E2),
-                          ),
-                          const SizedBox(height: 10),
-                          _buildRow("End Time", task.EndTime),
-                          const Divider(
-                            thickness: 1,
-                            height: 1,
-                            color: Color(0xFFE2E2E2),
-                          ),
-                          const SizedBox(height: 10),
-                          _buildRow("Task Time", task.TaskTime),
-                          const Divider(
-                            thickness: 1,
-                            height: 1,
-                            color: Color(0xFFE2E2E2),
-                          ),
-                          _buildRow(
-                            "Status",
-                            task.strTaskStauts,
-                            valueColor: task.strTaskStauts.toLowerCase() == "completed"
-                                ? Colors.green
-                                : Colors.black,
-                          ),
-                          const Divider(
-                            thickness: 1,
-                            height: 1,
-                            color: Color(0xFFE2E2E2),
-                          ),
-                          const SizedBox(height: 8),
-
-                          _buildRow("Entry Date/Time", "${task.CreatedDate}, ${task.CreatedTime}"),
-                          const Divider(
-                            thickness: 1,
-                            height: 1,
-                            color: Color(0xFFE2E2E2),
-                          ),
-
-                          const SizedBox(height: 8),
-                          const Text(
-                            "Task Description",
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            task.TaskShortDescription,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )).toList()
-
+                    ...summaries
+                        .map((task) => Container(
+                              width: double.infinity,
+                              margin: const EdgeInsets.only(bottom: 12),
+                              padding: const EdgeInsets.all(14),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF5F9FE),
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 6,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    task.ProjectName,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  _buildRow("Timesheet Date", task.EntryDate),
+                                  const Divider(
+                                    thickness: 1,
+                                    height: 1,
+                                    color: Color(0xFFE2E2E2),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  _buildRow("Start Time", task.StartTime),
+                                  const Divider(
+                                    thickness: 1,
+                                    height: 1,
+                                    color: Color(0xFFE2E2E2),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  _buildRow("End Time", task.EndTime),
+                                  const Divider(
+                                    thickness: 1,
+                                    height: 1,
+                                    color: Color(0xFFE2E2E2),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  _buildRow("Task Time", task.TaskTime),
+                                  const Divider(
+                                    thickness: 1,
+                                    height: 1,
+                                    color: Color(0xFFE2E2E2),
+                                  ),
+                                  _buildRow(
+                                    "Status",
+                                    task.strTaskStauts,
+                                    valueColor:
+                                        task.strTaskStauts.toLowerCase() ==
+                                                "completed"
+                                            ? Colors.green
+                                            : Colors.black,
+                                  ),
+                                  const Divider(
+                                    thickness: 1,
+                                    height: 1,
+                                    color: Color(0xFFE2E2E2),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  _buildRow("Entry Date/Time",
+                                      "${task.CreatedDate}, ${task.CreatedTime}"),
+                                  const Divider(
+                                    thickness: 1,
+                                    height: 1,
+                                    color: Color(0xFFE2E2E2),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  const Text(
+                                    "Task Description",
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    task.TaskShortDescription,
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ))
+                        .toList()
                   ],
                 ),
               ],
@@ -992,9 +1037,6 @@ class timesheet_provider extends ChangeNotifier {
     );
   }
 
-
-
-
   Map<String, Color> get statusColorMap => {};
 
   Widget _buildRow(String label, String value, {Color? valueColor}) {
@@ -1003,15 +1045,14 @@ class timesheet_provider extends ChangeNotifier {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-        Text(
-              label,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.normal,
-                color: Colors.black87,
-              ),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.normal,
+              color: Colors.black87,
             ),
-
+          ),
           const SizedBox(width: 12),
           Text(
             value,
@@ -1026,11 +1067,4 @@ class timesheet_provider extends ChangeNotifier {
       ),
     );
   }
-
-
-
-
-
-
-
 }

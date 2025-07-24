@@ -54,7 +54,7 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
       provider.focusedDay = now;
       provider.selectedDay = now;
 
-      provider.fetchTimesheetData(context, now.month, now.year);
+      provider.fetchTimesheetData(context, now.month, now.year, userId);
       //provider.fetchTimesheetData(context);
       provider.fetchLeaveSummary(now, userId);
 
@@ -113,7 +113,7 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                   onPageChanged: (focusedDay) {
                     provider.focusedDay = focusedDay;
                     provider.selectedDay = DateTime(focusedDay.year, focusedDay.month, 1);
-                    provider.fetchTimesheetData(context, focusedDay.month, focusedDay.year);
+                    provider.fetchTimesheetData(context, focusedDay.month, focusedDay.year, userId);
                     provider.fetchLeaveSummary(focusedDay, userId);
                   },
                   selectedDayPredicate: (day) =>

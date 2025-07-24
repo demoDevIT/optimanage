@@ -180,7 +180,10 @@ class _TaskSummaryScreenState extends State<TaskSummaryScreen> {
                               MaterialPageRoute(
                                 builder: (_) => ChangeNotifierProvider(
                                   create: (_) => DailyTaskProvider(),
-                                  child: DailyTaskScreen(task: widget.task!), // 👈 Pass task
+                                  child: DailyTaskScreen(
+                                    task: widget.task!,      // ✅ already passed
+                                    userId: widget.userId,   // ✅ pass the userId too
+                                  ),
                                 ),
                               ),
                             );
