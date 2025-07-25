@@ -118,10 +118,21 @@ class _AssignedTaskScreenState extends State<AssignedTaskScreen> {
         child: Column(
           children: [
             Expanded(
-              child: ListView.builder(
+              child: assignedProjects.isEmpty
+                  ? const Center(
+                child: Text(
+                  'No record',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey,
+                  ),
+                ),
+              )
+                  : ListView.builder(
                 itemCount: assignedProjects.length,
                 itemBuilder: (context, index) {
-                  final project = assignedProjects[index]; // ✅ Define project here
+                  final project = assignedProjects[index];
 
                   return Container(
                     margin: const EdgeInsets.symmetric(vertical: 6),
@@ -135,12 +146,12 @@ class _AssignedTaskScreenState extends State<AssignedTaskScreen> {
                       initiallyExpanded: expandedIndex == index,
                       onExpansionChanged: (expanded) {
                         setState(() {
-                          expandedIndex = expanded ? index : null; // Accordion behavior
+                          expandedIndex = expanded ? index : null;
                         });
                       },
                       tilePadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
                       childrenPadding: EdgeInsets.zero,
-                      shape: const RoundedRectangleBorder(), // You can keep this if needed
+                      shape: const RoundedRectangleBorder(),
                       title: Text(
                         "${project.projectName} (${project.taskData.length})",
                         style: const TextStyle(
@@ -161,11 +172,8 @@ class _AssignedTaskScreenState extends State<AssignedTaskScreen> {
                           height: 1,
                           thickness: 1,
                           color: Color(0xFFE5E5E5),
-                          indent: 0,
-                          endIndent: 0,
                         ),
                         ...List.generate(project.taskData.length, (taskIndex) {
-                          // final task = project['tasks'][taskIndex];
                           final taskKey = '$index-$taskIndex';
                           final task = project.taskData[taskIndex];
 
@@ -175,25 +183,9 @@ class _AssignedTaskScreenState extends State<AssignedTaskScreen> {
                             onChanged: (value) {
                               setState(() {
                                 selectedTaskKey = value;
-                                selectedTask = task; // Save the selected task
+                                selectedTask = task;
                               });
                             },
-
-                            // onChanged: (value) {
-                            //   setState(() {
-                            //     selectedTaskKey = value;
-                            //   });
-                            //   Navigator.push(
-                            //     context,
-                            //     MaterialPageRoute(
-                            //       builder: (context) => TaskSummaryScreen(
-                            //         task: task,
-                            //         selectedDate: widget.selectedDate,
-                            //         userId: widget.userId,
-                            //       ),
-                            //     ),
-                            //   );
-                            // },
                             contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                             title: Text(
                               task.taskName,
@@ -210,32 +202,23 @@ class _AssignedTaskScreenState extends State<AssignedTaskScreen> {
               ),
             ),
 
+
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  if (selectedTask != null) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => TaskSummaryScreen(
-                          task: selectedTask!, // 👈 ensure it's not null
-                          selectedDate: widget.selectedDate,
-                          userId: widget.userId,
-                        ),
+                onPressed: selectedTask == null ? null : () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TaskSummaryScreen(
+                        task: selectedTask!,
+                        selectedDate: widget.selectedDate,
+                        userId: widget.userId,
                       ),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Please select a task first"),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
+                    ),
+                  );
                 },
-
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF25507C),
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -252,6 +235,7 @@ class _AssignedTaskScreenState extends State<AssignedTaskScreen> {
                   ),
                 ),
               ),
+
             ),
           ],
         ),

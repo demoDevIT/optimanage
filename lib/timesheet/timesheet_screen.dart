@@ -72,8 +72,10 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
     provider.showLeaveDetails = false;
     provider.showdailyDetails = false;
+    });
     super.dispose();
   }
 

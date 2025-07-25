@@ -33,14 +33,26 @@ class AssignedTaskProvider with ChangeNotifier {
       final response = await http.postRequest("/api/Timesheet/GetAssignTaskList", body);
       UtilityClass.dismissProgressDialog();
 
-      if (response.data['Status'] == true && response.data['Data'] != null) {
+      if (response.data['Status'] == true &&
+          response.data['Data'] != null &&
+          response.data['Data'].toString().isNotEmpty) {
+
         final List<dynamic> jsonList = jsonDecode(response.data['Data']);
         _assignedProjects = jsonList.map((e) => AssignedProjectModel.fromJson(e)).toList();
         notifyListeners();
+
       } else {
         _assignedProjects = [];
-        UtilityClass.showSnackBar(context, response.data['Message'] ?? 'No data found', Colors.red);
+
+        // Show 'No data found' only if Data is actually empty
+        UtilityClass.showSnackBar(
+          context,
+          'No record found.',
+          Colors.red,
+        );
       }
+
+
     } catch (e) {
       UtilityClass.dismissProgressDialog();
       print("❌ Error in fetchAssignedTasks: $e");
