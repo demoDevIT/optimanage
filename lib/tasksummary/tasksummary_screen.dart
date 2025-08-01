@@ -5,6 +5,8 @@ import '../constant/common.dart';
 import '../dailytask/dailytask_provider.dart';
 import '../dailytask/dailytask_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
 
 class TaskSummaryScreen extends StatefulWidget {
   final AssignedTaskModel task;
@@ -48,7 +50,11 @@ class _TaskSummaryScreenState extends State<TaskSummaryScreen> {
           Navigator.of(context).pop(false);
         },
         actions: [
-          Image.asset('assets/icons/notification.png', width: 24, height: 24),
+          SvgPicture.asset(
+            'assets/icons/notification.svg',
+            width: 24,
+            height: 24,
+          ),
           SizedBox(width: 10),
         ],
       ),

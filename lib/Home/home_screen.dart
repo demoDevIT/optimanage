@@ -8,6 +8,7 @@ import '../timesheet/timesheet_screen.dart';
 import '../utils/PrefUtil.dart';
 import '../utils/RightToLeftRoute.dart';
 import 'home_provider.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -31,10 +32,16 @@ class HomeScreen extends StatelessWidget {
         centerTitle: true,
         leading: Builder(
           builder: (context) => IconButton(
-            icon: Image.asset(
-              'assets/icons/dashboard_menu.png',
-              width: 24,
-              height: 24,
+            icon:
+            // Image.asset(
+            //   'assets/icons/dashboard_menu.png',
+            //   width: 24,
+            //   height: 24,
+            // ),
+            SvgPicture.asset(
+              'assets/icons/dashboard_menu.svg',
+              width: 18,
+              height: 18,
             ),
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
@@ -49,13 +56,21 @@ class HomeScreen extends StatelessWidget {
                 //   MaterialPageRoute(builder: (context) => const ProfileScreen()),
                 // );
               },
-              child: Image.asset(
-                'assets/icons/notification.png',
-                //for new notifications (with dot)
-                //'assets/icons/notify.png', // for no notifications (without dot)
-                width: 24, // optional: set width
-                height: 24, // optional: set height
+              child:
+              // Image.asset(
+              //   'assets/icons/notification.png',
+              //   //for new notifications (with dot)
+              //   //'assets/icons/notify.png', // for no notifications (without dot)
+              //   width: 24, // optional: set width
+              //   height: 24, // optional: set height
+              // ),
+
+              SvgPicture.asset(
+                'assets/icons/notification.svg',
+                width: 24,
+                height: 24,
               ),
+
             ),
           ),
         ],
@@ -107,7 +122,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     _dashboardCard(
-                      imagePath: 'assets/icons/dailyTmsht.png',
+                      imagePath: 'assets/icons/dailyTmsht.svg',
                       title: 'Daily Timesheets',
                       onTap: () {
                         Navigator.push(
@@ -120,7 +135,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     _dashboardCard(
-                      imagePath: 'assets/icons/leave.png',
+                      imagePath: 'assets/icons/leave.svg',
                       title: 'Leave',
                       onTap: () {
                         Navigator.push(
@@ -169,7 +184,7 @@ class HomeScreen extends StatelessWidget {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.asset(
+                child: SvgPicture.asset(
                   imagePath,
                   width: 56,
                   height: 56,
@@ -317,7 +332,7 @@ class _AppDrawer extends State<AppDrawer> {
 
                 /// Drawer items
                 drawerItem(
-                  'assets/icons/dashboard.png',
+                  'assets/icons/dashboard.svg',
                   'Daily Timesheets',
                   context,
                       () {
@@ -330,7 +345,7 @@ class _AppDrawer extends State<AppDrawer> {
                     );
                   },
                 ),
-                drawerItem('assets/icons/project.png', 'Leave', context, () {
+                drawerItem('assets/icons/project.svg', 'Leave', context, () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -339,8 +354,13 @@ class _AppDrawer extends State<AppDrawer> {
                   );
                 }),
                 ListTile(
-                  leading: Image.asset('assets/icons/recruit.png',
-                      width: 24, height: 24),
+                  // leading: Image.asset('assets/icons/recruit.svg',
+                  //     width: 24, height: 24),
+                  leading: SvgPicture.asset(
+                    'assets/icons/recruit.svg',
+                    width: 25,
+                    height: 25,
+                  ),
                   title: const Text('Profile'),
                   onTap: () {
                     Navigator.push(
@@ -351,8 +371,13 @@ class _AppDrawer extends State<AppDrawer> {
                   },
                 ),
                 ListTile(
-                  leading: Image.asset('assets/icons/logout.png',
-                      width: 24, height: 24),
+                  // leading: Image.asset('assets/icons/logout.svg',
+                  //     width: 24, height: 24),
+                  leading: SvgPicture.asset(
+                    'assets/icons/logout.svg',
+                    width: 25,
+                    height: 25,
+                  ),
                   title: const Text('Logout'),
                   onTap: () async {
                     Navigator.pop(context);
@@ -386,7 +411,12 @@ class _AppDrawer extends State<AppDrawer> {
 
   Widget drawerItem(String imagePath, String title, BuildContext context, VoidCallback onTap) {
     return ListTile(
-      leading: Image.asset(imagePath, width: 24, height: 24),
+      leading:
+      SvgPicture.asset(
+        imagePath,
+        width: 18,
+        height: 18,
+      ),
       title: Text(title),
       onTap: onTap,
     );

@@ -21,6 +21,7 @@ import 'CalendraModel.dart';
 import 'package:intl/intl.dart';
 import '../utils/UtilityClass.dart';
 import 'package:optimanage/constant/colors.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class timesheet_provider extends ChangeNotifier {
   // final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -164,7 +165,7 @@ class timesheet_provider extends ChangeNotifier {
     final _formKey = GlobalKey<FormState>();
     final TextEditingController remarksController = TextEditingController();
 
-   // final parentContext = context;
+    // final parentContext = context;
     String? timeError;
 
     showModalBottomSheet(
@@ -172,12 +173,12 @@ class timesheet_provider extends ChangeNotifier {
       isScrollControlled: true,
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
       ),
       builder: (context) {
         return StatefulBuilder(// You need this, notice the parameters below:
             builder: (BuildContext context, StateSetter setState) {
-              //String? timeError;
+          //String? timeError;
           return Padding(
             padding: MediaQuery.of(context).viewInsets,
             child: Container(
@@ -192,31 +193,37 @@ class timesheet_provider extends ChangeNotifier {
               child: Column(
                 children: [
                   Visibility(
-                    visible: type == "No Task Assigned" ? true : false,
-                    child: Container(
+                    visible: type == "No Task Assigned",
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          top: 10, bottom: 10, left: 10, right: 10), // tighter padding
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          /// Header Row
+                          // Header
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
-                                'optimanage.devitsandbox.com Says',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 14),
+                              const Expanded(
+                                child: Text(
+                                  'optimanage.devitsandbox.com Says',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold, fontSize: 14),
+                                ),
                               ),
                               IconButton(
                                 icon: const Icon(Icons.close, size: 20),
+                                padding: EdgeInsets.zero, // Remove icon padding
+                                constraints: BoxConstraints(), // Shrink tap area
                                 onPressed: () => Navigator.of(context).pop(),
                               ),
                             ],
                           ),
 
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 5), // Smaller spacing
 
-                          /// Warning Message
+                          // Warning Message
                           const Text.rich(
                             TextSpan(
                               children: [
@@ -229,7 +236,7 @@ class timesheet_provider extends ChangeNotifier {
                                 ),
                                 TextSpan(
                                   text:
-                                      'Kindly please add task carefully. If you haven\'t mapped with a Module then contact your team lead for the same. Task added in {No Task} will not be considered for your performance evaluation.',
+                                  'Kindly please add task carefully. If you haven\'t mapped with a Module then contact your team lead for the same. Task added in {No Task} will not be considered for your performance evaluation.',
                                   style: TextStyle(
                                     color: Colors.black87,
                                     fontWeight: FontWeight.bold,
@@ -239,58 +246,51 @@ class timesheet_provider extends ChangeNotifier {
                             ),
                           ),
 
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 6),
 
-                          /// Action Buttons
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            // Right align
-                            children: [
-                              SizedBox(width: 12),
-                              // Space between buttons
-                              ElevatedButton(
-                                onPressed: () async {
-                                  print("22Selected Date: $date");
-
-                                  Navigator.pop(context); // Close the modal
-                                  int userId =
-                                      await PrefUtil.getPrefUserId() ?? 0;
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => ChangeNotifierProvider(
-                                        create: (_) => NoTaskAssignProvider(),
-                                        child: NoTaskAssignScreen(
-                                          selectedDate: DateTime.now(),
-                                          userId: userId,
-                                        ),
+                          // OK Button aligned right
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                Navigator.pop(context);
+                                int userId = await PrefUtil.getPrefUserId() ?? 0;
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => ChangeNotifierProvider(
+                                      create: (_) => NoTaskAssignProvider(),
+                                      child: NoTaskAssignScreen(
+                                        selectedDate: DateTime.now(),
+                                        userId: userId,
                                       ),
                                     ),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Color(0xFF25507C),
-                                  // Save button color
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
                                   ),
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 24, vertical: 10),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(0xFF25507C),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                                child: Text(
-                                  'OK',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                minimumSize: Size(0, 0), // Important: Shrink button height
+                              ),
+                              child: const Text(
+                                'OK',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
-                            ],
-                          )
+                            ),
+                          ),
                         ],
                       ),
                     ),
                   ),
+
                   // visible: type == "Add Leave" ? true : false,
                   Visibility(
                       visible: type == "Add Leave" ? true : false,
@@ -391,24 +391,28 @@ class timesheet_provider extends ChangeNotifier {
                                       Expanded(
                                         flex: 5,
                                         child: GestureDetector(
-                                          onTap: () => selectTime(context, true, setState),
-                                          child: _timeInfo("Start Time", startTime!.format(context)),
+                                          onTap: () => selectTime(
+                                              context, true, setState),
+                                          child: _timeInfo("Start Time",
+                                              startTime!.format(context)),
                                         ),
                                       ),
                                       const SizedBox(width: 12),
                                       Expanded(
                                         flex: 5,
                                         child: GestureDetector(
-                                          onTap: () => selectTime(context, false, setState),
-                                          child: _timeInfo("End Time", endTime!.format(context)),
+                                          onTap: () => selectTime(
+                                              context, false, setState),
+                                          child: _timeInfo("End Time",
+                                              endTime!.format(context)),
                                         ),
                                       ),
                                     ],
                                   ),
-
                                   if (timeError != null)
                                     Padding(
-                                      padding: const EdgeInsets.only(top: 6, left: 4),
+                                      padding: const EdgeInsets.only(
+                                          top: 6, left: 4),
                                       child: Text(
                                         timeError!,
                                         style: const TextStyle(
@@ -418,7 +422,6 @@ class timesheet_provider extends ChangeNotifier {
                                         ),
                                       ),
                                     ),
-
                                   const SizedBox(height: 12),
                                   Row(
                                     children: [
@@ -493,21 +496,24 @@ class timesheet_provider extends ChangeNotifier {
                                     // Space between buttons
                                     ElevatedButton(
                                       onPressed: () async {
-
-
-
-                                        if (!_formKey.currentState!.validate()) {
-                                          debugPrint("❌ Form validation failed");
+                                        if (!_formKey.currentState!
+                                            .validate()) {
+                                          debugPrint(
+                                              "❌ Form validation failed");
                                           return;
                                         }
 
                                         // Start-End Time Validation
-                                        final startMinutes = startTime!.hour * 60 + startTime!.minute;
-                                        final endMinutes = endTime!.hour * 60 + endTime!.minute;
+                                        final startMinutes =
+                                            startTime!.hour * 60 +
+                                                startTime!.minute;
+                                        final endMinutes = endTime!.hour * 60 +
+                                            endTime!.minute;
 
                                         if (startMinutes >= endMinutes) {
                                           setState(() {
-                                            timeError = 'Start time must be before end time';
+                                            timeError =
+                                                'Start time must be before end time';
                                           });
                                           return;
                                         } else {
@@ -516,25 +522,42 @@ class timesheet_provider extends ChangeNotifier {
                                           });
                                         }
 
-
-
                                         leaveDate = date;
 
                                         try {
-                                          final start = DateTime(leaveDate!.year, leaveDate!.month, leaveDate!.day, startTime!.hour, startTime!.minute);
-                                          final end = DateTime(leaveDate!.year, leaveDate!.month, leaveDate!.day, endTime!.hour, endTime!.minute);
+                                          final start = DateTime(
+                                              leaveDate!.year,
+                                              leaveDate!.month,
+                                              leaveDate!.day,
+                                              startTime!.hour,
+                                              startTime!.minute);
+                                          final end = DateTime(
+                                              leaveDate!.year,
+                                              leaveDate!.month,
+                                              leaveDate!.day,
+                                              endTime!.hour,
+                                              endTime!.minute);
 
-                                          final duration = end.difference(start);
+                                          final duration =
+                                              end.difference(start);
                                           leaveHours = duration.inHours;
-                                          leaveMinutes = duration.inMinutes % 60;
-                                          final totalMinutes = duration.inMinutes;
+                                          leaveMinutes =
+                                              duration.inMinutes % 60;
+                                          final totalMinutes =
+                                              duration.inMinutes;
 
-                                          final formattedDate = formatDate(leaveDate!);
-                                          final formattedStart = formatTimeOfDay(startTime!);
-                                          final formattedEnd = formatTimeOfDay(endTime!);
-                                          final remarks = remarksController.text.trim();
+                                          final formattedDate =
+                                              formatDate(leaveDate!);
+                                          final formattedStart =
+                                              formatTimeOfDay(startTime!);
+                                          final formattedEnd =
+                                              formatTimeOfDay(endTime!);
+                                          final remarks =
+                                              remarksController.text.trim();
 
-                                          final userId = await PrefUtil.getPrefUserId() ?? 0;
+                                          final userId =
+                                              await PrefUtil.getPrefUserId() ??
+                                                  0;
 
                                           await submitLeaveRequest(
                                             context: context,
@@ -549,8 +572,13 @@ class timesheet_provider extends ChangeNotifier {
                                             userId: userId,
                                           );
 
-                                          await fetchLeaveSummary(focusedDay, userId);
-                                          await fetchTimesheetData(context, focusedDay.month, focusedDay.year, userId);
+                                          await fetchLeaveSummary(
+                                              focusedDay, userId);
+                                          await fetchTimesheetData(
+                                              context,
+                                              focusedDay.month,
+                                              focusedDay.year,
+                                              userId);
 
                                           Navigator.pop(context);
                                           resetLeaveForm();
@@ -558,7 +586,6 @@ class timesheet_provider extends ChangeNotifier {
                                           debugPrint("❌ Save button error: $e");
                                         }
                                       },
-
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Color(0xFF25507C),
                                         // Save button color
@@ -619,8 +646,13 @@ class timesheet_provider extends ChangeNotifier {
           ),
           child: Row(
             children: [
-              Image.asset(
-                'assets/icons/clock.png',
+              // Image.asset(
+              //   'assets/icons/clockOLD.png',
+              //   width: 20,
+              //   height: 20,
+              // ),
+              SvgPicture.asset(
+                'assets/icons/clock.svg',
                 width: 20,
                 height: 20,
               ),

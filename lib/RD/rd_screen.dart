@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../constant/common.dart';
 import 'package:optimanage/RD/rd_provider.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class RdScreen extends StatefulWidget {
   final DateTime selectedDate;
@@ -277,7 +278,11 @@ class _RdScreenState extends State<RdScreen> {
           title: "R&D Tasks",
           callback: () => Navigator.of(context).pop(false),
           actions: [
-            Image.asset('assets/icons/notification.png', width: 24, height: 24),
+            SvgPicture.asset(
+              'assets/icons/notification.svg',
+              width: 24,
+              height: 24,
+            ),
             SizedBox(width: 10),
           ],
         ),

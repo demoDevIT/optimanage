@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:optimanage/assignedtask/assignedtask_provider.dart';
 
 import 'AssignedTaskModel.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class AssignedTaskScreen extends StatefulWidget {
   final DateTime selectedDate;
@@ -105,8 +106,8 @@ class _AssignedTaskScreenState extends State<AssignedTaskScreen> {
           Navigator.of(context).pop(false);
         },
         actions: [
-          Image.asset(
-            'assets/icons/notification.png',
+          SvgPicture.asset(
+            'assets/icons/notification.svg',
             width: 24,
             height: 24,
           ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../utils/UtilityClass.dart';
 import 'package:optimanage/services/HttpService.dart';
 import 'package:optimanage/constant/Constants.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class ChangePasswordDialog extends StatefulWidget {
   final int userId; // Pass user ID here
@@ -103,13 +104,21 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
                 }),
                 child: Padding(
                   padding: const EdgeInsets.all(12.0),
-                  child: Image.asset(
+                  child:
+                  // Image.asset(
+                  //   _obscureNewPassword
+                  //       ? 'assets/icons/eyeOn.svg'
+                  //       : 'assets/icons/eyeOff.svg',
+                  //   width: 24,
+                  //   height: 24,
+                  //   fit: BoxFit.contain,
+                  // ),
+                  SvgPicture.asset(
                     _obscureNewPassword
-                        ? 'assets/icons/eyeOn.png'
-                        : 'assets/icons/eyeOff.png',
+                        ? 'assets/icons/eyeOn.svg'
+                        : 'assets/icons/eyeOff.svg',
                     width: 24,
                     height: 24,
-                    fit: BoxFit.contain,
                   ),
                 ),
               ),
@@ -133,13 +142,22 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
                 }),
                 child: Padding(
                   padding: const EdgeInsets.all(12.0),
-                  child: Image.asset(
+                  child:
+                  // Image.asset(
+                  //   _obscureConfirmPassword
+                  //       ? 'assets/icons/eyeOn.svg'
+                  //       : 'assets/icons/eyeOff.svg',
+                  //   width: 24,
+                  //   height: 24,
+                  //   fit: BoxFit.contain,
+                  // ),
+
+                  SvgPicture.asset(
                     _obscureConfirmPassword
-                        ? 'assets/icons/eyeOn.png'
-                        : 'assets/icons/eyeOff.png',
+                        ? 'assets/icons/eyeOn.svg'
+                        : 'assets/icons/eyeOff.svg',
                     width: 24,
                     height: 24,
-                    fit: BoxFit.contain,
                   ),
                 ),
               ),

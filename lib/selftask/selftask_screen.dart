@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../selftask/selftask_provider.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class SelfTaskScreen extends StatefulWidget {
   const SelfTaskScreen({Key? key}) : super(key: key);
@@ -170,9 +171,15 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
             children: [
               Padding(
                 padding: const EdgeInsets.only(top: 2),
-                child: Image.asset(
-                  'assets/icons/calendar.png',
+                child:
+                // Image.asset(
+                //   'assets/icons/calendar.png',
+                //   width: 20,
+                // ),
+                SvgPicture.asset(
+                  'assets/icons/calendar.svg',
                   width: 20,
+                  height: 20,
                 ),
               ),
               const SizedBox(width: 8),
@@ -239,7 +246,11 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16),
-            child: Image.asset('assets/icons/notification.png', width: 24),
+            child: SvgPicture.asset(
+              'assets/icons/notification.svg',
+              width: 24,
+              height: 24,
+            ),
           )
         ],
       ),
@@ -341,14 +352,23 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                         },
                         icon: const Icon(
                           Icons.upload_file,
+                          size: 20,
                           color: Colors.white, // ✅ white icon
                         ),
-                        label: const Text(
-                          "Upload Documents",
-                          style: TextStyle(color: Colors.white), // ✅ white text
+                        label: const Padding(
+                          padding: EdgeInsets.only(left: 4.0), // slight padding for spacing
+                          child: Text(
+                            "Upload Documents",
+                            style: TextStyle(color: Colors.white),
+                          ),
                         ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF25507C),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), // control button size
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30), // rounded pill shape
+                          ),
+                          elevation: 3,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -368,11 +388,11 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                     ],
                   ),
 
-                  const Positioned(
-                    right: 16,
-                    top: 20,
-                    child: Icon(Icons.upload_rounded, size: 20),
-                  )
+                  // const Positioned(
+                  //   right: 16,
+                  //   top: 20,
+                  //   child: Icon(Icons.upload_rounded, size: 20),
+                  // )
                 ],
               ),
 

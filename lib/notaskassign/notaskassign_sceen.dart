@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../constant/common.dart';
 import 'package:optimanage/notaskassign/notaskassign_provider.dart';
 import 'package:optimanage/constant/colors.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 
 class NoTaskAssignScreen extends StatefulWidget {
@@ -94,7 +95,11 @@ class _NoTaskAssignScreenState extends State<NoTaskAssignScreen> {
         title: "No Task Assigned",
         callback: () => Navigator.of(context).pop(false),
         actions: [
-          Image.asset('assets/icons/notification.png', width: 24, height: 24),
+          SvgPicture.asset(
+            'assets/icons/notification.svg',
+            width: 24,
+            height: 24,
+          ),
           const SizedBox(width: 10),
         ],
       ),

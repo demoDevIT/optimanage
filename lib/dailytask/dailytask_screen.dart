@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../assignedtask/AssignedTaskModel.dart';
 import 'dailytask_provider.dart';
 import '../utils/UtilityClass.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class DailyTaskScreen extends StatefulWidget {
   final AssignedTaskModel task;
@@ -92,26 +93,21 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         elevation: 0,
+        leading: const BackButton(color: Colors.black),
+        title: const Text('Daily Task Details',
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          'Daily Task Details',
-          style: TextStyle(
-            fontSize: 17,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
-          ),
-        ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none, color: Colors.black),
-            onPressed: () {},
-          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: SvgPicture.asset(
+              'assets/icons/notification.svg',
+              width: 24,
+              height: 24,
+            ),
+          )
         ],
       ),
       body: Padding(
@@ -446,8 +442,13 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
         ),
         child: Row(
           children: [
-            Image.asset(
-              'assets/icons/calendar.png',
+            // Image.asset(
+            //   'assets/icons/calendar.png',
+            //   width: 20,
+            //   height: 20,
+            // ),
+            SvgPicture.asset(
+              'assets/icons/calendar.svg',
               width: 20,
               height: 20,
             ),

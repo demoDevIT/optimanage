@@ -14,6 +14,7 @@ import '../selftask/selftask_provider.dart';
 import '../selftask/selftask_screen.dart';
 import '../utils/PrefUtil.dart';
 import '../utils/UtilityClass.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class TimeSheetScreen extends StatefulWidget {
   final String? status;
@@ -91,8 +92,8 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
         },
         actions: [
           // LanguageToggleSwitch(),
-          Image.asset(
-            'assets/icons/notification.png',
+          SvgPicture.asset(
+            'assets/icons/notification.svg',
             width: 24,
             height: 24,
           ),
@@ -114,7 +115,7 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                   calendarFormat: CalendarFormat.month,
                   onPageChanged: (focusedDay) {
                     provider.focusedDay = focusedDay;
-                    provider.selectedDay = DateTime(focusedDay.year, focusedDay.month, 1);
+                   // provider.selectedDay = DateTime(focusedDay.year, focusedDay.month, 1);
                     provider.fetchTimesheetData(context, focusedDay.month, focusedDay.year, userId);
                     provider.fetchLeaveSummary(focusedDay, userId);
                   },
