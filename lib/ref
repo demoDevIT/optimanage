@@ -1,0 +1,463 @@
+  void showNoTaskBottomSheet(
+      BuildContext context, String type, DateTime date, timesheet_provider provider) {
+    print("11Selected Date: $date");
+    print("showNoTaskBottomSheet5555");
+     provider.resetLeaveForm();
+    provider.leaveType = "Half Day";
+    final _formKey = GlobalKey<FormState>();
+    final TextEditingController remarksController = TextEditingController();
+
+    // final parentContext = context;
+    String? timeError;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+      ),
+      builder: (context) {
+        return  DraggableScrollableSheet(
+            expand: false,
+            initialChildSize: 0.7, // 60% of screen height
+            minChildSize: 0.3,
+            maxChildSize: 0.95,
+            builder: (context, scrollController){
+              return Scaffold(
+              body: SingleChildScrollView(
+                  controller: scrollController,
+                  padding: EdgeInsets.all(10.0),
+                  child:  Padding(
+                      padding: MediaQuery.of(context).viewInsets,
+                      child: Wrap(
+                        children: [
+                          Column(
+                            children: [
+                              Visibility(
+                                visible: type == "No Task Assigned",
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 10, bottom: 10, left: 10, right: 10), // tighter padding
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      // Header
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          const Expanded(
+                                            child: Text(
+                                              'optimanage.devitsandbox.com Says',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold, fontSize: 14),
+                                            ),
+                                          ),
+                                          IconButton(
+                                            icon: const Icon(Icons.close, size: 20),
+                                            padding: EdgeInsets.zero, // Remove icon padding
+                                            constraints: BoxConstraints(), // Shrink tap area
+                                            onPressed: () => Navigator.of(context).pop(),
+                                          ),
+                                        ],
+                                      ),
+
+                                      const SizedBox(height: 5), // Smaller spacing
+
+                                      // Warning Message
+                                      const Text.rich(
+                                        TextSpan(
+                                          children: [
+                                            TextSpan(
+                                              text: 'Warning: ',
+                                              style: TextStyle(
+                                                color: Colors.red,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            TextSpan(
+                                              text:
+                                              'Kindly please add task carefully. If you haven\'t mapped with a Module then contact your team lead for the same. Task added in {No Task} will not be considered for your performance evaluation.',
+                                              style: TextStyle(
+                                                color: Colors.black87,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+
+                                      const SizedBox(height: 6),
+
+                                      // OK Button aligned right
+                                      Align(
+                                        alignment: Alignment.centerRight,
+                                        child: ElevatedButton(
+                                          onPressed: () async {
+                                            Navigator.pop(context);
+                                            int userId = await PrefUtil.getPrefUserId() ?? 0;
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) => ChangeNotifierProvider(
+                                                  create: (_) => NoTaskAssignProvider(),
+                                                  child: NoTaskAssignScreen(
+                                                    selectedDate: DateTime.now(),
+                                                    userId: userId,
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Color(0xFF25507C),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(12),
+                                            ),
+                                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                            minimumSize: Size(0, 0), // Important: Shrink button height
+                                          ),
+                                          child: const Text(
+                                            'OK',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+
+                              // visible: type == "Add Leave" ? true : false,
+                              Visibility(
+                                  visible: type == "Add Leave" ? true : false,
+                                  child: Form(
+                                      key: _formKey,
+                                      child:  SingleChildScrollView(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  flex: 8,
+                                                  child: Text(
+                                                    "Mark Leave (${date.toIso8601String().split('T').first})",
+                                                    style: const TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Color(0xFF000000),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Expanded(
+                                                  flex: 2,
+                                                  child: IconButton(
+                                                    icon: const Icon(Icons.close),
+                                                    onPressed: () {
+                                                      provider.resetLeaveForm(); // 🧹 optional second cleanup
+                                                      Navigator.pop(context);
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            // ✅ Add horizontal line below title
+                                            const Divider(
+                                              color: Color(0xFFE6E6E6),
+                                              thickness: 1,
+                                              height: 1,
+                                              indent: 0,
+                                              // ✅ No left margin
+                                              endIndent: 0, // ✅ No right margin
+                                            ),
+
+                                            const SizedBox(height: 12),
+                                            DropdownButtonFormField<String>(
+                                              value: provider.leaveType,
+                                              icon: const SizedBox.shrink(),
+                                              decoration: InputDecoration(
+                                                filled: true,
+                                                fillColor: const Color(0xFFF5F9FE),
+                                                border: OutlineInputBorder(
+                                                  borderRadius: BorderRadius.circular(12),
+                                                  borderSide: BorderSide.none,
+                                                ),
+                                                suffixIcon: const Icon(
+                                                  Icons.arrow_drop_down,
+                                                  size: 30,
+                                                  color: Color(0xFF25507C),
+                                                ),
+                                              ),
+                                              items: [
+                                                "Half Day",
+                                                "Full Day",
+                                                "Early Going",
+                                                "Late Coming"
+                                              ].map((type) => DropdownMenuItem(
+                                                value: type,
+                                                child: Text(type),
+                                              ))
+                                                  .toList(),
+                                              onChanged: (val) {
+                                                if (val != null) {
+                                                  provider.leaveType = val;
+                                                  setState(() {});
+                                                }
+                                              },
+                                              validator: (val) =>
+                                              (val == null || val.isEmpty)
+                                                  ? 'Please select leave type'
+                                                  : null,
+
+                                            ),
+
+
+                                            const SizedBox(height: 16),
+                                            if (provider.leaveType == "Half Day" ||
+                                                provider.leaveType == "Early Going" ||
+                                                provider.leaveType == "Late Coming") ...[
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    flex: 5,
+                                                    child: GestureDetector(
+                                                      onTap: () => provider.selectTime(
+                                                          context, true, setState),
+                                                      child: provider.timeInfo("Start Time",
+                                                          provider.startTime!.format(context)),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 12),
+                                                  Expanded(
+                                                    flex: 5,
+                                                    child: GestureDetector(
+                                                      onTap: () => provider.selectTime(
+                                                          context, false, setState),
+                                                      child:  provider.timeInfo("End Time",
+                                                          provider.endTime!.format(context)),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              if (timeError != null)
+                                                Padding(
+                                                  padding: const EdgeInsets.only(
+                                                      top: 6, left: 4),
+                                                  child: Text(
+                                                    timeError!,
+                                                    style: const TextStyle(
+                                                      color: Colors.red,
+                                                      fontSize: 12,
+                                                      fontWeight: FontWeight.w400,
+                                                    ),
+                                                  ),
+                                                ),
+                                              const SizedBox(height: 12),
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                      flex: 5,
+                                                      child: provider.timeInfo(
+                                                          "Leave Hour", provider.leaveHour)),
+                                                  const SizedBox(width: 12),
+                                                  Expanded(
+                                                      flex: 5,
+                                                      child: provider.timeInfo(
+                                                          "Leave Minute", provider.leaveMinute)),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 16),
+                                            ],
+
+                                            TextFormField(
+                                              focusNode: provider.myFocusNode,
+                                              controller: remarksController,
+                                              maxLines: 4,
+                                              decoration: InputDecoration(
+                                                hintText: 'Description',
+                                                filled: true,
+                                                fillColor: Color(0xFFF5F9FE),
+                                                // Light fill background
+                                                contentPadding: const EdgeInsets.all(10),
+                                                enabledBorder: OutlineInputBorder(
+                                                  borderRadius: BorderRadius.circular(12),
+                                                  borderSide: BorderSide.none, // No border
+                                                ),
+                                                focusedBorder: OutlineInputBorder(
+                                                  borderRadius: BorderRadius.circular(12),
+                                                  borderSide: BorderSide(
+                                                      color: Color(0xFF2196F3),
+                                                      width: 2), // Blue border on focus
+                                                ),
+                                              ),
+                                              validator: (val) =>
+                                              (val == null || val.isEmpty)
+                                                  ? 'Please enter a description'
+                                                  : null,
+                                            ),
+                                            const SizedBox(height: 20),
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.end,
+                                              // Right align
+                                              children: [
+                                                OutlinedButton(
+                                                  onPressed: () {
+                                                    provider.resetLeaveForm(); // 🧹 optional second cleanup
+                                                    Navigator.pop(context);
+                                                  },
+                                                  style: OutlinedButton.styleFrom(
+                                                    side: BorderSide(
+                                                        color: Color(0xFF25507C)),
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                      BorderRadius.circular(12),
+                                                    ),
+                                                    padding: const EdgeInsets.symmetric(
+                                                        horizontal: 24, vertical: 10),
+                                                  ),
+                                                  child: Text(
+                                                    'Close',
+                                                    style: TextStyle(
+                                                      color: Color(0xFF25507C),
+                                                      fontWeight: FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(width: 12),
+                                                // Space between buttons
+                                                ElevatedButton(
+                                                  onPressed: () async {
+                                                    if (!_formKey.currentState!
+                                                        .validate()) {
+                                                      debugPrint(
+                                                          "❌ Form validation failed");
+                                                      return;
+                                                    }
+
+                                                    // Start-End Time Validation
+                                                    final startMinutes =
+                                                        provider.startTime!.hour * 60 +
+                                                            provider.startTime!.minute;
+                                                    final endMinutes = provider.endTime!.hour * 60 +
+                                                        provider.endTime!.minute;
+
+                                                    if (startMinutes >= endMinutes) {
+                                                      setState(() {
+                                                        timeError =
+                                                        'Start time must be before end time';
+                                                      });
+                                                      return;
+                                                    } else {
+                                                      setState(() {
+                                                        timeError = null;
+                                                      });
+                                                    }
+
+                                                    provider.leaveDate = date;
+
+                                                    try {
+                                                      final start = DateTime(
+                                                          provider.leaveDate!.year,
+                                                          provider.leaveDate!.month,
+                                                          provider.leaveDate!.day,
+                                                          provider.startTime!.hour,
+                                                          provider.startTime!.minute);
+                                                      final end = DateTime(
+                                                          provider.leaveDate!.year,
+                                                          provider.leaveDate!.month,
+                                                          provider.leaveDate!.day,
+                                                          provider.endTime!.hour,
+                                                          provider.endTime!.minute);
+
+                                                      final duration =
+                                                      end.difference(start);
+                                                      provider.leaveHours = duration.inHours;
+                                                      provider.leaveMinutes =
+                                                          duration.inMinutes % 60;
+                                                      final totalMinutes =
+                                                          duration.inMinutes;
+
+                                                      final formattedDate =
+                                                      provider.formatDate(provider.leaveDate!);
+                                                      final formattedStart =
+                                                      provider.formatTimeOfDay(provider.startTime!);
+                                                      final formattedEnd =
+                                                      provider.formatTimeOfDay(provider.endTime!);
+                                                      final remarks =
+                                                      remarksController.text.trim();
+
+                                                      final userId =
+                                                          await PrefUtil.getPrefUserId() ??
+                                                              0;
+
+                                                      await provider.submitLeaveRequest(
+                                                        context: context,
+                                                        leaveType: provider.leaveType,
+                                                        leaveDate: formattedDate,
+                                                        startTime: formattedStart,
+                                                        endTime: formattedEnd,
+                                                        leaveHours: provider.leaveHours,
+                                                        leaveMinutes: provider.leaveMinutes,
+                                                        leaveTimeInMinutes: totalMinutes,
+                                                        remarks: remarks,
+                                                        userId: userId,
+                                                      );
+
+                                                      await provider.fetchLeaveSummary(provider.focusedDay, userId);
+                                                      await provider.fetchTimesheetData(
+                                                          context,
+                                                          provider.focusedDay.month,
+                                                          provider.focusedDay.year,
+                                                          userId);
+
+                                                      Navigator.pop(context);
+                                                      provider. resetLeaveForm();
+                                                    } catch (e) {
+                                                      debugPrint("❌ Save button error: $e");
+                                                    }
+                                                  },
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor: Color(0xFF25507C),
+                                                    // Save button color
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                      BorderRadius.circular(12),
+                                                    ),
+                                                    padding: EdgeInsets.symmetric(
+                                                        horizontal: 24, vertical: 10),
+                                                  ),
+                                                  child: Text(
+                                                    'Save',
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontWeight: FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                      )
+
+                                  )
+                                // )
+                                // )
+                              ),
+                            ],
+                          )
+                        ],
+                      ))),
+              );},
+            );
+
+      },
+    );
+  }
+}

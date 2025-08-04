@@ -135,7 +135,7 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                       if (widget.status != "daily" && !isWeekend) {
                         print("showNoTaskBottomSheet4444");
                         provider.showSelectDateBottomSheet(
-                            context, "Add Leave", provider.selectedDay!, 550);
+                            context, "Add Leave", provider.selectedDay!, 0.7);
                       } else if (widget.status != "daily" && isWeekend) {
                         // Optional: show toast/snackbar or do nothing
                         showDialog(

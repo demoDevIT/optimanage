@@ -45,7 +45,7 @@ dependencies:
   shared_preferences: any
   image_picker: ^1.0.7
   file_picker: ^10.2.0
-
+  dropdown_search: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

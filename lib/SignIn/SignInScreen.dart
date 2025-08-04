@@ -194,7 +194,9 @@ class _SignInScreenState extends State<SignInScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () async {
+                        onPressed: provider.isLoading
+                            ? null // disable button
+                            : () async {
                           bool cannect = await UtilityClass
                               .checkInternetConnectivity();
                           if (cannect == true) {
@@ -203,13 +205,7 @@ class _SignInScreenState extends State<SignInScreen> {
                               await provider.loginUser(_scaffoldKey.currentContext!);
                             }
                           } else {
-                            // await UtilityClass.askForInput(
-                            //   'Optmanage App',
-                            //   "Please connect internet.",
-                            //   'Okay',
-                            //   'Okay',
-                            //   true,
-                            // );
+                            UtilityClass.showSnackBar(context, "Please connect to the internet.", Colors.red);
                           }
                           provider.notifyListeners();
                         },

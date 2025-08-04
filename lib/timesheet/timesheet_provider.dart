@@ -176,10 +176,20 @@ class timesheet_provider extends ChangeNotifier {
         borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
       ),
       builder: (context) {
-        return StatefulBuilder(// You need this, notice the parameters below:
+        return  StatefulBuilder(// You need this, notice the parameters below:
             builder: (BuildContext context, StateSetter setState) {
           //String? timeError;
-          return Padding(
+          return DraggableScrollableSheet(
+              expand: false,
+              initialChildSize: 0.7, // 60% of screen height
+              minChildSize: 0.3,
+              maxChildSize: 0.95,
+              builder: (context, scrollController){
+                return Scaffold(
+              body: SingleChildScrollView(
+              controller: scrollController,
+              padding: EdgeInsets.all(10.0),
+              child:Padding(
             padding: MediaQuery.of(context).viewInsets,
             child: Container(
               margin: EdgeInsets.only(top: 10),
@@ -365,9 +375,9 @@ class timesheet_provider extends ChangeNotifier {
                                     "Late Coming"
                                   ]
                                       .map((type) => DropdownMenuItem(
-                                            value: type,
-                                            child: Text(type),
-                                          ))
+                                    value: type,
+                                    child: Text(type),
+                                  ))
                                       .toList(),
                                   onChanged: (val) {
                                     if (val != null) {
@@ -377,9 +387,9 @@ class timesheet_provider extends ChangeNotifier {
                                     }
                                   },
                                   validator: (val) =>
-                                      (val == null || val.isEmpty)
-                                          ? 'Please select leave type'
-                                          : null,
+                                  (val == null || val.isEmpty)
+                                      ? 'Please select leave type'
+                                      : null,
                                 ),
 
                                 const SizedBox(height: 16),
@@ -460,9 +470,9 @@ class timesheet_provider extends ChangeNotifier {
                                     ),
                                   ),
                                   validator: (val) =>
-                                      (val == null || val.isEmpty)
-                                          ? 'Please enter a description'
-                                          : null,
+                                  (val == null || val.isEmpty)
+                                      ? 'Please enter a description'
+                                      : null,
                                 ),
                                 const SizedBox(height: 20),
                                 Row(
@@ -479,7 +489,7 @@ class timesheet_provider extends ChangeNotifier {
                                             color: Color(0xFF25507C)),
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
-                                              BorderRadius.circular(12),
+                                          BorderRadius.circular(12),
                                         ),
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 24, vertical: 10),
@@ -513,7 +523,7 @@ class timesheet_provider extends ChangeNotifier {
                                         if (startMinutes >= endMinutes) {
                                           setState(() {
                                             timeError =
-                                                'Start time must be before end time';
+                                            'Start time must be before end time';
                                           });
                                           return;
                                         } else {
@@ -539,7 +549,7 @@ class timesheet_provider extends ChangeNotifier {
                                               endTime!.minute);
 
                                           final duration =
-                                              end.difference(start);
+                                          end.difference(start);
                                           leaveHours = duration.inHours;
                                           leaveMinutes =
                                               duration.inMinutes % 60;
@@ -547,13 +557,13 @@ class timesheet_provider extends ChangeNotifier {
                                               duration.inMinutes;
 
                                           final formattedDate =
-                                              formatDate(leaveDate!);
+                                          formatDate(leaveDate!);
                                           final formattedStart =
-                                              formatTimeOfDay(startTime!);
+                                          formatTimeOfDay(startTime!);
                                           final formattedEnd =
-                                              formatTimeOfDay(endTime!);
+                                          formatTimeOfDay(endTime!);
                                           final remarks =
-                                              remarksController.text.trim();
+                                          remarksController.text.trim();
 
                                           final userId =
                                               await PrefUtil.getPrefUserId() ??
@@ -591,7 +601,7 @@ class timesheet_provider extends ChangeNotifier {
                                         // Save button color
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
-                                              BorderRadius.circular(12),
+                                          BorderRadius.circular(12),
                                         ),
                                         padding: EdgeInsets.symmetric(
                                             horizontal: 24, vertical: 10),
@@ -612,14 +622,14 @@ class timesheet_provider extends ChangeNotifier {
                           ),
                         ),
                       )
-                      // )
-                      // )
-                      ),
+                    // )
+                    // )
+                  ),
                 ],
               ),
             ),
-          );
-        });
+          )));
+        });});
       },
     );
   }

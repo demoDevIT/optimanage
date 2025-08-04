@@ -10,6 +10,7 @@ import '../main.dart';
 import '../utils/PrefUtil.dart';
 import '../utils/RightToLeftRoute.dart';
 import '../utils/UtilityClass.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -40,7 +41,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: "Profile",
         callback: () => Navigator.of(context).pop(false),
         actions: [
-          Image.asset('assets/icons/notification.png', width: 24, height: 24),
+          SvgPicture.asset(
+            'assets/icons/notification.svg',
+            width: 24,
+            height: 24,
+          ),
           const SizedBox(width: 10),
         ],
       ),
