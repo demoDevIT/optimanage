@@ -182,7 +182,7 @@ class timesheet_provider extends ChangeNotifier {
           //String? timeError;
           return DraggableScrollableSheet(
               expand: false,
-              initialChildSize: 0.7, // 60% of screen height
+              initialChildSize: getHeight, //0.3, // 60% of screen height
               minChildSize: 0.3,
               maxChildSize: 0.95,
               builder: (context, scrollController){
@@ -196,6 +196,7 @@ class timesheet_provider extends ChangeNotifier {
               children: [
                 Visibility(
                   visible: type == "No Task Assigned",
+
                   child: Padding(
                     padding: const EdgeInsets.only(
                         top: 10, bottom: 10, left: 10, right: 10), // tighter padding
@@ -298,348 +299,384 @@ class timesheet_provider extends ChangeNotifier {
                     visible: type == "Add Leave" ? true : false,
                     child: Form(
                       key: _formKey,
-                      child: SingleChildScrollView(
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            maxHeight: MediaQuery.of(context).size.height *
-                                0.6, // Adjust modal height
-                          ),
-                          //  child: IntrinsicHeight(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    flex: 8,
-                                    child: Text(
-                                      "Mark Leave (${date.toIso8601String().split('T').first})",
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFF000000),
+                    //  child: SafeArea(
+                        child: SingleChildScrollView(
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxHeight: MediaQuery.of(context).size.height *
+                                  0.6, // Adjust modal height
+                            ),
+                            //  child: IntrinsicHeight(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 8,
+                                      child: Text(
+                                        "Mark Leave (${date.toIso8601String().split('T').first})",
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFF000000),
+                                        ),
                                       ),
                                     ),
+                                    Expanded(
+                                      flex: 2,
+                                      child: IconButton(
+                                        icon: const Icon(Icons.close),
+                                        onPressed: () {
+                                          resetLeaveForm(); // 🧹 optional second cleanup
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                // ✅ Add horizontal line below title
+                                const Divider(
+                                  color: Color(0xFFE6E6E6),
+                                  thickness: 1,
+                                  height: 1,
+                                  indent: 0,
+                                  // ✅ No left margin
+                                  endIndent: 0, // ✅ No right margin
+                                ),
+
+                                const SizedBox(height: 12),
+
+                                Row(
+                                    children: [
+                                      Expanded(
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(horizontal: 12),
+                                          decoration: BoxDecoration(
+                                            color: Color(0xFFF5F7FA), // Light background like Screenshot 1
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: Theme(
+                                            data: Theme.of(context).copyWith(
+                                              inputDecorationTheme: InputDecorationTheme(
+                                                border: InputBorder.none,          // 💥 Remove border
+                                                enabledBorder: InputBorder.none,   // 💥 Remove border
+                                                focusedBorder: InputBorder.none,   // 💥 Remove border
+                                                errorBorder: InputBorder.none,
+                                                disabledBorder: InputBorder.none,
+                                                contentPadding: EdgeInsets.zero,
+                                              ),
+                                            ),
+                                            child: DropdownSearch<String>(
+                                              selectedItem: "Half Day",
+                                              items: (filter, infiniteScrollProps) =>
+                                              ["Half Day",
+                                                "Full Day",
+                                                "Early Going",
+                                                "Late Coming"],
+                                              popupProps: PopupProps.bottomSheet(
+                                                fit: FlexFit.loose,
+                                                constraints: BoxConstraints(maxHeight: 250),
+                                              ),
+
+                                              dropdownBuilder: (context, selectedItem) => Padding(
+                                                padding: EdgeInsets.symmetric(vertical: 16),
+                                                child: Text(
+                                                  selectedItem ?? "Leave Type",
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    color: selectedItem == null ? Colors.grey : Colors.black,
+                                                  ),
+                                                ),
+                                              ),
+
+
+
+                                              onChanged: (val){
+                                                if (val != null) {
+                                                  leaveType = val;
+                                                  notifyListeners();
+                                                  setState(() {});
+                                                }
+                                              },
+
+                                              validator: (val) =>
+                                              (val == null || val.isEmpty)
+                                                  ? 'Please select leave type'
+                                                  : null,
+                                            ),),
+                                        ),),]),
+                                // DropdownButtonFormField<String>(
+                                //   value: leaveType,
+                                //   icon: const SizedBox.shrink(),
+                                //   decoration: InputDecoration(
+                                //     filled: true,
+                                //     fillColor: const Color(0xFFF5F9FE),
+                                //     border: OutlineInputBorder(
+                                //       borderRadius: BorderRadius.circular(12),
+                                //       borderSide: BorderSide.none,
+                                //     ),
+                                //     suffixIcon: const Icon(
+                                //       Icons.arrow_drop_down,
+                                //       size: 30,
+                                //       color: Color(0xFF25507C),
+                                //     ),
+                                //   ),
+                                //   items: [
+                                //     "Half Day",
+                                //     "Full Day",
+                                //     "Early Going",
+                                //     "Late Coming"
+                                //   ]
+                                //       .map((type) => DropdownMenuItem(
+                                //     value: type,
+                                //     child: Text(type),
+                                //   ))
+                                //       .toList(),
+                                //   onChanged: (val) {
+                                //     if (val != null) {
+                                //       leaveType = val;
+                                //       notifyListeners();
+                                //       setState(() {});
+                                //     }
+                                //   },
+                                //   validator: (val) =>
+                                //   (val == null || val.isEmpty)
+                                //       ? 'Please select leave type'
+                                //       : null,
+                                // ),
+
+                                const SizedBox(height: 16),
+                                if (leaveType == "Half Day" ||
+                                    leaveType == "Early Going" ||
+                                    leaveType == "Late Coming") ...[
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        flex: 5,
+                                        child: GestureDetector(
+                                          onTap: () => selectTime(
+                                              context, true, setState),
+                                          child: _timeInfo("Start Time",
+                                              startTime!.format(context)),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        flex: 5,
+                                        child: GestureDetector(
+                                          onTap: () => selectTime(
+                                              context, false, setState),
+                                          child: _timeInfo("End Time",
+                                              endTime!.format(context)),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  Expanded(
-                                    flex: 2,
-                                    child: IconButton(
-                                      icon: const Icon(Icons.close),
+                                  if (timeError != null)
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          top: 6, left: 4),
+                                      child: Text(
+                                        timeError!,
+                                        style: const TextStyle(
+                                          color: Colors.red,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                    ),
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                          flex: 5,
+                                          child: _timeInfo(
+                                              "Leave Hour", leaveHour)),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                          flex: 5,
+                                          child: _timeInfo(
+                                              "Leave Minute", leaveMinute)),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+                                ],
+
+                                TextFormField(
+                                  controller: remarksController,
+                                  maxLines: 4,
+                                  decoration: InputDecoration(
+                                    hintText: 'Description',
+                                    filled: true,
+                                    fillColor: Color(0xFFF5F9FE),
+                                    // Light fill background
+                                    contentPadding: const EdgeInsets.all(10),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide.none, // No border
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: BorderSide(
+                                          color: Color(0xFF2196F3),
+                                          width: 2), // Blue border on focus
+                                    ),
+                                  ),
+                                  validator: (val) =>
+                                  (val == null || val.isEmpty)
+                                      ? 'Please enter a description'
+                                      : null,
+                                ),
+                                const SizedBox(height: 20),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  // Right align
+                                  children: [
+                                    OutlinedButton(
                                       onPressed: () {
                                         resetLeaveForm(); // 🧹 optional second cleanup
                                         Navigator.pop(context);
                                       },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              // ✅ Add horizontal line below title
-                              const Divider(
-                                color: Color(0xFFE6E6E6),
-                                thickness: 1,
-                                height: 1,
-                                indent: 0,
-                                // ✅ No left margin
-                                endIndent: 0, // ✅ No right margin
-                              ),
-
-                              const SizedBox(height: 12),
-
-                        Row(
-                          children: [
-                            Expanded(
-                              child: DropdownSearch<String>(
-                                selectedItem: "Half Day",
-                                items: (filter, infiniteScrollProps) =>
-                                ["Half Day",
-                                  "Full Day",
-                                  "Early Going",
-                                  "Late Coming"],
-                                popupProps: PopupProps.bottomSheet(
-                                    fit: FlexFit.loose, constraints: BoxConstraints()),
-
-                                onChanged: (val){
-                                  if (val != null) {
-                                    leaveType = val;
-                                    notifyListeners();
-                                    setState(() {});
-                                  }
-                                },
-                                validator: (val) =>
-                                (val == null || val.isEmpty)
-                                    ? 'Please select leave type'
-                                    : null,
-                              ),
-                            ),]),
-                              // DropdownButtonFormField<String>(
-                              //   value: leaveType,
-                              //   icon: const SizedBox.shrink(),
-                              //   decoration: InputDecoration(
-                              //     filled: true,
-                              //     fillColor: const Color(0xFFF5F9FE),
-                              //     border: OutlineInputBorder(
-                              //       borderRadius: BorderRadius.circular(12),
-                              //       borderSide: BorderSide.none,
-                              //     ),
-                              //     suffixIcon: const Icon(
-                              //       Icons.arrow_drop_down,
-                              //       size: 30,
-                              //       color: Color(0xFF25507C),
-                              //     ),
-                              //   ),
-                              //   items: [
-                              //     "Half Day",
-                              //     "Full Day",
-                              //     "Early Going",
-                              //     "Late Coming"
-                              //   ]
-                              //       .map((type) => DropdownMenuItem(
-                              //     value: type,
-                              //     child: Text(type),
-                              //   ))
-                              //       .toList(),
-                              //   onChanged: (val) {
-                              //     if (val != null) {
-                              //       leaveType = val;
-                              //       notifyListeners();
-                              //       setState(() {});
-                              //     }
-                              //   },
-                              //   validator: (val) =>
-                              //   (val == null || val.isEmpty)
-                              //       ? 'Please select leave type'
-                              //       : null,
-                              // ),
-
-                              const SizedBox(height: 16),
-                              if (leaveType == "Half Day" ||
-                                  leaveType == "Early Going" ||
-                                  leaveType == "Late Coming") ...[
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      flex: 5,
-                                      child: GestureDetector(
-                                        onTap: () => selectTime(
-                                            context, true, setState),
-                                        child: _timeInfo("Start Time",
-                                            startTime!.format(context)),
+                                      style: OutlinedButton.styleFrom(
+                                        side: BorderSide(
+                                            color: Color(0xFF25507C)),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                          BorderRadius.circular(12),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 24, vertical: 10),
+                                      ),
+                                      child: Text(
+                                        'Close',
+                                        style: TextStyle(
+                                          color: Color(0xFF25507C),
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                       ),
                                     ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      flex: 5,
-                                      child: GestureDetector(
-                                        onTap: () => selectTime(
-                                            context, false, setState),
-                                        child: _timeInfo("End Time",
-                                            endTime!.format(context)),
+                                    SizedBox(width: 12),
+                                    // Space between buttons
+                                    ElevatedButton(
+                                      onPressed: () async {
+                                        if (!_formKey.currentState!
+                                            .validate()) {
+                                          debugPrint(
+                                              "❌ Form validation failed");
+                                          return;
+                                        }
+
+                                        // Start-End Time Validation
+                                        final startMinutes =
+                                            startTime!.hour * 60 +
+                                                startTime!.minute;
+                                        final endMinutes = endTime!.hour * 60 +
+                                            endTime!.minute;
+
+                                        if (startMinutes >= endMinutes) {
+                                          setState(() {
+                                            timeError =
+                                            'Start time must be before end time';
+                                          });
+                                          return;
+                                        } else {
+                                          setState(() {
+                                            timeError = null;
+                                          });
+                                        }
+
+                                        leaveDate = date;
+
+                                        try {
+                                          final start = DateTime(
+                                              leaveDate!.year,
+                                              leaveDate!.month,
+                                              leaveDate!.day,
+                                              startTime!.hour,
+                                              startTime!.minute);
+                                          final end = DateTime(
+                                              leaveDate!.year,
+                                              leaveDate!.month,
+                                              leaveDate!.day,
+                                              endTime!.hour,
+                                              endTime!.minute);
+
+                                          final duration =
+                                          end.difference(start);
+                                          leaveHours = duration.inHours;
+                                          leaveMinutes =
+                                              duration.inMinutes % 60;
+                                          final totalMinutes =
+                                              duration.inMinutes;
+
+                                          final formattedDate =
+                                          formatDate(leaveDate!);
+                                          final formattedStart =
+                                          formatTimeOfDay(startTime!);
+                                          final formattedEnd =
+                                          formatTimeOfDay(endTime!);
+                                          final remarks =
+                                          remarksController.text.trim();
+
+                                          final userId =
+                                              await PrefUtil.getPrefUserId() ??
+                                                  0;
+
+                                          await submitLeaveRequest(
+                                            context: context,
+                                            leaveType: leaveType,
+                                            leaveDate: formattedDate,
+                                            startTime: formattedStart,
+                                            endTime: formattedEnd,
+                                            leaveHours: leaveHours,
+                                            leaveMinutes: leaveMinutes,
+                                            leaveTimeInMinutes: totalMinutes,
+                                            remarks: remarks,
+                                            userId: userId,
+                                          );
+
+                                          await fetchLeaveSummary(
+                                              focusedDay, userId);
+                                          await fetchTimesheetData(
+                                              context,
+                                              focusedDay.month,
+                                              focusedDay.year,
+                                              userId);
+
+                                          Navigator.pop(context);
+                                          resetLeaveForm();
+                                        } catch (e) {
+                                          debugPrint("❌ Save button error: $e");
+                                        }
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Color(0xFF25507C),
+                                        // Save button color
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                          BorderRadius.circular(12),
+                                        ),
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 24, vertical: 10),
+                                      ),
+                                      child: Text(
+                                        'Save',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                       ),
                                     ),
                                   ],
-                                ),
-                                if (timeError != null)
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        top: 6, left: 4),
-                                    child: Text(
-                                      timeError!,
-                                      style: const TextStyle(
-                                        color: Colors.red,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                    ),
-                                  ),
-                                const SizedBox(height: 12),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                        flex: 5,
-                                        child: _timeInfo(
-                                            "Leave Hour", leaveHour)),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                        flex: 5,
-                                        child: _timeInfo(
-                                            "Leave Minute", leaveMinute)),
-                                  ],
-                                ),
-                                const SizedBox(height: 16),
+                                )
                               ],
-
-                              TextFormField(
-                                controller: remarksController,
-                                maxLines: 4,
-                                decoration: InputDecoration(
-                                  hintText: 'Description',
-                                  filled: true,
-                                  fillColor: Color(0xFFF5F9FE),
-                                  // Light fill background
-                                  contentPadding: const EdgeInsets.all(10),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide.none, // No border
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(
-                                        color: Color(0xFF2196F3),
-                                        width: 2), // Blue border on focus
-                                  ),
-                                ),
-                                validator: (val) =>
-                                (val == null || val.isEmpty)
-                                    ? 'Please enter a description'
-                                    : null,
-                              ),
-                              const SizedBox(height: 20),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                // Right align
-                                children: [
-                                  OutlinedButton(
-                                    onPressed: () {
-                                      resetLeaveForm(); // 🧹 optional second cleanup
-                                      Navigator.pop(context);
-                                    },
-                                    style: OutlinedButton.styleFrom(
-                                      side: BorderSide(
-                                          color: Color(0xFF25507C)),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                        BorderRadius.circular(12),
-                                      ),
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 24, vertical: 10),
-                                    ),
-                                    child: Text(
-                                      'Close',
-                                      style: TextStyle(
-                                        color: Color(0xFF25507C),
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(width: 12),
-                                  // Space between buttons
-                                  ElevatedButton(
-                                    onPressed: () async {
-                                      if (!_formKey.currentState!
-                                          .validate()) {
-                                        debugPrint(
-                                            "❌ Form validation failed");
-                                        return;
-                                      }
-
-                                      // Start-End Time Validation
-                                      final startMinutes =
-                                          startTime!.hour * 60 +
-                                              startTime!.minute;
-                                      final endMinutes = endTime!.hour * 60 +
-                                          endTime!.minute;
-
-                                      if (startMinutes >= endMinutes) {
-                                        setState(() {
-                                          timeError =
-                                          'Start time must be before end time';
-                                        });
-                                        return;
-                                      } else {
-                                        setState(() {
-                                          timeError = null;
-                                        });
-                                      }
-
-                                      leaveDate = date;
-
-                                      try {
-                                        final start = DateTime(
-                                            leaveDate!.year,
-                                            leaveDate!.month,
-                                            leaveDate!.day,
-                                            startTime!.hour,
-                                            startTime!.minute);
-                                        final end = DateTime(
-                                            leaveDate!.year,
-                                            leaveDate!.month,
-                                            leaveDate!.day,
-                                            endTime!.hour,
-                                            endTime!.minute);
-
-                                        final duration =
-                                        end.difference(start);
-                                        leaveHours = duration.inHours;
-                                        leaveMinutes =
-                                            duration.inMinutes % 60;
-                                        final totalMinutes =
-                                            duration.inMinutes;
-
-                                        final formattedDate =
-                                        formatDate(leaveDate!);
-                                        final formattedStart =
-                                        formatTimeOfDay(startTime!);
-                                        final formattedEnd =
-                                        formatTimeOfDay(endTime!);
-                                        final remarks =
-                                        remarksController.text.trim();
-
-                                        final userId =
-                                            await PrefUtil.getPrefUserId() ??
-                                                0;
-
-                                        await submitLeaveRequest(
-                                          context: context,
-                                          leaveType: leaveType,
-                                          leaveDate: formattedDate,
-                                          startTime: formattedStart,
-                                          endTime: formattedEnd,
-                                          leaveHours: leaveHours,
-                                          leaveMinutes: leaveMinutes,
-                                          leaveTimeInMinutes: totalMinutes,
-                                          remarks: remarks,
-                                          userId: userId,
-                                        );
-
-                                        await fetchLeaveSummary(
-                                            focusedDay, userId);
-                                        await fetchTimesheetData(
-                                            context,
-                                            focusedDay.month,
-                                            focusedDay.year,
-                                            userId);
-
-                                        Navigator.pop(context);
-                                        resetLeaveForm();
-                                      } catch (e) {
-                                        debugPrint("❌ Save button error: $e");
-                                      }
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Color(0xFF25507C),
-                                      // Save button color
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                        BorderRadius.circular(12),
-                                      ),
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 24, vertical: 10),
-                                    ),
-                                    child: Text(
-                                      'Save',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              )
-                            ],
+                            ),
+                            //),
                           ),
-                          //),
                         ),
-                      ),
+                     // ),
+
                     )
                   // )
                   // )

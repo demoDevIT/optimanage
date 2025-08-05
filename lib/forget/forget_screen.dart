@@ -67,11 +67,36 @@ class _ForgetScreenState extends State<ForgetScreen> {
                       height: 110,
                     ),
                   ),
+                  // const SizedBox(height: 32),
+                  // Image.asset(
+                  //   'assets/logos/forget.png',
+                  //   height: 90,
+                  // ),
                   const SizedBox(height: 32),
-                  Image.asset(
-                    'assets/logos/forget.png',
-                    height: 90,
+
+                  const Text(
+                    'Forget Password',
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w700, // Bold as per image
+                      color: Colors.black,
+                    ),
                   ),
+
+                  const SizedBox(height: 8),
+
+                  const Text(
+                    'No worries, we\'ll send reset instructions.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500, // medium weight (between normal and bold)
+                      color: Color(0xFF878490),
+                    ),
+                  ),
+
+
+
                   const SizedBox(height: 32),
 
                   // ✅ Email Input Field

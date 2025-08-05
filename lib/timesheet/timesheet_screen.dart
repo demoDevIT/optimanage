@@ -135,7 +135,7 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                       if (widget.status != "daily" && !isWeekend) {
                         print("showNoTaskBottomSheet4444");
                         provider.showSelectDateBottomSheet(
-                            context, "Add Leave", provider.selectedDay!, 0.7);
+                            context, "Add Leave", provider.selectedDay!, 0.6);
                       } else if (widget.status != "daily" && isWeekend) {
                         // Optional: show toast/snackbar or do nothing
                         showDialog(
@@ -469,7 +469,7 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
             //showNoTaskDialog(context);
             print("showNoTaskBottomSheet2222");
             provider.showNoTaskBottomSheet(
-                context, "No Task Assigned", provider.selectedDay!, 280);
+                context, "No Task Assigned", provider.selectedDay!, 0.3);
           } else if (label == 'R&D') {
             Navigator.push(
               context,
