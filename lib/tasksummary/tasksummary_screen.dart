@@ -33,7 +33,7 @@ class _TaskSummaryScreenState extends State<TaskSummaryScreen> {
     // Call API on load
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = Provider.of<TaskSummaryProvider>(context, listen: false);
-      provider.fetchTaskSummary(widget.task.taskIssueID); // new param
+      provider.fetchTaskSummary(widget.task.taskIssueID,context); // new param
     });
   }
 
@@ -129,7 +129,7 @@ class _TaskSummaryScreenState extends State<TaskSummaryScreen> {
                       child: ElevatedButton(
                         onPressed: () async {
                           final provider = Provider.of<TaskSummaryProvider>(context, listen: false);
-                          final notEntryCount = await provider.validateTimesheetEntry(widget.selectedDate, widget.userId);
+                          final notEntryCount = await provider.validateTimesheetEntry(widget.selectedDate, widget.userId,context);
 
                           if (notEntryCount == null) {
                             ScaffoldMessenger.of(context).showSnackBar(

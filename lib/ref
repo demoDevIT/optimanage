@@ -23,7 +23,7 @@
             initialChildSize: 0.7, // 60% of screen height
             minChildSize: 0.3,
             maxChildSize: 0.95,
-            builder: (context, scrollController){
+            builder:  scrollController){
               return Scaffold(
               body: SingleChildScrollView(
                   controller: scrollController,

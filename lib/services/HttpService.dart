@@ -3,12 +3,13 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:flutter/material.dart';
+import '../main.dart';
 import '../utils/UtilityClass.dart';
 
 class HttpService {
   late Dio _dio;
   // , "Authorization" : "Bearer ${StaticVariables.authToken}"
-  HttpService(String baseUrl) {
+  HttpService(String baseUrl,BuildContext context) {
     _dio = Dio(BaseOptions(
       baseUrl: baseUrl,
       headers: {"Content-Type": "application/json"},
@@ -22,7 +23,7 @@ class HttpService {
       return client;
     };
 
-    initializeInterceptors();
+    initializeInterceptors(context);
   }
 
 
@@ -118,7 +119,8 @@ class HttpService {
 
   }
 
-  initializeInterceptors() {
+  initializeInterceptors(BuildContext context) {
+   UtilityClass.showProgressDialog(navigatorKey.currentState!.context,'Please wait...');
     _dio.interceptors.add(InterceptorsWrapper(
       onError: (error, handler) {
         debugPrint('onError: ${error.message}');
@@ -130,6 +132,7 @@ class HttpService {
       },
       onResponse: (response, handler) {
         debugPrint('onResponse: ${response.data.toString()}');
+        UtilityClass.dismissProgressDialog();
         return handler.next(response);
       },
     ));

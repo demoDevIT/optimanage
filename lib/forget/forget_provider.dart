@@ -12,15 +12,13 @@ class ForgetProvider with ChangeNotifier {
     required String email,
   }) async {
     try {
-      UtilityClass.showProgressDialog(context, "Checking email...");
-      HttpService http = HttpService(Constants.baseurl);
+      HttpService http = HttpService(Constants.baseurl,context);
 
       final body = {
         "Email": email,
       };
 
       final response = await http.postRequest("/api/Employee/GetEmailAuthenticate", body);
-      UtilityClass.dismissProgressDialog();
 
       if (response.data['Status'] == true) {
         final resultString = response.data['Result'];
@@ -55,7 +53,6 @@ class ForgetProvider with ChangeNotifier {
       }
 
     } catch (e) {
-      UtilityClass.dismissProgressDialog();
       UtilityClass.showSnackBar(context, "Something went wrong", Colors.red);
       print("❌ Error in authenticateEmail: $e");
     }

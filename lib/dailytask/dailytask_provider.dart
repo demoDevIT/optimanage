@@ -11,14 +11,12 @@ class DailyTaskProvider with ChangeNotifier {
 
   Future<void> fetchTaskStatusList(BuildContext context) async {
     try {
-      UtilityClass.showProgressDialog(context, 'Fetching Task Status...');
 
-      HttpService http = HttpService(Constants.baseurl);
+      HttpService http = HttpService(Constants.baseurl,context);
 
       // ✅ POST with empty body
       final response = await http.postRequest("/api/Dropdown/GetDailyTaskStatusList", {});
 
-      UtilityClass.dismissProgressDialog();
 
       print("✅ Task Status Response: ${response.data}");
 
@@ -37,7 +35,6 @@ class DailyTaskProvider with ChangeNotifier {
         UtilityClass.askForInput('No Data', 'Task status list is empty.', 'OK', '', true);
       }
     } catch (e) {
-      UtilityClass.dismissProgressDialog();
       print("❌ Error fetching task status: $e");
       UtilityClass.askForInput('Error', 'Failed to load task status.', 'OK', '', true);
     }
@@ -56,7 +53,6 @@ class DailyTaskProvider with ChangeNotifier {
     required int moduleId,
   }) async {
     try {
-      UtilityClass.showProgressDialog(context, 'Submitting Daily Task...');
 
       final now = DateTime.now();
       final entryDate = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
@@ -81,10 +77,9 @@ class DailyTaskProvider with ChangeNotifier {
 
       print('📤 Sending Timesheet data: $body');
 
-      HttpService http = HttpService(Constants.baseurl);
+      HttpService http = HttpService(Constants.baseurl,context);
       final response = await http.postRequest("/api/Timesheet/CreateTimesheet", body);
 
-      UtilityClass.dismissProgressDialog();
 
       final success = response.data['State'] == 1;
       final message = response.data['Message'] ?? "Submission successful";
@@ -96,7 +91,6 @@ class DailyTaskProvider with ChangeNotifier {
         UtilityClass.showSnackBar(context, message, Colors.red);
       }
     } catch (e) {
-      UtilityClass.dismissProgressDialog();
       debugPrint("❌ Submit error: $e");
       UtilityClass.showSnackBar(context, "Something went wrong", Colors.red);
     }

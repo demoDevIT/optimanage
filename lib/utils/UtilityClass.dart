@@ -114,7 +114,7 @@ class UtilityClass {
 
   static dismissProgressDialog() {
     if (dialogContext != null) {
-      Navigator.pop(dialogContext!);
+      Navigator.pop(navigatorKey.currentState!.context!);
     } else {
       debugPrint("Unable to dismiss progress dialog");
     }

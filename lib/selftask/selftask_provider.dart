@@ -43,8 +43,7 @@ class SelfTaskProvider with ChangeNotifier {
   /// Fetch Projects
   Future<void> fetchProjectList(BuildContext context) async {
     try {
-      UtilityClass.showProgressDialog(context, 'Fetching Projects...');
-      HttpService http = HttpService(Constants.baseurl);
+      HttpService http = HttpService(Constants.baseurl,context);
 
       final body = {
         "UserId": 55,
@@ -54,7 +53,6 @@ class SelfTaskProvider with ChangeNotifier {
       };
 
       final response = await http.postRequest("/api/Dropdown/GetProjectList", body);
-      UtilityClass.dismissProgressDialog();
 
       if (response.data["Status"] == true && response.data["Result"] != null) {
         final List<dynamic> list = jsonDecode(response.data["Result"]);
@@ -62,7 +60,6 @@ class SelfTaskProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      UtilityClass.dismissProgressDialog();
       UtilityClass.askForInput('Error', 'Failed to load project list.', 'OK', '', true);
     }
   }
@@ -76,8 +73,7 @@ class SelfTaskProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      UtilityClass.showProgressDialog(context, 'Fetching Modules...');
-      HttpService http = HttpService(Constants.baseurl);
+      HttpService http = HttpService(Constants.baseurl,context);
 
       final body = {
         "UserId": 0,
@@ -87,7 +83,6 @@ class SelfTaskProvider with ChangeNotifier {
       };
 
       final response = await http.postRequest("/api/Dropdown/GetModuleList", body);
-      UtilityClass.dismissProgressDialog();
 
       if (response.data["Status"] == true && response.data["Result"] != null) {
         final List<dynamic> list = jsonDecode(response.data["Result"]);
@@ -95,7 +90,6 @@ class SelfTaskProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      UtilityClass.dismissProgressDialog();
       UtilityClass.askForInput('Error', 'Failed to load module list.', 'OK', '', true);
     }
   }
@@ -106,8 +100,7 @@ class SelfTaskProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      UtilityClass.showProgressDialog(context, 'Fetching Submodules...');
-      HttpService http = HttpService(Constants.baseurl);
+      HttpService http = HttpService(Constants.baseurl,context);
 
       final body = {
         "UserId": 0,
@@ -117,7 +110,6 @@ class SelfTaskProvider with ChangeNotifier {
       };
 
       final response = await http.postRequest("/api/Dropdown/GetSubModuleList", body);
-      UtilityClass.dismissProgressDialog();
 
       if (response.data["Status"] == true && response.data["Result"] != null) {
         final List<dynamic> list = jsonDecode(response.data["Result"]);
@@ -128,7 +120,6 @@ class SelfTaskProvider with ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      UtilityClass.dismissProgressDialog();
       _subModules = [];
       notifyListeners();
       UtilityClass.askForInput('Error', 'Failed to load submodule list.', 'OK', '', true);
@@ -147,8 +138,7 @@ class SelfTaskProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      UtilityClass.showProgressDialog(context, 'Fetching Task Types...');
-      HttpService http = HttpService(Constants.baseurl);
+      HttpService http = HttpService(Constants.baseurl,context);
 
       final body = {
         "UserId": 0,
@@ -158,7 +148,6 @@ class SelfTaskProvider with ChangeNotifier {
       };
 
       final response = await http.postRequest("/api/Dropdown/GetTaskTypeList", body);
-      UtilityClass.dismissProgressDialog();
 
       if (response.data["Status"] == true && response.data["Result"] != null) {
         final List<dynamic> list = jsonDecode(response.data["Result"]);
@@ -166,7 +155,6 @@ class SelfTaskProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      UtilityClass.dismissProgressDialog();
       UtilityClass.askForInput('Error', 'Failed to load task type list.', 'OK', '', true);
     }
   }
@@ -213,10 +201,10 @@ class SelfTaskProvider with ChangeNotifier {
     );
   }
 
-  Future<void> uploadFiles() async {
+  Future<void> uploadFiles(BuildContext context) async {
     uploadedFilePaths.clear();
 
-    HttpService http = HttpService(Constants.baseurl);
+    HttpService http = HttpService(Constants.baseurl,context);
 
     for (var file in selectedFiles) {
       final filePath = file.path;
@@ -291,7 +279,7 @@ class SelfTaskProvider with ChangeNotifier {
       isLoading = true;
       notifyListeners();
 
-      await uploadFiles(); // 🚀 Upload files first
+      await uploadFiles(context); // 🚀 Upload files first
 
       List<Map<String, dynamic>> documents = uploadedFilePaths.map((path) => {
         "TaskId": 0,
@@ -317,7 +305,7 @@ class SelfTaskProvider with ChangeNotifier {
         "TaskDocuments": documents, // ✅ New field
       };
 
-      HttpService http = HttpService(Constants.baseurl);
+      HttpService http = HttpService(Constants.baseurl,context);
       final response = await http.postRequest("/api/Timesheet/AddSelfTask", body);
 
       final success = response.data['State'] == 1;

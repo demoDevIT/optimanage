@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:optimanage/timesheet/CalendraModel.dart';
 
+import '../main.dart';
 import '../notaskassign/notaskassign_provider.dart';
 import '../notaskassign/notaskassign_sceen.dart';
 import '../utils/PrefUtil.dart';
@@ -637,14 +638,13 @@ class timesheet_provider extends ChangeNotifier {
                                           );
 
                                           await fetchLeaveSummary(
-                                              focusedDay, userId);
+                                              focusedDay, userId,context);
                                           await fetchTimesheetData(
                                               context,
                                               focusedDay.month,
                                               focusedDay.year,
                                               userId);
 
-                                          Navigator.pop(context);
                                           resetLeaveForm();
                                         } catch (e) {
                                           debugPrint("❌ Save button error: $e");
@@ -780,9 +780,8 @@ class timesheet_provider extends ChangeNotifier {
   Future<void> fetchTimesheetData(
       BuildContext context, int month, int year, int userId) async {
     try {
-      UtilityClass.showProgressDialog(context, 'Please wait...');
 
-      HttpService http = HttpService(Constants.baseurl);
+      HttpService http = HttpService(Constants.baseurl,context);
 
       Map<String, dynamic> inputText = {
         "MonthId": month,
@@ -796,7 +795,6 @@ class timesheet_provider extends ChangeNotifier {
         inputText,
       );
 
-      UtilityClass.dismissProgressDialog();
       print("✅ calendar Response: ${response.data}");
 
       CalendraModel getresponse = CalendraModel.fromJson(response.data);
@@ -838,7 +836,6 @@ class timesheet_provider extends ChangeNotifier {
         print("❌ No data found in Result.");
       }
     } catch (e) {
-      UtilityClass.dismissProgressDialog();
       print("❌ Exception while calling API: $e");
 
       UtilityClass.askForInput(
@@ -853,9 +850,10 @@ class timesheet_provider extends ChangeNotifier {
 
   List<TaskSummaryModalPopup> taskSummaries = [];
 
-  Future<void> fetchTaskSummary(DateTime date, int userId) async {
+  Future<void> fetchTaskSummary(DateTime date, int userId, BuildContext context) async {
+    taskSummaries.clear();
     try {
-      HttpService http = HttpService(Constants.baseurl);
+      HttpService http = HttpService(Constants.baseurl,context);
 
       print("✅ GetHourSummaryList request date: ${date}");
 
@@ -872,15 +870,33 @@ class timesheet_provider extends ChangeNotifier {
         body,
       );
 
-      final resultString = response.data['Result'];
 
-      if (resultString != null) {
+      if (response.data['State'].toString() == "1" &&  response.data['Status'].toString() == "true") {
+        final resultString = response.data['Result'];
+
         final List decodedList = jsonDecode(resultString);
 
         taskSummaries = decodedList
             .map((item) => TaskSummaryModalPopup.fromJson(item))
             .toList();
+
+        if (taskSummaries.isNotEmpty) {
+          showtaskSummaryBottomSheet(
+            context,
+            "Add Leave",
+            selectedDay!,
+            0.75,
+            taskSummaries,
+          );
+        } else {
+          ScaffoldMessenger.of(navigatorKey.currentState!.context).showSnackBar(
+            SnackBar(content: Text("No task summary available.111111")),
+          );
+        }
       } else {
+        ScaffoldMessenger.of(navigatorKey.currentState!.context).showSnackBar(
+          SnackBar(content: Text("No task summary available.111111")),
+        );
         taskSummaries = [];
       }
 
@@ -894,9 +910,9 @@ class timesheet_provider extends ChangeNotifier {
 
   List<LeaveSummaryModalPopup> leaveSummaries = [];
 
-  Future<void> fetchLeaveSummary(DateTime date, int userId) async {
+  Future<void> fetchLeaveSummary(DateTime date, int userId, BuildContext context) async {
     try {
-      HttpService http = HttpService(Constants.baseurl);
+      HttpService http = HttpService(Constants.baseurl,context);
 
       final body = {
         "LeaveMonth": date.month,
@@ -958,7 +974,7 @@ class timesheet_provider extends ChangeNotifier {
 
       print("📤 Request body: $body");
 
-      HttpService http = HttpService(Constants.baseurl);
+      HttpService http = HttpService(Constants.baseurl,context);
       final response =
           await http.postRequest("/api/Timesheet/AddResourceLeave", body);
 
@@ -973,11 +989,11 @@ class timesheet_provider extends ChangeNotifier {
         UtilityClass.showSnackBar(context, message, kPrimaryDark);
 
         // Refresh calendar + timesheet data
-        await fetchLeaveSummary(focusedDay, userId);
+        await fetchLeaveSummary(focusedDay, userId,context);
         await fetchTimesheetData(
             context, focusedDay.month, focusedDay.year, userId);
 
-        Navigator.pop(context); // Close modal
+     // Close modal
       } else {
         UtilityClass.showSnackBar(context, errorMessage, Colors.red);
       }

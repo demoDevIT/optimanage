@@ -9,9 +9,9 @@ class TaskSummaryProvider extends ChangeNotifier {
   List<TaskSummary> taskSummaries = [];
   TaskSummary? taskSummary;
 
-  Future<void> fetchTaskSummary(int taskId) async {
+  Future<void> fetchTaskSummary(int taskId, BuildContext context) async {
     try {
-      HttpService http = HttpService(Constants.baseurl);
+      HttpService http = HttpService(Constants.baseurl,context);
 
       final body = {
         "TaskId": taskId,
@@ -44,9 +44,9 @@ class TaskSummaryProvider extends ChangeNotifier {
   }
 
 
-  Future<int?> validateTimesheetEntry(DateTime date, int userId) async {
+  Future<int?> validateTimesheetEntry(DateTime date, int userId, BuildContext context) async {
     try {
-      final http = HttpService(Constants.baseurl);
+      final http = HttpService(Constants.baseurl,context);
       final formattedDate =
           "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
 

@@ -14,15 +14,13 @@ class ProfileProvider with ChangeNotifier {
 
   Future<void> fetchProfile(BuildContext context) async {
     try {
-      UtilityClass.showProgressDialog(context, 'Fetching Profile...');
-      HttpService http = HttpService(Constants.baseurl);
+      HttpService http = HttpService(Constants.baseurl,context);
 
       // ✅ Dynamically get UserId from PrefUtil
       int? userId = await PrefUtil.getPrefUserId();
 
       if (userId == null || userId == 0) {
-        UtilityClass.dismissProgressDialog();
-        print("❌ User ID not found in preferences.");
+          print("❌ User ID not found in preferences.");
         UtilityClass.askForInput('Error', 'User ID not found.', 'OK', '', true);
         return;
       }
@@ -32,7 +30,6 @@ class ProfileProvider with ChangeNotifier {
       };
       print("✅ Profile Request: ${body}");
       final response = await http.postRequest("/api/Employee/GetEmployeeProfile", body);
-      UtilityClass.dismissProgressDialog();
 
       print("✅ Profile Response: ${response.data}");
 
@@ -46,7 +43,6 @@ class ProfileProvider with ChangeNotifier {
         print("❌ No profile found.");
       }
     } catch (e) {
-      UtilityClass.dismissProgressDialog();
       print("❌ Error fetching profile: $e");
       UtilityClass.askForInput('Error', 'Failed to load profile.', 'OK', '', true);
     }

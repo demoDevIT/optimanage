@@ -20,9 +20,8 @@ class AssignedTaskProvider with ChangeNotifier {
     required int userId,
   }) async {
     try {
-      UtilityClass.showProgressDialog(context, "Loading assigned tasks...");
 
-      HttpService http = HttpService(Constants.baseurl);
+      HttpService http = HttpService(Constants.baseurl,context);
 
       final body = {
         "FromDate": fromDate,
@@ -31,7 +30,6 @@ class AssignedTaskProvider with ChangeNotifier {
       };
 
       final response = await http.postRequest("/api/Timesheet/GetAssignTaskList", body);
-      UtilityClass.dismissProgressDialog();
 
       if (response.data['Status'] == true &&
           response.data['Data'] != null &&
@@ -54,7 +52,6 @@ class AssignedTaskProvider with ChangeNotifier {
 
 
     } catch (e) {
-      UtilityClass.dismissProgressDialog();
       print("❌ Error in fetchAssignedTasks: $e");
       _assignedProjects = [];
       UtilityClass.showSnackBar(context, "Something went wrong!", Colors.red);

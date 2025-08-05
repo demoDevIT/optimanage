@@ -18,9 +18,8 @@ class RdProvider with ChangeNotifier {
   /// Get Project List
   Future<void> fetchProjectList(BuildContext context) async {
     try {
-      UtilityClass.showProgressDialog(context, 'Fetching Projects...');
 
-      HttpService http = HttpService(Constants.baseurl);
+      HttpService http = HttpService(Constants.baseurl,context);
 
       final int userId = await PrefUtil.getPrefUserId() ?? 0;
       final int roleId = await PrefUtil.getRoleId() ?? 0; // fallback if null
@@ -35,7 +34,6 @@ class RdProvider with ChangeNotifier {
       print("✅ RD Project List Request: ${body}");
 
       final response = await http.postRequest("/api/Dropdown/GetProjectList", body);
-      UtilityClass.dismissProgressDialog();
 
       print("✅ Project List Response: ${response.data}");
 
@@ -47,7 +45,6 @@ class RdProvider with ChangeNotifier {
         print("❌ No projects found.");
       }
     } catch (e) {
-      UtilityClass.dismissProgressDialog();
       print("❌ Error fetching projects: $e");
       UtilityClass.askForInput('Error', 'Failed to load project list.', 'OK', '', true);
     }
@@ -56,9 +53,8 @@ class RdProvider with ChangeNotifier {
   /// Get Module List by ProjectId
   Future<void> fetchModuleList(BuildContext context, int projectId) async {
     try {
-      UtilityClass.showProgressDialog(context, 'Fetching Modules...');
 
-      HttpService http = HttpService(Constants.baseurl);
+      HttpService http = HttpService(Constants.baseurl,context);
 
       final int userId = await PrefUtil.getPrefUserId() ?? 0;
       final int roleId = await PrefUtil.getRoleId() ?? 0; // fallback if null
@@ -73,7 +69,6 @@ class RdProvider with ChangeNotifier {
       print("✅ RD Module List Request: ${body}");
 
       final response = await http.postRequest("/api/Dropdown/GetModuleList", body);
-      UtilityClass.dismissProgressDialog();
 
       print("✅ Module List Response: ${response.data}");
 
@@ -85,7 +80,6 @@ class RdProvider with ChangeNotifier {
         print("❌ No modules found.");
       }
     } catch (e) {
-      UtilityClass.dismissProgressDialog();
       print("❌ Error fetching modules: $e");
       UtilityClass.askForInput('Error', 'Failed to load module list.', 'OK', '', true);
     }
@@ -96,9 +90,8 @@ class RdProvider with ChangeNotifier {
 
   Future<void> fetchSubModuleList(BuildContext context, int moduleId, int projectId) async {
     try {
-      UtilityClass.showProgressDialog(context, 'Fetching Submodules...');
 
-      HttpService http = HttpService(Constants.baseurl);
+      HttpService http = HttpService(Constants.baseurl,context);
 
       final int userId = await PrefUtil.getPrefUserId() ?? 0;
       final int roleId = await PrefUtil.getRoleId() ?? 0; // fallback if null
@@ -113,7 +106,6 @@ class RdProvider with ChangeNotifier {
       print("✅ RD SUB-Module List Request: ${body}");
 
       final response = await http.postRequest("/api/Dropdown/GetSubModuleList", body);
-      UtilityClass.dismissProgressDialog();
 
       print("✅ Submodule Response: ${response.data}");
 
@@ -126,7 +118,6 @@ class RdProvider with ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      UtilityClass.dismissProgressDialog();
       print("❌ Error fetching submodules: $e");
       _subModules = []; // fallback
       notifyListeners();
@@ -171,7 +162,7 @@ class RdProvider with ChangeNotifier {
 
       print('📤 Sending data to APIIIII--->: $body');
 
-      HttpService http = HttpService(Constants.baseurl);
+      HttpService http = HttpService(Constants.baseurl,context);
       final response = await http.postRequest("/api/Timesheet/CreateTimesheet", body);
 
       final success = response.data['State'] == 1;

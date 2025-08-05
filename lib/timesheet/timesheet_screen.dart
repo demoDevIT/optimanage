@@ -117,7 +117,7 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                     provider.focusedDay = focusedDay;
                    // provider.selectedDay = DateTime(focusedDay.year, focusedDay.month, 1);
                     provider.fetchTimesheetData(context, focusedDay.month, focusedDay.year, userId);
-                    provider.fetchLeaveSummary(focusedDay, userId);
+                    provider.fetchLeaveSummary(focusedDay, userId,context);
                   },
                   selectedDayPredicate: (day) =>
                       isSameDay(provider.selectedDay, day),
@@ -154,23 +154,8 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                           ),
                         );
                       } else if (widget.status == "daily" && !isWeekend) {
-                        UtilityClass.showProgressDialog(context, 'Please wait...');
-                        provider.fetchTaskSummary(provider.selectedDay!, userId);
-                        Navigator.pop(context); // close progress dialog
+                        provider.fetchTaskSummary(provider.selectedDay!, userId,context);
 
-                        if (provider.taskSummaries.isNotEmpty) {
-                          provider.showtaskSummaryBottomSheet(
-                            context,
-                            "Add Leave",
-                            provider.selectedDay!,
-                            0.75,
-                            provider.taskSummaries,
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("No task summary available.")),
-                          );
-                        }
                       }
 
                     });

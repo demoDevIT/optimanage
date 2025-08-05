@@ -40,7 +40,7 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
     setState(() => _isLoading = true);
 
     try {
-      HttpService http = HttpService(Constants.baseurl);
+      HttpService http = HttpService(Constants.baseurl,context);
 
       Map<String, dynamic> body = {
         'Password': newPassword,

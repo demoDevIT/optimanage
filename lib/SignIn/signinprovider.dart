@@ -55,7 +55,7 @@ import 'package:flutter/material.dart';
 
       _setLoading(true); // Set loading state
       try {
-        HttpService http = HttpService(Constants.baseurl);
+        HttpService http = HttpService(Constants.baseurl,buildContext);
 
         String empId = empIDController.text;
         String pass = passwordController.text;
