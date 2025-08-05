@@ -63,9 +63,12 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
       if (widget.status == "daily") {
         provider.showLeaveDetails = true;
         provider.showdailyDetails = false;
+        print("1111111111");
       } else {
         provider.showLeaveDetails = false;
         provider.showdailyDetails = true;
+        print("222222222222");
+
       }
     });
   }
@@ -117,7 +120,7 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                     provider.focusedDay = focusedDay;
                    // provider.selectedDay = DateTime(focusedDay.year, focusedDay.month, 1);
                     provider.fetchTimesheetData(context, focusedDay.month, focusedDay.year, userId);
-                    provider.fetchLeaveSummary(focusedDay, userId,context);
+                    provider.fetchLeaveSummary(focusedDay, userId);
                   },
                   selectedDayPredicate: (day) =>
                       isSameDay(provider.selectedDay, day),

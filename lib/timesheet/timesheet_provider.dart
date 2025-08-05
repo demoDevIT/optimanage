@@ -638,7 +638,7 @@ class timesheet_provider extends ChangeNotifier {
                                           );
 
                                           await fetchLeaveSummary(
-                                              focusedDay, userId,context);
+                                              focusedDay, userId);
                                           await fetchTimesheetData(
                                               context,
                                               focusedDay.month,
@@ -777,8 +777,7 @@ class timesheet_provider extends ChangeNotifier {
     }
   }
 
-  Future<void> fetchTimesheetData(
-      BuildContext context, int month, int year, int userId) async {
+  Future<void> fetchTimesheetData(BuildContext context, int month, int year, int userId) async {
     try {
 
       HttpService http = HttpService(Constants.baseurl,context);
@@ -890,12 +889,12 @@ class timesheet_provider extends ChangeNotifier {
           );
         } else {
           ScaffoldMessenger.of(navigatorKey.currentState!.context).showSnackBar(
-            SnackBar(content: Text("No task summary available.111111")),
+            SnackBar(content: Text("No task summary available.")),
           );
         }
       } else {
         ScaffoldMessenger.of(navigatorKey.currentState!.context).showSnackBar(
-          SnackBar(content: Text("No task summary available.111111")),
+          SnackBar(content: Text("No task summary available.")),
         );
         taskSummaries = [];
       }
@@ -910,7 +909,7 @@ class timesheet_provider extends ChangeNotifier {
 
   List<LeaveSummaryModalPopup> leaveSummaries = [];
 
-  Future<void> fetchLeaveSummary(DateTime date, int userId, BuildContext context) async {
+  Future<void> fetchLeaveSummary(DateTime date, int userId) async {
     try {
       HttpService http = HttpService(Constants.baseurl,context);
 
@@ -924,7 +923,7 @@ class timesheet_provider extends ChangeNotifier {
         "/api/Timesheet/GetLeaveSummaryList",
         body,
       );
-
+      if (response.data['State'].toString() == "1" &&  response.data['Status'].toString() == "true") {
       final resultString = response.data['Result'];
 
       if (resultString != null) {
@@ -933,11 +932,13 @@ class timesheet_provider extends ChangeNotifier {
         leaveSummaries = decodedList
             .map((item) => LeaveSummaryModalPopup.fromJson(item))
             .toList();
+        notifyListeners();
+
       } else {
         leaveSummaries = [];
-      }
+      }}else {
 
-      notifyListeners();
+      }
     } catch (e) {
       debugPrint("❌ Error fetching leave summary: $e");
       leaveSummaries = [];
@@ -989,7 +990,7 @@ class timesheet_provider extends ChangeNotifier {
         UtilityClass.showSnackBar(context, message, kPrimaryDark);
 
         // Refresh calendar + timesheet data
-        await fetchLeaveSummary(focusedDay, userId,context);
+        await fetchLeaveSummary(focusedDay, userId);
         await fetchTimesheetData(
             context, focusedDay.month, focusedDay.year, userId);
 

@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:optimanage/main.dart';
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 
 class UtilityClass {
   static BuildContext? dialogContext;
@@ -77,37 +78,37 @@ class UtilityClass {
         barrierDismissible: false,
         builder: (context) {
           dialogContext = context;
-          return Dialog(
-            backgroundColor: Colors.grey[100],
-            child: Container(
-              height: 150,
-              width: 50,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Center(
-                    child: LoadingAnimationWidget.discreteCircle(
-                      size: 60,
-                      color: Colors.lightGreen,
-                    ),
+          return  Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Center(
+                child: SizedBox(
+                  height: 80,
+                  child: Lottie.asset(
+                    'assets/loader/progress-lod.json',
+                    fit: BoxFit.contain,
+                    repeat: true,
                   ),
-                  const SizedBox(height: 5),
-                  Text(
-                    message,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  )
-                ],
+                ),
               ),
-            ),
+              // Center(
+              //   child: LoadingAnimationWidget.discreteCircle(
+              //     size: 60,
+              //     color: Colors.lightGreen,
+              //   ),
+              // ),
+              // const SizedBox(height: 5),
+              // Text(
+              //   message,
+              //   textAlign: TextAlign.center,
+              //   style: const TextStyle(
+              //     fontSize: 14,
+              //     fontWeight: FontWeight.w500,
+              //   ),
+              // )
+            ],
           );
         });
   }
