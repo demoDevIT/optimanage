@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../assignedtask/AssignedTaskModel.dart';
 import 'dailytask_provider.dart';
@@ -8,11 +9,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 class DailyTaskScreen extends StatefulWidget {
   final AssignedTaskModel task;
   final int userId;
+  final DateTime selectedDate;
 
   const DailyTaskScreen({
     super.key,
     required this.task,
     required this.userId, // 🔹 Add this line
+    required this.selectedDate,
   });
 
   @override
@@ -34,7 +37,7 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
   @override
   void initState() {
     super.initState();
-
+    print("📄 initState -> TaskIssueID: ${widget.task.taskIssueID}");
     projectId = widget.task.projectId;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -90,6 +93,7 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
 
   @override
   Widget build(BuildContext context) {
+   // print("📄 DailyTaskScreen -> TaskIssueID: ${task.taskIssueID}");
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -416,8 +420,11 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
     final String startStr = _startTime!.hour.toString().padLeft(2, '0') + ':' + _startTime!.minute.toString().padLeft(2, '0');
     final String endStr = _endTime!.hour.toString().padLeft(2, '0') + ':' + _endTime!.minute.toString().padLeft(2, '0');
 
+    final formattedDate = DateFormat('yyyy-MM-dd').format(widget.selectedDate);
+
     await provider.submitDailyTask(
       context: context,
+      taskId: widget.task.taskIssueID ?? 0,
       description: description,
       startTime: startStr,
       endTime: endStr,
@@ -427,6 +434,7 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
       projectId: projectId,
       moduleId: 0, // Replace with actual moduleId if needed
       userId: widget.userId,  // Replace with actual userId
+      selectedDate: formattedDate
     );
   }
 

@@ -188,7 +188,8 @@ class _TaskSummaryScreenState extends State<TaskSummaryScreen> {
                                   create: (_) => DailyTaskProvider(),
                                   child: DailyTaskScreen(
                                     task: widget.task!,      // ✅ already passed
-                                    userId: widget.userId,   // ✅ pass the userId too
+                                    userId: widget.userId,
+                                    selectedDate: widget.selectedDate,// ✅ pass the userId too
                                   ),
                                 ),
                               ),

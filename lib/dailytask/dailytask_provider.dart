@@ -42,6 +42,7 @@ class DailyTaskProvider with ChangeNotifier {
 
   Future<void> submitDailyTask({
     required BuildContext context,
+    required int taskId,
     required String description,
     required String startTime,
     required String endTime,
@@ -51,6 +52,7 @@ class DailyTaskProvider with ChangeNotifier {
     required int projectId,
     required int userId,
     required int moduleId,
+    required String selectedDate
   }) async {
     try {
 
@@ -60,10 +62,10 @@ class DailyTaskProvider with ChangeNotifier {
 
       final body = {
         "TaskType": 1,
-        "TaskId": 0,
+        "TaskId": taskId,
         "TaskDescription": description,
         "TaskStatus": taskStatus,
-        "EntryDate": entryDate,
+        "EntryDate": selectedDate,
         "TaskHour": taskHour,
         "TaskMinutes": taskMinutes,
         "TaskDuration": taskDuration,
@@ -81,10 +83,12 @@ class DailyTaskProvider with ChangeNotifier {
       final response = await http.postRequest("/api/Timesheet/CreateTimesheet", body);
 
 
-      final success = response.data['State'] == 1;
-      final message = response.data['Message'] ?? "Submission successful";
+      final state = response.data['State'];
+      final status = response.data['Status'];
+      final message = response.data['Message'] ?? 'Submission successful';
 
-      if (success) {
+      print("elseeeeee11===============>");
+      if (state == 1 && status == true) {
         UtilityClass.showSnackBar(context, message, Colors.green);
         Navigator.pop(context, true);
       } else {

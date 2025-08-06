@@ -51,13 +51,13 @@ class TaskSummaryModalPopup {
 
   factory TaskSummaryModalPopup.fromJson(Map<String, dynamic> json) {
     return TaskSummaryModalPopup(
-      strTaskStauts: json["strTaskStauts"],
+      strTaskStauts: json['strTaskStauts'] ?? '',
       TaskName: json["TaskName"],
       TimeSheetID: json["TimeSheetID"],
       SubTaskDescription: json["SubTaskDescription"],
       SubTaskShortDescription: json["SubTaskShortDescription"],
-      TaskDescription: json["TaskDescription"],
-      TaskShortDescription: json["TaskShortDescription"],
+      TaskDescription: json['TaskDescription'] ?? '',
+      TaskShortDescription: json['TaskShortDescription'] ?? '',
       TaskTime: json["TaskTime"],
       EntryDate: json["EntryDate"],
       EntryDate_DDMMYYYY: json["EntryDate_DDMMYYYY"],

@@ -7,6 +7,7 @@ import '../selftask/module_model.dart';
 import '../selftask/task_type_model.dart';
 import 'package:optimanage/services/HttpService.dart';
 import 'package:optimanage/constant/Constants.dart';
+import '../utils/PrefUtil.dart';
 import '../utils/UtilityClass.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
@@ -42,16 +43,18 @@ class SelfTaskProvider with ChangeNotifier {
 
   /// Fetch Projects
   Future<void> fetchProjectList(BuildContext context) async {
+    final int userId = await PrefUtil.getPrefUserId() ?? 0;
     try {
       HttpService http = HttpService(Constants.baseurl,context);
 
       final body = {
-        "UserId": 55,
+        "UserId": userId,
         "RoleId": 4,
         "ProjectId": 0,
         "ModuleId": 0,
       };
 
+      print("request=============>${body}");
       final response = await http.postRequest("/api/Dropdown/GetProjectList", body);
 
       if (response.data["Status"] == true && response.data["Result"] != null) {
@@ -271,15 +274,19 @@ class SelfTaskProvider with ChangeNotifier {
     required String startDate,
     required String endDate,
     required int taskDuration,
-    String notes = '',
-    String remarks = '',
-    int isHigherPriority = 0,
+    required String notes,
+    required String remarks,
+    required int isHigherPriority,
   }) async {
     try {
       isLoading = true;
       notifyListeners();
 
-      await uploadFiles(context); // 🚀 Upload files first
+
+     //   uploadFiles(context);
+
+
+      // 🚀 Upload files first
 
       List<Map<String, dynamic>> documents = uploadedFilePaths.map((path) => {
         "TaskId": 0,
@@ -302,32 +309,47 @@ class SelfTaskProvider with ChangeNotifier {
         "Notes": notes,
         "Remarks": remarks,
         "IsHigherPriority": isHigherPriority,
-        "TaskDocuments": documents, // ✅ New field
+        "TaskDocuments": documents,
       };
 
-      HttpService http = HttpService(Constants.baseurl,context);
+      print("✅ submit data: ${body}");
+
+      HttpService http = HttpService(Constants.baseurl, context);
       final response = await http.postRequest("/api/Timesheet/AddSelfTask", body);
 
-      final success = response.data['State'] == 1;
+      print("✅ API raw response: ${response.data}");
+
+      final state = response.data['State'];
+      final status = response.data['Status'];
       final message = response.data['Message'] ?? 'Task submitted successfully';
 
-      if (success) {
+      print("🔍 Parsed response => State: $state | Status: $status | Message: $message");
+
+      print("elseeeeee11===============>");
+      if (state == 1 && status == true) {
         UtilityClass.showSnackBar(context, message, Colors.green);
         Navigator.pop(context, true);
         return true;
       } else {
-        UtilityClass.showSnackBar(context, message, Colors.red);
+        print("elseeeeee22===============>");
+        UtilityClass.showSnackBar(context, response.data['ErrorMessage'], Colors.red);
+        Navigator.pop(context, true);
         return false;
       }
-    } catch (e) {
+    } catch (e, stacktrace) {
+      print("elseeeeee33===============>");
       debugPrint("❌ Submit Error: $e");
+      debugPrint("📛 Stacktrace: $stacktrace");
       UtilityClass.showSnackBar(context, "Something went wrong", Colors.red);
       return false;
     } finally {
+      print("elseeeeee44===============>");
+      print("⏹️ isLoading = false triggered");
       isLoading = false;
       notifyListeners();
     }
   }
+
 
   void clearSelections() {
     selectedProjectId = null;

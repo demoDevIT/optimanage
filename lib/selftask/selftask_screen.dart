@@ -4,6 +4,8 @@ import '../selftask/selftask_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../utils/PrefUtil.dart';
+
 class SelfTaskScreen extends StatefulWidget {
   const SelfTaskScreen({Key? key}) : super(key: key);
 
@@ -12,6 +14,8 @@ class SelfTaskScreen extends StatefulWidget {
 }
 
 class _SelfTaskScreenState extends State<SelfTaskScreen> {
+  int userId = 0;
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   String? selectedProject;
@@ -61,7 +65,6 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
     });
   }
 
-
   Future<void> _selectDate(BuildContext context, bool isStart) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -89,6 +92,7 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: DropdownButtonFormField<String>(
+        isExpanded: true,
         value: selectedValue,
         validator: (value) => value == null ? 'Please select $hint' : null,
         onChanged: onChanged,
@@ -172,11 +176,11 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
               Padding(
                 padding: const EdgeInsets.only(top: 2),
                 child:
-                // Image.asset(
-                //   'assets/icons/calendar.png',
-                //   width: 20,
-                // ),
-                SvgPicture.asset(
+                    // Image.asset(
+                    //   'assets/icons/calendar.png',
+                    //   width: 20,
+                    // ),
+                    SvgPicture.asset(
                   'assets/icons/calendar.svg',
                   width: 20,
                   height: 20,
@@ -234,208 +238,228 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<SelfTaskProvider>(context);
-    return Scaffold(
-      backgroundColor: const Color(0xFFFDFDFD),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: const BackButton(color: Colors.black),
-        title: const Text('Self Task Details',
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        centerTitle: true,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: SvgPicture.asset(
-              'assets/icons/notification.svg',
-              width: 24,
-              height: 24,
-            ),
-          )
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              _buildValidatedDropdown(
-                hint: 'Project Name',
-                items: provider.projects.map((e) => e.name).toList(),
-                selectedValue: provider.selectedProjectId == null
-                    ? null
-                    : provider.projects
-                        .firstWhere((p) => p.id == provider.selectedProjectId)
-                        .name,
-                onChanged: (val) {
-                  final selected =
-                      provider.projects.firstWhere((e) => e.name == val);
-                  provider.setSelectedProject(selected.id);
-                  provider.fetchModuleList(context, selected.id);
-                },
+    return Stack(children: [
+      Scaffold(
+        backgroundColor: const Color(0xFFFDFDFD),
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: const BackButton(color: Colors.black),
+          title: const Text('Self Task Details',
+              style:
+                  TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+          centerTitle: true,
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 16),
+              child: SvgPicture.asset(
+                'assets/icons/notification.svg',
+                width: 24,
+                height: 24,
               ),
-              _buildValidatedDropdown(
-                hint: 'Module Name',
-                items: provider.modules.map((e) => e.name).toList(),
-                selectedValue: provider.selectedModuleId == null
-                    ? null
-                    : provider.modules
-                        .firstWhere((m) => m.id == provider.selectedModuleId)
-                        .name,
-                onChanged: (val) {
-                  final selected =
-                      provider.modules.firstWhere((e) => e.name == val);
-                  provider.setSelectedModule(selected.id);
-                  provider.fetchTaskTypeList(
-                      context, provider.selectedProjectId!, selected.id);
-                  provider.fetchSubModuleList(context, selected.id);
-                },
-              ),
-              if (provider.subModules.isNotEmpty)
+            )
+          ],
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
                 _buildValidatedDropdown(
-                  hint: 'Submodule Name',
-                  items: provider.subModules.map((e) => e.name).toList(),
-                  selectedValue: provider.selectedSubModuleId == null
+                  hint: 'Project Name',
+                  items: provider.projects.map((e) => e.name).toList(),
+                  selectedValue: provider.selectedProjectId == null
                       ? null
-                      : provider.subModules
-                          .firstWhere(
-                              (s) => s.id == provider.selectedSubModuleId)
+                      : provider.projects
+                          .firstWhere((p) => p.id == provider.selectedProjectId)
                           .name,
                   onChanged: (val) {
                     final selected =
-                        provider.subModules.firstWhere((e) => e.name == val);
-                    provider.setSelectedSubModule(selected.id);
+                        provider.projects.firstWhere((e) => e.name == val);
+                    provider.setSelectedProject(selected.id);
+
+                    // 🟢 Reset dependent fields
+                    provider.setSelectedModule(null);
+                    provider.setSelectedSubModule(null);
+                    provider.setSelectedTaskType(null);
+
+                    provider.fetchModuleList(context, selected.id);
                   },
                 ),
+                _buildValidatedDropdown(
+                  hint: 'Module Name',
+                  items: provider.modules.map((e) => e.name).toList(),
+                  selectedValue: provider.selectedModuleId == null
+                      ? null
+                      : provider.modules
+                          .firstWhere((m) => m.id == provider.selectedModuleId)
+                          .name,
+                  onChanged: (val) {
+                    final selected =
+                        provider.modules.firstWhere((e) => e.name == val);
+                    provider.setSelectedModule(selected.id);
 
-              _buildValidatedDropdown(
-                hint: 'Task Type',
-                items: provider.taskTypes.map((e) => e.name).toList(),
-                selectedValue: provider.selectedTaskTypeId == null
-                    ? null
-                    : provider.taskTypes
-                        .firstWhere((t) => t.id == provider.selectedTaskTypeId)
-                        .name,
-                onChanged: (val) {
-                  final selected =
-                      provider.taskTypes.firstWhere((e) => e.name == val);
-                  provider.setSelectedTaskType(selected.id);
-                },
-              ),
-              _buildTextField('Task Name', taskNameController,
-                  isRequired: true),
-              _buildTextField('Description', descriptionController,
-                  maxLines: 3, isRequired: true),
-              Row(
-                children: [
-                  _buildDateField('Start Date', startDate,
-                      () => _selectDate(context, true)),
-                  _buildDateField(
-                      'End Date', endDate, () => _selectDate(context, false)),
-                ],
-              ),
+                    // 🟢 Reset submodule and task type when module changes
+                    provider.setSelectedSubModule(null);
+                    provider.setSelectedTaskType(null);
 
-              _buildTextField(
-                  'Estimated Time (In Hours)', estimatedTimeController,
-                  isRequired: true, keyboardType: TextInputType.number),
-              _buildTextField('Notes', notesController),
-              Stack(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          Provider.of<SelfTaskProvider>(context, listen: false)
-                              .pickDocuments(context);
-                        },
-                        icon: const Icon(
-                          Icons.upload_file,
-                          size: 20,
-                          color: Colors.white, // ✅ white icon
-                        ),
-                        label: const Padding(
-                          padding: EdgeInsets.only(left: 4.0), // slight padding for spacing
-                          child: Text(
-                            "Upload Documents",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF25507C),
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12), // control button size
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30), // rounded pill shape
-                          ),
-                          elevation: 3,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      ...provider.selectedFiles.map((file) => ListTile(
-                        dense: true,
-                        leading: const Icon(Icons.insert_drive_file),
-                        title: Text(file.name),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.clear, size: 20),
-                          onPressed: () {
-                            setState(() {
-                              provider.selectedFiles.remove(file);
-                            });
-                          },
-                        ),
-                      )),
-                    ],
-                  ),
-
-                  // const Positioned(
-                  //   right: 16,
-                  //   top: 20,
-                  //   child: Icon(Icons.upload_rounded, size: 20),
-                  // )
-                ],
-              ),
-
-              // _buildValidatedDropdown(
-              //   hint: 'Assign To',
-              //   items: ['Member A', 'Member B'],
-              //   selectedValue: selectedAssignee,
-              //   onChanged: (val) => setState(() => selectedAssignee = val),
-              // ),
-              CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                controlAffinity: ListTileControlAffinity.leading,
-                title: const Text('Higher Priority',
-                    style: TextStyle(fontSize: 14)),
-                value: isPriority,
-                onChanged: (val) => setState(() => isPriority = val ?? false),
-                activeColor: const Color(0xFF25507C),
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _submitSelfTaskForm,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF25507C),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: const Text(
-                    'Submit',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600),
-                  ),
+                    provider.fetchTaskTypeList(
+                        context, provider.selectedProjectId!, selected.id);
+                    provider.fetchSubModuleList(context, selected.id);
+                  },
                 ),
-              )
-            ],
+                if (provider.subModules.isNotEmpty)
+                  _buildValidatedDropdown(
+                    hint: 'Submodule Name',
+                    items: provider.subModules.map((e) => e.name).toList(),
+                    selectedValue: provider.selectedSubModuleId == null
+                        ? null
+                        : provider.subModules
+                            .firstWhere(
+                                (s) => s.id == provider.selectedSubModuleId)
+                            .name,
+                    onChanged: (val) {
+                      final selected =
+                          provider.subModules.firstWhere((e) => e.name == val);
+                      provider.setSelectedSubModule(selected.id);
+                    },
+                  ),
+
+                _buildValidatedDropdown(
+                  hint: 'Task Type',
+                  items: provider.taskTypes.map((e) => e.name).toList(),
+                  selectedValue: provider.selectedTaskTypeId == null
+                      ? null
+                      : provider.taskTypes
+                          .firstWhere(
+                              (t) => t.id == provider.selectedTaskTypeId)
+                          .name,
+                  onChanged: (val) {
+                    final selected =
+                        provider.taskTypes.firstWhere((e) => e.name == val);
+                    provider.setSelectedTaskType(selected.id);
+                  },
+                ),
+                _buildTextField('Task Name', taskNameController,
+                    isRequired: true),
+                _buildTextField('Description', descriptionController,
+                    maxLines: 3, isRequired: true),
+                Row(
+                  children: [
+                    _buildDateField('Start Date', startDate,
+                        () => _selectDate(context, true)),
+                    _buildDateField(
+                        'End Date', endDate, () => _selectDate(context, false)),
+                  ],
+                ),
+
+                _buildTextField(
+                    'Estimated Time (In Hours)', estimatedTimeController,
+                    isRequired: true, keyboardType: TextInputType.number),
+                _buildTextField('Notes', notesController),
+                Stack(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            Provider.of<SelfTaskProvider>(context,
+                                    listen: false)
+                                .pickDocuments(context);
+                          },
+                          icon: const Icon(
+                            Icons.upload_file,
+                            size: 20,
+                            color: Colors.white, // ✅ white icon
+                          ),
+                          label: const Padding(
+                            padding: EdgeInsets.only(left: 4.0),
+                            // slight padding for spacing
+                            child: Text(
+                              "Upload Documents",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF25507C),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 12),
+                            // control button size
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                  30), // rounded pill shape
+                            ),
+                            elevation: 3,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        ...provider.selectedFiles.map((file) => ListTile(
+                              dense: true,
+                              leading: const Icon(Icons.insert_drive_file),
+                              title: Text(file.name),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.clear, size: 20),
+                                onPressed: () {
+                                  setState(() {
+                                    provider.selectedFiles.remove(file);
+                                  });
+                                },
+                              ),
+                            )),
+                      ],
+                    ),
+
+                    // const Positioned(
+                    //   right: 16,
+                    //   top: 20,
+                    //   child: Icon(Icons.upload_rounded, size: 20),
+                    // )
+                  ],
+                ),
+
+                // _buildValidatedDropdown(
+                //   hint: 'Assign To',
+                //   items: ['Member A', 'Member B'],
+                //   selectedValue: selectedAssignee,
+                //   onChanged: (val) => setState(() => selectedAssignee = val),
+                // ),
+                CheckboxListTile(
+                  contentPadding: EdgeInsets.zero,
+                  controlAffinity: ListTileControlAffinity.leading,
+                  title: const Text('Higher Priority',
+                      style: TextStyle(fontSize: 14)),
+                  value: isPriority,
+                  onChanged: (val) => setState(() => isPriority = val ?? false),
+                  activeColor: const Color(0xFF25507C),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: provider.isLoading ? null : _submitSelfTaskForm,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF25507C),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: const Text(
+                      'Submit',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),
-    );
+    ]);
   }
 
   Future<void> _submitSelfTaskForm() async {
@@ -447,6 +471,7 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
     }
 
     final provider = Provider.of<SelfTaskProvider>(context, listen: false);
+    final int userId = await PrefUtil.getPrefUserId() ?? 0;
 
     if (provider.selectedProjectId == null ||
         provider.selectedModuleId == null ||
@@ -471,7 +496,7 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
       taskTypeId: provider.selectedTaskTypeId!,
       taskName: taskNameController.text.trim(),
       taskDescription: descriptionController.text.trim(),
-      userId: 55,
+      userId: userId,
       startDate: formattedStartDate,
       endDate: formattedEndDate,
       taskDuration: taskDuration,
@@ -481,7 +506,8 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
     );
 
     if (success) {
-      // ✅ Clear form
+      provider.isLoading = false;
+      provider.notifyListeners();
       _formKey.currentState?.reset();
 
       taskNameController.clear();
@@ -499,9 +525,15 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
         endDate = DateTime(DateTime.now().year, DateTime.now().month + 1, 0);
       });
 
-      provider.clearSelections(); // 👉 Add this method in the provider to clear dropdown values and selected files
+      provider.clearSelections();
+
+      print("📦 Form submitted successfully! Navigating back...");
+
+      Navigator.pop(context, true);
     }
   }
+
+
   @override
   void dispose() {
     // Clear all controllers
@@ -516,6 +548,4 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
 
     super.dispose();
   }
-
-
 }
