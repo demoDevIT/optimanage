@@ -142,6 +142,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               if (check) {
                 print("✅ Logout button pressed");
+                await PrefUtil.setUserLoggedWay("false");
+                await PrefUtil.clearAll();
 
                 navigatorKey.currentState?.pushReplacement(
                   RightToLeftRoute(

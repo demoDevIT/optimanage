@@ -389,6 +389,7 @@ class _AppDrawer extends State<AppDrawer> {
                       false,
                     );
                     if (check) {
+                      await PrefUtil.setUserLoggedWay("false");
                       await PrefUtil.clearAll();
                       navigatorKey.currentState?.pushReplacement(
                         RightToLeftRoute(

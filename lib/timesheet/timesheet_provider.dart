@@ -567,6 +567,7 @@ class timesheet_provider extends ChangeNotifier {
                                               "❌ Form validation failed");
                                           return;
                                         }
+                                        Navigator.pop(navigatorKey.currentState!.context);
 
                                         // Start-End Time Validation
                                         final startMinutes =
@@ -637,13 +638,13 @@ class timesheet_provider extends ChangeNotifier {
                                             userId: userId,
                                           );
 
-                                          await fetchLeaveSummary(
-                                              focusedDay, userId);
-                                          await fetchTimesheetData(
-                                              context,
-                                              focusedDay.month,
-                                              focusedDay.year,
-                                              userId);
+                                          // await fetchLeaveSummary(
+                                          //     focusedDay, userId);
+                                          // await fetchTimesheetData(
+                                          //     context,
+                                          //     focusedDay.month,
+                                          //     focusedDay.year,
+                                          //     userId);
 
                                           resetLeaveForm();
                                         } catch (e) {
@@ -829,6 +830,7 @@ class timesheet_provider extends ChangeNotifier {
             }
           }
         }
+        await fetchLeaveSummary(focusedDay, userId);
 
         notifyListeners();
       } else {
@@ -911,7 +913,7 @@ class timesheet_provider extends ChangeNotifier {
 
   Future<void> fetchLeaveSummary(DateTime date, int userId) async {
     try {
-      HttpService http = HttpService(Constants.baseurl,context);
+      HttpService http = HttpService(Constants.baseurl,navigatorKey.currentState!.context,);
 
       final body = {
         "LeaveMonth": date.month,
@@ -932,13 +934,15 @@ class timesheet_provider extends ChangeNotifier {
         leaveSummaries = decodedList
             .map((item) => LeaveSummaryModalPopup.fromJson(item))
             .toList();
-        notifyListeners();
 
       } else {
         leaveSummaries = [];
-      }}else {
+      }}
+      else {
 
       }
+      notifyListeners();
+
     } catch (e) {
       debugPrint("❌ Error fetching leave summary: $e");
       leaveSummaries = [];
@@ -976,28 +980,27 @@ class timesheet_provider extends ChangeNotifier {
       print("📤 Request body: $body");
 
       HttpService http = HttpService(Constants.baseurl,context);
-      final response =
-          await http.postRequest("/api/Timesheet/AddResourceLeave", body);
-
+      final response = await http.postRequest("/api/Timesheet/AddResourceLeave", body);
       print("✅ Response: ${response.data}");
 
-      final message = response.data['Message'] ?? "Leave added";
-      final success = response.data['State'] == 1;
-      final errorMessage =
-          response.data['ErrorMessage'] ?? "Failed to add leave";
+      //final success = response.data['State'];
+     // final errorMessage =response.data['ErrorMessage'] ?? "Failed to add leave";
 
-      if (success) {
-        UtilityClass.showSnackBar(context, message, kPrimaryDark);
+      if (response.data['State'].toString() == "1" && response.data['Status'].toString() == "true") {
+        UtilityClass.showSnackBar(navigatorKey.currentState!.context, response.data['Message'] ?? "Leave added", kPrimaryDark);
+        print("1111111111111");
 
         // Refresh calendar + timesheet data
-        await fetchLeaveSummary(focusedDay, userId);
-        await fetchTimesheetData(
-            context, focusedDay.month, focusedDay.year, userId);
-
-     // Close modal
+        await fetchTimesheetData(navigatorKey.currentState!.context, focusedDay.month, focusedDay.year, userId);
+        // Close modal
       } else {
-        UtilityClass.showSnackBar(context, errorMessage, Colors.red);
+        print("2222222222222");
+        UtilityClass.showSnackBar(navigatorKey.currentState!.context, response.data['ErrorMessage'].toString(), Colors.red);
+        // await fetchLeaveSummary(focusedDay, userId);
+        // await fetchTimesheetData(
+        //     context, focusedDay.month, focusedDay.year, userId);
       }
+      notifyListeners();
     } catch (e) {
       debugPrint("❌ Submit leave error: $e");
       UtilityClass.showSnackBar(context, "Error occurred", Colors.red);
@@ -1130,7 +1133,29 @@ class timesheet_provider extends ChangeNotifier {
                                   ),
                                   const SizedBox(height: 6),
                                   Text(
-                                    task.TaskShortDescription,
+                                    task.TaskDescription,
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  const Divider(
+                                    thickness: 1,
+                                    height: 1,
+                                    color: Color(0xFFE2E2E2),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  const Text(
+                                    "Subtask Description",
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    task.SubTaskDescription,
                                     style: const TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.bold,

@@ -122,6 +122,21 @@ class _TaskSummaryScreenState extends State<TaskSummaryScreen> {
                       ),
                     ),
                     const SizedBox(height: 24),
+                    const Text(
+                      "Subtask Description",
+                      style: TextStyle(fontSize: 13, color: Colors.black),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      task.description,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
 
                     SizedBox(
                       width: double.infinity,

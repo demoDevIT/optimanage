@@ -1,19 +1,68 @@
 import 'package:flutter/material.dart';
 import 'package:optimanage/SignIn/SignInScreen.dart';
+import 'package:optimanage/Home/home_provider.dart';
+import 'package:optimanage/Home/home_screen.dart';
+import 'package:optimanage/utils/PrefUtil.dart';
+import 'package:provider/provider.dart';
 
-class OnboardingScreenPage extends StatelessWidget {
+class OnboardingScreenPage extends StatefulWidget {
   const OnboardingScreenPage({Key? key}) : super(key: key);
 
   @override
+  State<OnboardingScreenPage> createState() => _OnboardingScreenPageState();
+}
+
+class _OnboardingScreenPageState extends State<OnboardingScreenPage> {
+  bool _isChecking = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    final String? isLoggedIn = await PrefUtil.getUserLoggedWay();
+
+    if (!mounted) return;
+
+    if (isLoggedIn == "true") {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => ChangeNotifierProvider(
+            create: (_) => HomeProvider(),
+            child: const HomeScreen(),
+          ),
+        ),
+      );
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() {
+            _isChecking = false;
+          });
+        }
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_isChecking) {
+      return const Scaffold(
+        backgroundColor: Color(0xFFF7F8FC),
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    // Show onboarding only if not already logged in
     return Scaffold(
       backgroundColor: const Color(0xFFF7F8FC),
       body: SafeArea(
-        top: false, // Removes top padding from SafeArea
+        top: false,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // No padding for the image — full width
             Expanded(
               child: Column(
                 children: [
@@ -53,7 +102,6 @@ class OnboardingScreenPage extends StatelessWidget {
                 ],
               ),
             ),
-            // Button with horizontal padding
             Padding(
               padding: const EdgeInsets.fromLTRB(24.0, 0, 24.0, 40.0),
               child: SizedBox(

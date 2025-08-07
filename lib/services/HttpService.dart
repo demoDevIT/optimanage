@@ -120,13 +120,13 @@ class HttpService {
   }
 
   initializeInterceptors(BuildContext context) {
-   UtilityClass.showProgressDialog(navigatorKey.currentState!.context,'Please wait...');
     _dio.interceptors.add(InterceptorsWrapper(
       onError: (error, handler) {
         debugPrint('onError: ${error.message}');
         return handler.reject(error);
       },
       onRequest: (request, handler) {
+        UtilityClass.showProgressDialog(navigatorKey.currentState!.context,'Please wait...');
         debugPrint("onRequest: ${request.method} ${request.path}");
         return handler.next(request);
       },
