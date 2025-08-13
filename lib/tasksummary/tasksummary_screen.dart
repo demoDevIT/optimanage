@@ -153,7 +153,7 @@ class _TaskSummaryScreenState extends State<TaskSummaryScreen> {
                             return;
                           }
 
-                          if (notEntryCount < 6) {
+                          if (notEntryCount > 6) {
                             // Show the popup
                             showDialog(
                               context: context,
