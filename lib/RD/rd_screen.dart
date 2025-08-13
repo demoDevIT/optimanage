@@ -1,3 +1,4 @@
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -271,7 +272,7 @@ class _RdScreenState extends State<RdScreen> {
     final formattedDate = DateFormat('dd-MM-yyyy').format(widget.selectedDate);
 
     return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
+     // onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: common.Appbar(
@@ -299,36 +300,155 @@ class _RdScreenState extends State<RdScreen> {
                     style: TextStyle(fontWeight: FontWeight.w500),
                   ),
                   SizedBox(height: 16),
-                  _dropdownInput(
-                    hint: 'Project Name',
-                    items: rdProvider.projects.map((p) => p.fieldName).toList(),
-                    selected: selectedProject,
-                    onChanged: (val) {
-                      setState(() => selectedProject = val);
-                      final project = rdProvider.projects.firstWhere((p) => p.fieldName == val);
-                      rdProvider.fetchModuleList(context, project.fieldId);
-                      selectedModule = null;
-                    },
+                Container(
+                  // height: 48,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F7FA),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  _dropdownInput(
-                    hint: 'Module',
-                    items: rdProvider.modules.map((m) => m.text).toList(),
-                    selected: selectedModule,
-                    onChanged: (val) async {
-                      setState(() => selectedModule = val);
-                      final module = rdProvider.modules.firstWhere((m) => m.text == val);
-                      final project = rdProvider.projects.firstWhere((p) => p.fieldName == selectedProject);
-                      selectedSubModule = null;
-                      await rdProvider.fetchSubModuleList(context, module.value, project.fieldId);
-                    },
-                  ),
-                  if (rdProvider.subModules.isNotEmpty)
-                    _dropdownInput(
-                      hint: 'Submodule',
-                      items: rdProvider.subModules.map((s) => s.text).toList(),
-                      selected: selectedSubModule,
-                      onChanged: (val) => setState(() => selectedSubModule = val),
+                  child: Theme(
+                    data: Theme.of(context).copyWith(
+                      inputDecorationTheme: const InputDecorationTheme(
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                        contentPadding: EdgeInsets.zero,
+                      ),
                     ),
+                    child: DropdownSearch<String>(
+                      selectedItem: selectedProject,
+                      items: (filter, infiniteScrollProps) =>
+                          rdProvider.projects.map((p) => p.fieldName).toList(),
+                      popupProps: PopupProps.bottomSheet(
+                        fit: FlexFit.loose,
+                        constraints: const BoxConstraints(maxHeight: 250),
+                      ),
+                      dropdownBuilder: (context, selectedItem) => Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          selectedItem ?? 'Project Name',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: selectedItem == null ? Colors.grey : Colors.black,
+                          ),
+                        ),
+                      ),
+                      onChanged: (val) {
+                        if (val != null) {
+                          setState(() {
+                            selectedProject = val;
+                            selectedModule = null;
+                            selectedSubModule = null;
+                          });
+                          final project = rdProvider.projects
+                              .firstWhere((p) => p.fieldName == val);
+                          rdProvider.fetchModuleList(context, project.fieldId);
+                        }
+                      },
+                      validator: (val) => (val == null || val.isEmpty)
+                          ? 'Please select project'
+                          : null,
+                    ),
+                  ),
+                ),
+
+                  SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F7FA),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Theme(
+                    data: Theme.of(context).copyWith(
+                      inputDecorationTheme: const InputDecorationTheme(
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ),
+                    child: DropdownSearch<String>(
+                      selectedItem: selectedModule,
+                      items: (filter, infiniteScrollProps) =>
+                          rdProvider.modules.map((m) => m.text).toList(),
+                      popupProps: PopupProps.bottomSheet(
+                        fit: FlexFit.loose,
+                        constraints: const BoxConstraints(maxHeight: 250),
+                      ),
+                      dropdownBuilder: (context, selectedItem) => Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          selectedItem ?? 'Module',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: selectedItem == null ? Colors.grey : Colors.black,
+                          ),
+                        ),
+                      ),
+                      onChanged: (val) async {
+                        if (val != null) {
+                          setState(() {
+                            selectedModule = val;
+                            selectedSubModule = null;
+                          });
+                          final module =
+                          rdProvider.modules.firstWhere((m) => m.text == val);
+                          final project = rdProvider.projects
+                              .firstWhere((p) => p.fieldName == selectedProject);
+                          await rdProvider.fetchSubModuleList(
+                              context, module.value, project.fieldId);
+                        }
+                      },
+                      validator: (val) => val == null || val.isEmpty
+                          ? 'Please select module'
+                          : null,
+                    ),
+                  ),
+                ),
+
+                  if (rdProvider.subModules.isNotEmpty)
+                    Container(
+                      height: 56,
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF5F7FA),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: DropdownSearch<String>(
+                        selectedItem: selectedSubModule,
+                        items: (filter, _) async => rdProvider.subModules.map((s) => s.text).toList(),
+                        popupProps: PopupProps.bottomSheet(
+                          fit: FlexFit.loose,
+                          constraints: const BoxConstraints(maxHeight: 250),
+                        ),
+                        dropdownBuilder: (context, selectedItem) => Center(
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              selectedItem ?? 'Submodule',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: selectedItem == null ? Colors.grey : Colors.black,
+                              ),
+                            ),
+                          ),
+                        ),
+                        onChanged: (val) {
+                          if (val != null) {
+                            setState(() => selectedSubModule = val);
+                          }
+                        },
+                        validator: (val) =>
+                        (val == null || val.isEmpty) ? 'Please select submodule' : null,
+                      ),
+                    ),
+
                   _textInput(
                     hint: 'Daily Task Details',
                     controller: taskDetailsController,

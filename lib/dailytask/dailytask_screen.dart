@@ -1,3 +1,4 @@
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -306,6 +307,74 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
   Widget _dropdownInput() {
     final provider = Provider.of<DailyTaskProvider>(context);
 
+    return GestureDetector(
+      onTap: () async {
+        final result = await showModalBottomSheet<String>(
+          context: context,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+          ),
+          builder: (context) {
+            return SafeArea(
+              child: ListView.builder(
+                shrinkWrap: true,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                itemCount: provider.statusList.length,
+                itemBuilder: (context, index) {
+                  final item = provider.statusList[index];
+                  final value = item.value ?? '';
+                  final label = (item.child is Text)
+                      ? (item.child as Text).data ?? value
+                      : value;
+
+                  return ListTile(
+                    title: Text(label),
+                    onTap: () => Navigator.pop(context, value),
+                  );
+                },
+              ),
+            );
+          },
+        );
+
+
+        if (result != null) {
+          setState(() => _selectedStatus = result);
+        }
+      },
+      child: AbsorbPointer(
+        child: DropdownButtonFormField<String>(
+          value: _selectedStatus,
+          validator: (value) =>
+          value == null ? 'Please select Daily Task Status' : null,
+          onChanged: (_) {},
+          items: provider.statusList,
+          decoration: InputDecoration(
+            hintText: "Daily Task Status",
+            hintStyle: TextStyle(
+                color: Color(0xFF6E6A7C), fontWeight: FontWeight.w500),
+            filled: true,
+            fillColor: Color(0xFFF5F8FF),
+            contentPadding:
+            EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+            errorStyle:
+            TextStyle(color: Colors.red.shade700, fontSize: 13),
+          ),
+          icon: Icon(Icons.keyboard_arrow_down),
+        ),
+      ),
+    );
+  }
+
+
+
+  Widget _dropdownInput1() {
+    final provider = Provider.of<DailyTaskProvider>(context);
+
     return DropdownButtonFormField<String>(
       value: _selectedStatus,
       validator: (value) => value == null ? 'Please select Daily Task Status' : null,
@@ -325,6 +394,7 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
       ),
     );
   }
+
 
   Widget _timePickerField({
     required String label,

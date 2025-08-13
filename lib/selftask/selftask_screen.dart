@@ -1,3 +1,4 @@
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../selftask/selftask_provider.dart';
@@ -266,81 +267,317 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
             key: _formKey,
             child: Column(
               children: [
-                _buildValidatedDropdown(
-                  hint: 'Project Name',
-                  items: provider.projects.map((e) => e.name).toList(),
-                  selectedValue: provider.selectedProjectId == null
-                      ? null
-                      : provider.projects
-                          .firstWhere((p) => p.id == provider.selectedProjectId)
-                          .name,
-                  onChanged: (val) {
-                    final selected =
-                        provider.projects.firstWhere((e) => e.name == val);
-                    provider.setSelectedProject(selected.id);
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F8FF),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Theme(
+                    data: Theme.of(context).copyWith(
+                      inputDecorationTheme: const InputDecorationTheme(
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ),
+                    child: DropdownSearch<String>(
+                      selectedItem: provider.selectedProjectId == null
+                          ? null
+                          : provider.projects
+                              .firstWhere(
+                                  (p) => p.id == provider.selectedProjectId)
+                              .name,
+                      items: (filter, infiniteScrollProps) =>
+                          provider.projects.map((e) => e.name).toList(),
+                      popupProps: PopupProps.bottomSheet(
+                        showSearchBox: false,
+                        fit: FlexFit.loose,
+                        constraints: BoxConstraints(maxHeight: 250),
+                      ),
+                      dropdownBuilder: (context, selectedItem) => Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          selectedItem ?? 'Project Name',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: selectedItem == null
+                                ? Colors.grey
+                                : Colors.black,
+                          ),
+                        ),
+                      ),
+                      onChanged: (val) {
+                        if (val != null) {
+                          final selected = provider.projects
+                              .firstWhere((e) => e.name == val);
+                          provider.setSelectedProject(selected.id);
 
-                    // 🟢 Reset dependent fields
-                    provider.setSelectedModule(null);
-                    provider.setSelectedSubModule(null);
-                    provider.setSelectedTaskType(null);
+                          provider.setSelectedModule(null);
+                          provider.setSelectedSubModule(null);
+                          provider.setSelectedTaskType(null);
 
-                    provider.fetchModuleList(context, selected.id);
-                  },
+                          provider.fetchModuleList(context, selected.id);
+                        }
+                      },
+                    ),
+                  ),
                 ),
-                _buildValidatedDropdown(
-                  hint: 'Module Name',
-                  items: provider.modules.map((e) => e.name).toList(),
-                  selectedValue: provider.selectedModuleId == null
-                      ? null
-                      : provider.modules
-                          .firstWhere((m) => m.id == provider.selectedModuleId)
-                          .name,
-                  onChanged: (val) {
-                    final selected =
-                        provider.modules.firstWhere((e) => e.name == val);
-                    provider.setSelectedModule(selected.id);
 
-                    // 🟢 Reset submodule and task type when module changes
-                    provider.setSelectedSubModule(null);
-                    provider.setSelectedTaskType(null);
+                const SizedBox(height: 12),
 
-                    provider.fetchTaskTypeList(
-                        context, provider.selectedProjectId!, selected.id);
-                    provider.fetchSubModuleList(context, selected.id);
-                  },
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F8FF),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Theme(
+                    data: Theme.of(context).copyWith(
+                      inputDecorationTheme: const InputDecorationTheme(
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ),
+                    child: DropdownSearch<String>(
+                      selectedItem: provider.selectedModuleId == null
+                          ? null
+                          : provider.modules
+                              .firstWhere(
+                                  (m) => m.id == provider.selectedModuleId)
+                              .name,
+                      items: (filter, infiniteScrollProps) =>
+                          provider.modules.map((e) => e.name).toList(),
+                      popupProps: PopupProps.bottomSheet(
+                        showSearchBox: false,
+                        fit: FlexFit.loose,
+                        constraints: BoxConstraints(maxHeight: 250),
+                      ),
+                      dropdownBuilder: (context, selectedItem) => Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          selectedItem ?? 'Module Name',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: selectedItem == null
+                                ? Colors.grey
+                                : Colors.black,
+                          ),
+                        ),
+                      ),
+                      onChanged: (val) {
+                        if (val != null) {
+                          final selected =
+                              provider.modules.firstWhere((e) => e.name == val);
+                          provider.setSelectedModule(selected.id);
+
+                          // 🟢 Reset submodule and task type when module changes
+                          provider.setSelectedSubModule(null);
+                          provider.setSelectedTaskType(null);
+
+                          provider.fetchTaskTypeList(context,
+                              provider.selectedProjectId!, selected.id);
+                          provider.fetchSubModuleList(context, selected.id);
+                        }
+                      },
+                    ),
+                  ),
                 ),
+
+                const SizedBox(height: 12),
+
                 if (provider.subModules.isNotEmpty)
-                  _buildValidatedDropdown(
-                    hint: 'Submodule Name',
-                    items: provider.subModules.map((e) => e.name).toList(),
-                    selectedValue: provider.selectedSubModuleId == null
-                        ? null
-                        : provider.subModules
-                            .firstWhere(
-                                (s) => s.id == provider.selectedSubModuleId)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF5F8FF),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Theme(
+                      data: Theme.of(context).copyWith(
+                        inputDecorationTheme: const InputDecorationTheme(
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          errorBorder: InputBorder.none,
+                          disabledBorder: InputBorder.none,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                      child: DropdownSearch<String>(
+                        selectedItem: provider.selectedSubModuleId == null
+                            ? null
+                            : provider.subModules
+                            .firstWhere((s) => s.id == provider.selectedSubModuleId)
                             .name,
-                    onChanged: (val) {
-                      final selected =
-                          provider.subModules.firstWhere((e) => e.name == val);
-                      provider.setSelectedSubModule(selected.id);
-                    },
+                        items: (filter, infiniteScrollProps) =>
+                            provider.subModules.map((e) => e.name).toList(),
+                        popupProps: PopupProps.bottomSheet(
+                          showSearchBox: false,
+                          fit: FlexFit.loose,
+                          constraints: BoxConstraints(maxHeight: 250),
+                        ),
+                        dropdownBuilder: (context, selectedItem) => Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            selectedItem ?? 'Submodule Name',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: selectedItem == null ? Colors.grey : Colors.black,
+                            ),
+                          ),
+                        ),
+                        onChanged: (val) {
+                          if (val != null) {
+                            final selected =
+                            provider.subModules.firstWhere((e) => e.name == val);
+                            provider.setSelectedSubModule(selected.id);
+                          }
+                        },
+                      ),
+                    ),
                   ),
 
-                _buildValidatedDropdown(
-                  hint: 'Task Type',
-                  items: provider.taskTypes.map((e) => e.name).toList(),
-                  selectedValue: provider.selectedTaskTypeId == null
-                      ? null
-                      : provider.taskTypes
-                          .firstWhere(
-                              (t) => t.id == provider.selectedTaskTypeId)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F8FF),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Theme(
+                    data: Theme.of(context).copyWith(
+                      inputDecorationTheme: const InputDecorationTheme(
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ),
+                    child: DropdownSearch<String>(
+                      selectedItem: provider.selectedTaskTypeId == null
+                          ? null
+                          : provider.taskTypes
+                          .firstWhere((t) => t.id == provider.selectedTaskTypeId)
                           .name,
-                  onChanged: (val) {
-                    final selected =
-                        provider.taskTypes.firstWhere((e) => e.name == val);
-                    provider.setSelectedTaskType(selected.id);
-                  },
+                      items: (filter, infiniteScrollProps) =>
+                          provider.taskTypes.map((e) => e.name).toList(),
+                      popupProps: PopupProps.bottomSheet(
+                        showSearchBox: false,
+                        fit: FlexFit.loose,
+                        constraints: BoxConstraints(maxHeight: 250),
+                      ),
+                      dropdownBuilder: (context, selectedItem) => Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          selectedItem ?? 'Task Type',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: selectedItem == null ? Colors.grey : Colors.black,
+                          ),
+                        ),
+                      ),
+                      onChanged: (val) {
+                        if (val != null) {
+                          final selected =
+                          provider.taskTypes.firstWhere((e) => e.name == val);
+                          provider.setSelectedTaskType(selected.id);
+                        }
+                      },
+                    ),
+                  ),
                 ),
+
+
+                // _buildValidatedDropdown(
+                //   hint: 'Project Name',
+                //   items: provider.projects.map((e) => e.name).toList(),
+                //   selectedValue: provider.selectedProjectId == null
+                //       ? null
+                //       : provider.projects
+                //           .firstWhere((p) => p.id == provider.selectedProjectId)
+                //           .name,
+                //   onChanged: (val) {
+                //     final selected =
+                //         provider.projects.firstWhere((e) => e.name == val);
+                //     provider.setSelectedProject(selected.id);
+                //
+                //     // 🟢 Reset dependent fields
+                //     provider.setSelectedModule(null);
+                //     provider.setSelectedSubModule(null);
+                //     provider.setSelectedTaskType(null);
+                //
+                //     provider.fetchModuleList(context, selected.id);
+                //   },
+                // ),
+
+                // _buildValidatedDropdown(
+                //   hint: 'Module Name',
+                //   items: provider.modules.map((e) => e.name).toList(),
+                //   selectedValue: provider.selectedModuleId == null
+                //       ? null
+                //       : provider.modules
+                //           .firstWhere((m) => m.id == provider.selectedModuleId)
+                //           .name,
+                //   onChanged: (val) {
+                //     final selected =
+                //         provider.modules.firstWhere((e) => e.name == val);
+                //     provider.setSelectedModule(selected.id);
+                //
+                //     // 🟢 Reset submodule and task type when module changes
+                //     provider.setSelectedSubModule(null);
+                //     provider.setSelectedTaskType(null);
+                //
+                //     provider.fetchTaskTypeList(
+                //         context, provider.selectedProjectId!, selected.id);
+                //     provider.fetchSubModuleList(context, selected.id);
+                //   },
+                // ),
+
+                // if (provider.subModules.isNotEmpty)
+                //   _buildValidatedDropdown(
+                //     hint: 'Submodule Name',
+                //     items: provider.subModules.map((e) => e.name).toList(),
+                //     selectedValue: provider.selectedSubModuleId == null
+                //         ? null
+                //         : provider.subModules
+                //             .firstWhere(
+                //                 (s) => s.id == provider.selectedSubModuleId)
+                //             .name,
+                //     onChanged: (val) {
+                //       final selected =
+                //           provider.subModules.firstWhere((e) => e.name == val);
+                //       provider.setSelectedSubModule(selected.id);
+                //     },
+                //   ),
+
+                // _buildValidatedDropdown(
+                //   hint: 'Task Type',
+                //   items: provider.taskTypes.map((e) => e.name).toList(),
+                //   selectedValue: provider.selectedTaskTypeId == null
+                //       ? null
+                //       : provider.taskTypes
+                //           .firstWhere(
+                //               (t) => t.id == provider.selectedTaskTypeId)
+                //           .name,
+                //   onChanged: (val) {
+                //     final selected =
+                //         provider.taskTypes.firstWhere((e) => e.name == val);
+                //     provider.setSelectedTaskType(selected.id);
+                //   },
+                // ),
                 _buildTextField('Task Name', taskNameController,
                     isRequired: true),
                 _buildTextField('Description', descriptionController,
@@ -532,7 +769,6 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
       Navigator.pop(context, true);
     }
   }
-
 
   @override
   void dispose() {
