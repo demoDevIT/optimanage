@@ -286,7 +286,7 @@ class _AppDrawer extends State<AppDrawer> {
                               userInfo['UserImagePath']!.isNotEmpty
                               ? NetworkImage(userInfo['UserImagePath']!)
                           as ImageProvider
-                              : const AssetImage('assets/logos/avatar.png'),
+                              : const AssetImage('assets/logos/avatar2.png'),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -336,11 +336,12 @@ class _AppDrawer extends State<AppDrawer> {
                   'Daily Timesheets',
                   context,
                       () {
+                        Navigator.pop(context);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) =>
-                            TimeSheetScreen(status: "daily"),
+                            TimeSheetScreen(status: "daily", screenStatus: "0"),
                       ),
                     );
                   },

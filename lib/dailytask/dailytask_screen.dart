@@ -96,13 +96,16 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
   Widget build(BuildContext context) {
    // print("📄 DailyTaskScreen -> TaskIssueID: ${task.taskIssueID}");
     return Scaffold(
+      resizeToAvoidBottomInset: true, // ✅ Important for keyboard push
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: const BackButton(color: Colors.black),
-        title: const Text('Daily Task Details',
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Daily Task Details',
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         actions: [
           Padding(
@@ -115,98 +118,98 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
           )
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildTextField("PROJECT NAME", value: widget.task.projectName),
-              const SizedBox(height: 12),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildTextField("PROJECT NAME", value: widget.task.projectName),
+                const SizedBox(height: 12),
 
-              // 🔻 Task Description Field
-              _textInput(
-                hint: 'Daily Task Details',
-                controller: taskDetailsController,
-                maxLines: 3,
-              ),
+                _textInput(
+                  hint: 'Daily Task Details',
+                  controller: taskDetailsController,
+                  maxLines: 3,
+                ),
+                const SizedBox(height: 12),
 
-              const SizedBox(height: 12),
+                _dropdownInput(),
+                const SizedBox(height: 12),
 
-              // 🔻 Dropdown Field
-              _dropdownInput(),
-
-              const SizedBox(height: 12),
-
-              // 🔻 Start & End Time
-              Row(
-                children: [
-                  _timePickerField(
-                    label: "Start Time",
-                    time: _startTime,
-                    onTimePicked: (picked) {
-                      setState(() {
-                        _startTime = picked;
-                        _calculateDuration();
-                      });
-                    },
-                  ),
-                  const SizedBox(width: 12),
-                  _timePickerField(
-                    label: "End Time",
-                    time: _endTime,
-                    onTimePicked: (picked) {
-                      setState(() {
-                        _endTime = picked;
-                        _calculateDuration();
-                      });
-                    },
-                  ),
-                ],
-              ),
-
-              _textInput(
-                hint: 'Task Hour',
-                controller: taskHourController,
-                keyboardType: TextInputType.number,
-                readOnly: true,
-              ),
-              _textInput(
-                hint: 'Task Minute',
-                controller: taskMinuteController,
-                keyboardType: TextInputType.number,
-                readOnly: true,
-              ),
-
-              const Spacer(),
-
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: _submitForm,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF25507C),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                Row(
+                  children: [
+                    _timePickerField(
+                      label: "Start Time",
+                      time: _startTime,
+                      onTimePicked: (picked) {
+                        setState(() {
+                          _startTime = picked;
+                          _calculateDuration();
+                        });
+                      },
                     ),
-                  ),
-                  child: const Text(
-                    "Submit",
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                    const SizedBox(width: 12),
+                    _timePickerField(
+                      label: "End Time",
+                      time: _endTime,
+                      onTimePicked: (picked) {
+                        setState(() {
+                          _endTime = picked;
+                          _calculateDuration();
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+
+                _textInput(
+                  hint: 'Task Hour',
+                  controller: taskHourController,
+                  keyboardType: TextInputType.number,
+                  readOnly: true,
+                ),
+                const SizedBox(height: 8),
+
+                _textInput(
+                  hint: 'Task Minute',
+                  controller: taskMinuteController,
+                  keyboardType: TextInputType.number,
+                  readOnly: true,
+                ),
+                const SizedBox(height: 20),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: _submitForm,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF25507C),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      "Submit",
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
+
   }
 
   Widget _buildTextField(String hint, {String? value}) {

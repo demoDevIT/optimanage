@@ -180,19 +180,19 @@ class timesheet_provider extends ChangeNotifier {
       builder: (context) {
         return  StatefulBuilder(// You need this, notice the parameters below:
             builder: (BuildContext context, StateSetter setState) {
+              getHeight = (type == 'No Task Assigned') ? 0.3 : leaveType == 'Full Day' ? 0.45 : 0.60; // tweak
           //String? timeError;
           return DraggableScrollableSheet(
               expand: false,
-              initialChildSize: getHeight, //0.3, // 60% of screen height
-              minChildSize: 0.3,
+              initialChildSize: getHeight ,//0.3, // 60% of screen height
+              minChildSize:getHeight,
               maxChildSize: 0.95,
               builder: (context, scrollController){
                 return Scaffold(
               body: SingleChildScrollView(
-              controller: scrollController,
               padding: EdgeInsets.all(10.0),
               child:Padding(
-            padding: MediaQuery.of(context).viewInsets,
+              padding: MediaQuery.of(context).viewInsets,
             child: Column(
               children: [
                 Visibility(
@@ -850,6 +850,7 @@ class timesheet_provider extends ChangeNotifier {
   }
 
   List<TaskSummaryModalPopup> taskSummaries = [];
+  bool _isSnackBarVisible = false;
 
   Future<void> fetchTaskSummary(DateTime date, int userId, BuildContext context) async {
     taskSummaries.clear();
@@ -890,14 +891,16 @@ class timesheet_provider extends ChangeNotifier {
             taskSummaries,
           );
         } else {
-          ScaffoldMessenger.of(navigatorKey.currentState!.context).showSnackBar(
-            SnackBar(content: Text("No task summary available.")),
-          );
+          _showSnackBarOnce("No task summary available.");
+          // ScaffoldMessenger.of(navigatorKey.currentState!.context).showSnackBar(
+          //   SnackBar(content: Text("No task summary available.")),
+          // );
         }
       } else {
-        ScaffoldMessenger.of(navigatorKey.currentState!.context).showSnackBar(
-          SnackBar(content: Text("No task summary available.")),
-        );
+        _showSnackBarOnce("No task summary available.");
+        // ScaffoldMessenger.of(navigatorKey.currentState!.context).showSnackBar(
+        //   SnackBar(content: Text("No task summary available.")),
+        // );
         taskSummaries = [];
       }
 
@@ -909,9 +912,20 @@ class timesheet_provider extends ChangeNotifier {
     }
   }
 
+  void _showSnackBarOnce(String message) {
+    if (!_isSnackBarVisible) {
+      _isSnackBarVisible = true;
+      ScaffoldMessenger.of(navigatorKey.currentState!.context)
+          .showSnackBar(SnackBar(content: Text(message)))
+          .closed
+          .then((_) => _isSnackBarVisible = false); // reset after it disappears
+    }
+  }
+
   List<LeaveSummaryModalPopup> leaveSummaries = [];
 
   Future<void> fetchLeaveSummary(DateTime date, int userId) async {
+    leaveSummaries = [];
     try {
       HttpService http = HttpService(Constants.baseurl,navigatorKey.currentState!.context,);
 

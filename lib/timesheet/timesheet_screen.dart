@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:optimanage/Home/home_screen.dart';
 import 'package:optimanage/RD/rd_screen.dart';
 import 'package:optimanage/timesheet/timesheet_provider.dart';
 import 'package:provider/provider.dart';
@@ -18,8 +19,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class TimeSheetScreen extends StatefulWidget {
   final String? status;
+  final String? screenStatus;
 
-  const TimeSheetScreen({Key? key, this.status}) : super(key: key);
+  const TimeSheetScreen({Key? key, this.status, this.screenStatus}) : super(key: key);
 
   @override
   State<TimeSheetScreen> createState() => _TimeSheetScreenState();
@@ -91,7 +93,17 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
       appBar: common.Appbar(
         title: "Time Sheet",
         callback: () {
-          Navigator.of(context).pop(false);
+          if(widget.screenStatus == "1"){
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    HomeScreen(),
+              ),
+            );
+          }else {
+            Navigator.of(context).pop(false);
+          }
         },
         actions: [
           // LanguageToggleSwitch(),

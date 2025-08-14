@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import '../timesheet/timesheet_screen.dart';
 import '../utils/UtilityClass.dart';
 import 'package:optimanage/services/HttpService.dart';
 import 'package:optimanage/constant/Constants.dart';
@@ -90,7 +91,25 @@ class DailyTaskProvider with ChangeNotifier {
       print("elseeeeee11===============>");
       if (state == 1 && status == true) {
         UtilityClass.showSnackBar(context, message, Colors.green);
-        Navigator.pop(context, true);
+       // Navigator.pop(context, true);
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                TimeSheetScreen(status: "daily", screenStatus: "1"),
+          ),
+        );
+
+        // Navigator.of(context).popUntil((route) => route.isFirst);
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     //settings: RouteSettings(name: '/timesheet'), // 👈 important
+        //     builder: (context) => TimeSheetScreen(status: "daily"),
+        //   ),
+        // );
+
       } else {
         UtilityClass.showSnackBar(context, message, Colors.red);
       }

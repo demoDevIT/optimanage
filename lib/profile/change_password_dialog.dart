@@ -117,8 +117,8 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
                     _obscureNewPassword
                         ? 'assets/icons/eyeOn.svg'
                         : 'assets/icons/eyeOff.svg',
-                    width: 17,
-                    height: 17,
+                    width: 15,
+                    height: 15,
                   ),
                 ),
               ),
@@ -156,8 +156,8 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
                     _obscureConfirmPassword
                         ? 'assets/icons/eyeOn.svg'
                         : 'assets/icons/eyeOff.svg',
-                    width: 17,
-                    height: 17,
+                    width: 15,
+                    height: 15,
                   ),
                 ),
               ),
