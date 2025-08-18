@@ -595,66 +595,66 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                     'Estimated Time (In Hours)', estimatedTimeController,
                     isRequired: true, keyboardType: TextInputType.number),
                 _buildTextField('Notes', notesController),
-                Stack(
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            Provider.of<SelfTaskProvider>(context,
-                                    listen: false)
-                                .pickDocuments(context);
-                          },
-                          icon: const Icon(
-                            Icons.upload_file,
-                            size: 20,
-                            color: Colors.white, // ✅ white icon
-                          ),
-                          label: const Padding(
-                            padding: EdgeInsets.only(left: 4.0),
-                            // slight padding for spacing
-                            child: Text(
-                              "Upload Documents",
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF25507C),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 12),
-                            // control button size
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                  30), // rounded pill shape
-                            ),
-                            elevation: 3,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        ...provider.selectedFiles.map((file) => ListTile(
-                              dense: true,
-                              leading: const Icon(Icons.insert_drive_file),
-                              title: Text(file.name),
-                              trailing: IconButton(
-                                icon: const Icon(Icons.clear, size: 20),
-                                onPressed: () {
-                                  setState(() {
-                                    provider.selectedFiles.remove(file);
-                                  });
-                                },
-                              ),
-                            )),
-                      ],
-                    ),
-
-                    // const Positioned(
-                    //   right: 16,
-                    //   top: 20,
-                    //   child: Icon(Icons.upload_rounded, size: 20),
-                    // )
-                  ],
-                ),
+                // Stack(
+                //   children: [
+                //     Column(
+                //       crossAxisAlignment: CrossAxisAlignment.start,
+                //       children: [
+                //         ElevatedButton.icon(
+                //           onPressed: () {
+                //             Provider.of<SelfTaskProvider>(context,
+                //                     listen: false)
+                //                 .pickDocuments(context);
+                //           },
+                //           icon: const Icon(
+                //             Icons.upload_file,
+                //             size: 20,
+                //             color: Colors.white, // ✅ white icon
+                //           ),
+                //           label: const Padding(
+                //             padding: EdgeInsets.only(left: 4.0),
+                //             // slight padding for spacing
+                //             child: Text(
+                //               "Upload Documents",
+                //               style: TextStyle(color: Colors.white),
+                //             ),
+                //           ),
+                //           style: ElevatedButton.styleFrom(
+                //             backgroundColor: const Color(0xFF25507C),
+                //             padding: const EdgeInsets.symmetric(
+                //                 horizontal: 16, vertical: 12),
+                //             // control button size
+                //             shape: RoundedRectangleBorder(
+                //               borderRadius: BorderRadius.circular(
+                //                   30), // rounded pill shape
+                //             ),
+                //             elevation: 3,
+                //           ),
+                //         ),
+                //         const SizedBox(height: 8),
+                //         ...provider.selectedFiles.map((file) => ListTile(
+                //               dense: true,
+                //               leading: const Icon(Icons.insert_drive_file),
+                //               title: Text(file.name),
+                //               trailing: IconButton(
+                //                 icon: const Icon(Icons.clear, size: 20),
+                //                 onPressed: () {
+                //                   setState(() {
+                //                     provider.selectedFiles.remove(file);
+                //                   });
+                //                 },
+                //               ),
+                //             )),
+                //       ],
+                //     ),
+                //
+                //     // const Positioned(
+                //     //   right: 16,
+                //     //   top: 20,
+                //     //   child: Icon(Icons.upload_rounded, size: 20),
+                //     // )
+                //   ],
+                // ),
 
                 // _buildValidatedDropdown(
                 //   hint: 'Assign To',

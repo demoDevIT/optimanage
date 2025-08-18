@@ -72,11 +72,35 @@ class _SignInScreenState extends State<SignInScreen> {
 
                     const SizedBox(height: 24),
 
-                    // Sign In Heading Image
-                    Image.asset(
-                      'assets/logos/SignIn.png', // Your heading image
-                      width: 345,
-                      height: 99,
+                    // // Sign In Heading Image
+                    // Image.asset(
+                    //   'assets/logos/SignIn.png', // Your heading image
+                    //   width: 345,
+                    //   height: 99,
+                    // ),
+
+                    // Sign In Heading Text
+                    Text(
+                      "Sign In",
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    Text(
+                      "It was popularised in the 1960s with the release of\n"
+                          "Letraset sheets containing Lorem Ipsum.",
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
 
                     const SizedBox(height: 16),
