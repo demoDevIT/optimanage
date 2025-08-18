@@ -278,14 +278,14 @@ class _RdScreenState extends State<RdScreen> {
         appBar: common.Appbar(
           title: "R&D Tasks",
           callback: () => Navigator.of(context).pop(false),
-          actions: [
-            SvgPicture.asset(
-              'assets/icons/notification.svg',
-              width: 24,
-              height: 24,
-            ),
-            SizedBox(width: 10),
-          ],
+          // actions: [
+          //   SvgPicture.asset(
+          //     'assets/icons/notification.svg',
+          //     width: 24,
+          //     height: 24,
+          //   ),
+          //   SizedBox(width: 10),
+          // ],
         ),
         body: SafeArea(
           child: SingleChildScrollView(

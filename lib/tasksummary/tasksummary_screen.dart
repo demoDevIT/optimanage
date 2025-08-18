@@ -49,14 +49,14 @@ class _TaskSummaryScreenState extends State<TaskSummaryScreen> {
         callback: () {
           Navigator.of(context).pop(false);
         },
-        actions: [
-          SvgPicture.asset(
-            'assets/icons/notification.svg',
-            width: 24,
-            height: 24,
-          ),
-          SizedBox(width: 10),
-        ],
+        // actions: [
+        //   SvgPicture.asset(
+        //     'assets/icons/notification.svg',
+        //     width: 24,
+        //     height: 24,
+        //   ),
+        //   SizedBox(width: 10),
+        // ],
       ),
       body: task == null
           ? const Center(child: CircularProgressIndicator())

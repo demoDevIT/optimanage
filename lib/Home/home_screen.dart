@@ -46,34 +46,35 @@ class HomeScreen extends StatelessWidget {
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: GestureDetector(
-              onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) => const ProfileScreen()),
-                // );
-              },
-              child:
-              // Image.asset(
-              //   'assets/icons/notification.png',
-              //   //for new notifications (with dot)
-              //   //'assets/icons/notify.png', // for no notifications (without dot)
-              //   width: 24, // optional: set width
-              //   height: 24, // optional: set height
-              // ),
-
-              SvgPicture.asset(
-                'assets/icons/notification.svg',
-                width: 24,
-                height: 24,
-              ),
-
-            ),
-          ),
-        ],
+        // actions: [
+        //   Padding(
+        //     padding: const EdgeInsets.only(right: 16),
+        //     child: GestureDetector(
+        //       onTap: () {
+        //         // Navigator.push(
+        //         //   context,
+        //         //   MaterialPageRoute(builder: (context) => const ProfileScreen()),
+        //         // );
+        //       },
+        //       child:
+        //       SvgPicture.asset(
+        //         'assets/icons/notification.svg',
+        //         width: 24,
+        //         height: 24,
+        //       ),
+        //       // Image.asset(
+        //       //   'assets/icons/notification.png',
+        //       //   //for new notifications (with dot)
+        //       //   //'assets/icons/notify.png', // for no notifications (without dot)
+        //       //   width: 24, // optional: set width
+        //       //   height: 24, // optional: set height
+        //       // ),
+        //
+        //
+        //
+        //     ),
+        //   ),
+        // ],
       ),
       body: Column(
         children: [

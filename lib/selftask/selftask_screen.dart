@@ -8,7 +8,15 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../utils/PrefUtil.dart';
 
 class SelfTaskScreen extends StatefulWidget {
-  const SelfTaskScreen({Key? key}) : super(key: key);
+  final DateTime selectedDate;
+  final int userId;
+
+//  const SelfTaskScreen({Key? key}) : super(key: key);
+  const SelfTaskScreen({
+    super.key,
+    required this.selectedDate,
+    required this.userId,
+  });
 
   @override
   State<SelfTaskScreen> createState() => _SelfTaskScreenState();
@@ -58,8 +66,11 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
       documentController.clear();
 
       // 📆 Reset dates
-      startDate = DateTime(DateTime.now().year, DateTime.now().month, 1);
-      endDate = DateTime(DateTime.now().year, DateTime.now().month + 1, 0);
+      // startDate = DateTime(DateTime.now().year, DateTime.now().month, 1);
+      // endDate = DateTime(DateTime.now().year, DateTime.now().month + 1, 0);
+
+      startDate = widget.selectedDate;
+      endDate = widget.selectedDate;
 
       // 🔄 Re-fetch fresh project list
       provider.fetchProjectList(context);
@@ -163,7 +174,8 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
     return Flexible(
       flex: 1,
       child: GestureDetector(
-        onTap: onTap,
+       // onTap: onTap,
+        onTap: null,
         child: Container(
           margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -250,16 +262,16 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
               style:
                   TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
           centerTitle: true,
-          actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 16),
-              child: SvgPicture.asset(
-                'assets/icons/notification.svg',
-                width: 24,
-                height: 24,
-              ),
-            )
-          ],
+          // actions: [
+          //   Padding(
+          //     padding: const EdgeInsets.only(right: 16),
+          //     child: SvgPicture.asset(
+          //       'assets/icons/notification.svg',
+          //       width: 24,
+          //       height: 24,
+          //     ),
+          //   )
+          // ],
         ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -417,8 +429,9 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                         selectedItem: provider.selectedSubModuleId == null
                             ? null
                             : provider.subModules
-                            .firstWhere((s) => s.id == provider.selectedSubModuleId)
-                            .name,
+                                .firstWhere(
+                                    (s) => s.id == provider.selectedSubModuleId)
+                                .name,
                         items: (filter, infiniteScrollProps) =>
                             provider.subModules.map((e) => e.name).toList(),
                         popupProps: PopupProps.bottomSheet(
@@ -433,14 +446,16 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
-                              color: selectedItem == null ? Colors.grey : Colors.black,
+                              color: selectedItem == null
+                                  ? Colors.grey
+                                  : Colors.black,
                             ),
                           ),
                         ),
                         onChanged: (val) {
                           if (val != null) {
-                            final selected =
-                            provider.subModules.firstWhere((e) => e.name == val);
+                            final selected = provider.subModules
+                                .firstWhere((e) => e.name == val);
                             provider.setSelectedSubModule(selected.id);
                           }
                         },
@@ -469,8 +484,9 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                       selectedItem: provider.selectedTaskTypeId == null
                           ? null
                           : provider.taskTypes
-                          .firstWhere((t) => t.id == provider.selectedTaskTypeId)
-                          .name,
+                              .firstWhere(
+                                  (t) => t.id == provider.selectedTaskTypeId)
+                              .name,
                       items: (filter, infiniteScrollProps) =>
                           provider.taskTypes.map((e) => e.name).toList(),
                       popupProps: PopupProps.bottomSheet(
@@ -485,21 +501,22 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
-                            color: selectedItem == null ? Colors.grey : Colors.black,
+                            color: selectedItem == null
+                                ? Colors.grey
+                                : Colors.black,
                           ),
                         ),
                       ),
                       onChanged: (val) {
                         if (val != null) {
-                          final selected =
-                          provider.taskTypes.firstWhere((e) => e.name == val);
+                          final selected = provider.taskTypes
+                              .firstWhere((e) => e.name == val);
                           provider.setSelectedTaskType(selected.id);
                         }
                       },
                     ),
                   ),
                 ),
-
 
                 // _buildValidatedDropdown(
                 //   hint: 'Project Name',

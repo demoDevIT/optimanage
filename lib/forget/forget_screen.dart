@@ -62,7 +62,7 @@ class _ForgetScreenState extends State<ForgetScreen> {
                   Padding(
                     padding: const EdgeInsets.only(top: 101),
                     child: Image.asset(
-                      'assets/logos/logo.png',
+                      'assets/logos/logo.svg',
                       width: 105,
                       height: 110,
                     ),

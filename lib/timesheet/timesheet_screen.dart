@@ -21,7 +21,8 @@ class TimeSheetScreen extends StatefulWidget {
   final String? status;
   final String? screenStatus;
 
-  const TimeSheetScreen({Key? key, this.status, this.screenStatus}) : super(key: key);
+  const TimeSheetScreen({Key? key, this.status, this.screenStatus})
+      : super(key: key);
 
   @override
   State<TimeSheetScreen> createState() => _TimeSheetScreenState();
@@ -61,7 +62,6 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
       //provider.fetchTimesheetData(context);
       provider.fetchLeaveSummary(now, userId);
 
-
       if (widget.status == "daily") {
         provider.showLeaveDetails = true;
         provider.showdailyDetails = false;
@@ -70,17 +70,15 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
         provider.showLeaveDetails = false;
         provider.showdailyDetails = true;
         print("222222222222");
-
       }
     });
   }
 
-
   @override
   void dispose() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-    provider.showLeaveDetails = false;
-    provider.showdailyDetails = false;
+      provider.showLeaveDetails = false;
+      provider.showdailyDetails = false;
     });
     super.dispose();
   }
@@ -93,27 +91,26 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
       appBar: common.Appbar(
         title: "Time Sheet",
         callback: () {
-          if(widget.screenStatus == "1"){
+          if (widget.screenStatus == "1") {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) =>
-                    HomeScreen(),
+                builder: (context) => HomeScreen(),
               ),
             );
-          }else {
+          } else {
             Navigator.of(context).pop(false);
           }
         },
-        actions: [
-          // LanguageToggleSwitch(),
-          SvgPicture.asset(
-            'assets/icons/notification.svg',
-            width: 24,
-            height: 24,
-          ),
-          SizedBox(width: 10),
-        ],
+        // actions: [
+        //   // LanguageToggleSwitch(),
+        //   SvgPicture.asset(
+        //     'assets/icons/notification.svg',
+        //     width: 24,
+        //     height: 24,
+        //   ),
+        //   SizedBox(width: 10),
+        // ],
       ),
 
       body: SafeArea(
@@ -130,8 +127,9 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                   calendarFormat: CalendarFormat.month,
                   onPageChanged: (focusedDay) {
                     provider.focusedDay = focusedDay;
-                   // provider.selectedDay = DateTime(focusedDay.year, focusedDay.month, 1);
-                    provider.fetchTimesheetData(context, focusedDay.month, focusedDay.year, userId);
+                    // provider.selectedDay = DateTime(focusedDay.year, focusedDay.month, 1);
+                    provider.fetchTimesheetData(
+                        context, focusedDay.month, focusedDay.year, userId);
                     provider.fetchLeaveSummary(focusedDay, userId);
                   },
                   selectedDayPredicate: (day) =>
@@ -144,9 +142,9 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                           selectedDay.weekday == DateTime.saturday ||
                               selectedDay.weekday == DateTime.sunday;
 
-                    //  print("Selected date${selectedDay}");
-                    //  print("Selected day${focusedDay}");
-                    //  print("Selected date${widget.status}");
+                      //  print("Selected date${selectedDay}");
+                      //  print("Selected day${focusedDay}");
+                      //  print("Selected date${widget.status}");
                       if (widget.status != "daily" && !isWeekend) {
                         print("showNoTaskBottomSheet4444");
                         provider.showSelectDateBottomSheet(
@@ -169,10 +167,9 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                           ),
                         );
                       } else if (widget.status == "daily" && !isWeekend) {
-                        provider.fetchTaskSummary(provider.selectedDay!, userId,context);
-
+                        provider.fetchTaskSummary(
+                            provider.selectedDay!, userId, context);
                       }
-
                     });
                   },
                   calendarStyle: CalendarStyle(
@@ -202,15 +199,16 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                   ),
                   calendarBuilders: CalendarBuilders(
                     defaultBuilder: (context, day, _) {
-                      final normalizedDay = DateTime(day.year, day.month, day.day);
+                      final normalizedDay =
+                          DateTime(day.year, day.month, day.day);
                       final color = provider.statuses[normalizedDay];
 
                       final isWeekend = day.weekday == DateTime.saturday ||
                           day.weekday == DateTime.sunday;
 
-                    //  final backgroundColor = color ?? (isWeekend ? provider.weekendColor : Colors.transparent);
+                      //  final backgroundColor = color ?? (isWeekend ? provider.weekendColor : Colors.transparent);
                       final backgroundColor = color ?? (Colors.transparent);
-                    //  print("Day: $normalizedDay | Color: ${provider.statuses[normalizedDay]}");
+                      //  print("Day: $normalizedDay | Color: ${provider.statuses[normalizedDay]}");
 
                       return Container(
                         width: 35,
@@ -231,7 +229,6 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                       );
                     },
                   ),
-
                 ),
                 Padding(
                   padding:
@@ -278,37 +275,49 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
         builder: (context, provider, child) {
           return provider.showLeaveDetails
               ? Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: SizedBox(
-              width: double.infinity,
-              height: 52,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SelfTaskScreen(),
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => SelfTaskScreen(),
+                        //   ),
+                        // );
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SelfTaskScreen(
+                              selectedDate: provider.selectedDay!,
+                              // or any selected date
+                              userId: userId, // pass actual user ID here
+                            ),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF25507C),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      child: const Text(
+                        '+ Add Self Task',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
+                      ),
                     ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF25507C),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                ),
-                child: const Text(
-                  '+ Add Self Task',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          )
-              : const SizedBox.shrink(); // No button when showLeaveDetails is false
+                )
+              : const SizedBox
+                  .shrink(); // No button when showLeaveDetails is false
         },
       ),
       // added button in footer
@@ -367,29 +376,29 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                         style: const TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold)),
                     Text(formattedMonth,
-                        style: const TextStyle(
-                            color: Colors.white, fontSize: 10)),
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 10)),
                   ],
                 ),
               ),
               const SizedBox(width: 12),
-             // Expanded(
-               // child:
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Leave applied for: ${leave.LeaveTimeInMinutes}",
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF25507C),
-                      ),
+              // Expanded(
+              // child:
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Leave applied for: ${leave.LeaveTimeInMinutes}",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF25507C),
                     ),
-                    const SizedBox(height: 4),
-                    Text("Reason: ${leave.Remarks}",
-                        style: const TextStyle(color: Colors.grey)),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text("Reason: ${leave.Remarks}",
+                      style: const TextStyle(color: Colors.grey)),
+                ],
+              ),
               //),
               const Icon(
                 Icons.chevron_right,
@@ -402,7 +411,6 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
       }).toList(),
     );
   }
-
 
   Widget _buildTaskOptions() {
     return Padding(
@@ -458,6 +466,16 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
           color: Color(0xFF25507C),
         ),
         onTap: () {
+          DateTime today = DateTime.now();
+          DateTime selectedDate =
+              provider.selectedDay!; // assuming this is never null
+          DateTime normalizedToday =
+              DateTime(today.year, today.month, today.day);
+          DateTime normalizedSelected =
+              DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+
+          bool isFutureDate = normalizedSelected.isAfter(normalizedToday);
+
           if (label == 'Add Leave') {
             // _showAddLeaveModal(
             //     context, DateTime(2025, 4, 30)); // or selectedDate
@@ -465,40 +483,61 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
 
             provider.showNoTaskBottomSheet(
                 context, "Add Leave", DateTime(2025, 4, 30), 550);
-          } else if (label == 'No Task Assigned') {
-            //showNoTaskDialog(context);
-            print("showNoTaskBottomSheet2222");
-            provider.showNoTaskBottomSheet(
-                context, "No Task Assigned", provider.selectedDay!, 0.3);
-          } else if (label == 'R&D') {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => RdScreen(
-                  selectedDate: provider.selectedDay!, // or any selected date
-                  userId: userId,   // pass actual user ID here
+          } else if (label == 'No Task Assigned' ||
+              label == 'R&D' ||
+              label == 'Assigned Task') {
+            if (isFutureDate) {
+              // show alert if date is in the future
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text("Alert"),
+                  content: Text("You can't fill timesheet for future dates."),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text("OK"),
+                    ),
+                  ],
                 ),
-              ),
-            );
-          } else if (label == 'Assigned Task') {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ChangeNotifierProvider(
-                  create: (_) => AssignedTaskProvider(),
-                  child: AssignedTaskScreen(
+              );
+              return; // stop further execution
+            }
+
+            if (label == 'No Task Assigned') {
+              //showNoTaskDialog(context);
+              print("showNoTaskBottomSheet2222");
+              provider.showNoTaskBottomSheet(
+                  context, "No Task Assigned", provider.selectedDay!, 0.3);
+            } else if (label == 'R&D') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => RdScreen(
                     selectedDate: provider.selectedDay!,
-                    userId: userId,
+                    // or any selected date
+                    userId: userId, // pass actual user ID here
                   ),
                 ),
-              ),
-            );
-
+              );
+            } else if (label == 'Assigned Task') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ChangeNotifierProvider(
+                    create: (_) => AssignedTaskProvider(),
+                    child: AssignedTaskScreen(
+                      selectedDate: provider.selectedDay!,
+                      userId: userId,
+                    ),
+                  ),
+                ),
+              );
+            }
           }
           // or _selectedDay
         },
       ),
     );
   }
-
 }

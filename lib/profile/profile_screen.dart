@@ -40,14 +40,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: common.Appbar(
         title: "Profile",
         callback: () => Navigator.of(context).pop(false),
-        actions: [
-          SvgPicture.asset(
-            'assets/icons/notification.svg',
-            width: 24,
-            height: 24,
-          ),
-          const SizedBox(width: 10),
-        ],
+        // actions: [
+        //   SvgPicture.asset(
+        //     'assets/icons/notification.svg',
+        //     width: 24,
+        //     height: 24,
+        //   ),
+        //   const SizedBox(width: 10),
+        // ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),

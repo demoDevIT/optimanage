@@ -107,16 +107,16 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: SvgPicture.asset(
-              'assets/icons/notification.svg',
-              width: 24,
-              height: 24,
-            ),
-          )
-        ],
+        // actions: [
+        //   Padding(
+        //     padding: const EdgeInsets.only(right: 16),
+        //     child: SvgPicture.asset(
+        //       'assets/icons/notification.svg',
+        //       width: 24,
+        //       height: 24,
+        //     ),
+        //   )
+        // ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
