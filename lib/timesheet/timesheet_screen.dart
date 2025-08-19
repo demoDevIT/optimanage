@@ -288,6 +288,33 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                         //   ),
                         // );
 
+                        DateTime today = DateTime.now();
+                        DateTime selectedDate = provider.selectedDay!;
+                        DateTime normalizedToday =
+                        DateTime(today.year, today.month, today.day);
+                        DateTime normalizedSelected =
+                        DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+
+                        bool isFutureDate = normalizedSelected.isAfter(normalizedToday);
+
+                        if (isFutureDate) {
+                          // alert for future date
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: Text("Alert"),
+                              content: Text("You can't fill timesheet for future dates."),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text("OK"),
+                                ),
+                              ],
+                            ),
+                          );
+                          return; // block navigation
+                        }
+
                         Navigator.push(
                           context,
                           MaterialPageRoute(

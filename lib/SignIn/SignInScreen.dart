@@ -56,7 +56,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       padding: const EdgeInsets.only(top: 80),
                       // 👈 Top and Left margin
                       child: Image.asset(
-                        'assets/logos/logo.svg',
+                        'assets/logos/logo.png',
                         width: 105,
                         height: 110,
                       ),

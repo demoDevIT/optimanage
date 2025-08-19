@@ -105,14 +105,7 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
                 child: Padding(
                   padding: const EdgeInsets.all(12.0),
                   child:
-                  // Image.asset(
-                  //   _obscureNewPassword
-                  //       ? 'assets/icons/eyeOn.svg'
-                  //       : 'assets/icons/eyeOff.svg',
-                  //   width: 24,
-                  //   height: 24,
-                  //   fit: BoxFit.contain,
-                  // ),
+
                   SvgPicture.asset(
                     _obscureNewPassword
                         ? 'assets/icons/eyeOn.svg'
