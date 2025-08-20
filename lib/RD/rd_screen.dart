@@ -278,14 +278,14 @@ class _RdScreenState extends State<RdScreen> {
         appBar: common.Appbar(
           title: "R&D Tasks",
           callback: () => Navigator.of(context).pop(false),
-          // actions: [
+           actions: [
           //   SvgPicture.asset(
           //     'assets/icons/notification.svg',
           //     width: 24,
           //     height: 24,
           //   ),
-          //   SizedBox(width: 10),
-          // ],
+             SizedBox(width: 50),
+           ],
         ),
         body: SafeArea(
           child: SingleChildScrollView(
@@ -322,9 +322,25 @@ class _RdScreenState extends State<RdScreen> {
                       selectedItem: selectedProject,
                       items: (filter, infiniteScrollProps) =>
                           rdProvider.projects.map((p) => p.fieldName).toList(),
-                      popupProps: PopupProps.bottomSheet(
+                      popupProps: PopupProps.menu(
+                        showSearchBox: true,
                         fit: FlexFit.loose,
                         constraints: const BoxConstraints(maxHeight: 250),
+                        searchFieldProps: TextFieldProps(
+                          decoration: InputDecoration(
+                            labelText: "Search",
+                            prefixIcon:const Icon(Icons.search),
+                            border: const OutlineInputBorder(),
+                            enabledBorder: const OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                            ),
+                            focusedBorder: const OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                            ),
+                            // border:const OutlineInputBorder(border),
+                          ),
+                          style: const TextStyle(fontSize: 14),
+                        ),
                       ),
                       dropdownBuilder: (context, selectedItem) => Align(
                         alignment: Alignment.centerLeft,
@@ -377,9 +393,25 @@ class _RdScreenState extends State<RdScreen> {
                       selectedItem: selectedModule,
                       items: (filter, infiniteScrollProps) =>
                           rdProvider.modules.map((m) => m.text).toList(),
-                      popupProps: PopupProps.bottomSheet(
+                      popupProps: PopupProps.menu(
+                        showSearchBox: true,
                         fit: FlexFit.loose,
                         constraints: const BoxConstraints(maxHeight: 250),
+                        searchFieldProps: TextFieldProps(
+                          decoration: InputDecoration(
+                            labelText: "Search",
+                            prefixIcon:const Icon(Icons.search),
+                            border: const OutlineInputBorder(),
+                            enabledBorder: const OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                            ),
+                            focusedBorder: const OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                            ),
+                            // border:const OutlineInputBorder(border),
+                          ),
+                          style: const TextStyle(fontSize: 14),
+                        ),
                       ),
                       dropdownBuilder: (context, selectedItem) => Align(
                         alignment: Alignment.centerLeft,
@@ -423,9 +455,25 @@ class _RdScreenState extends State<RdScreen> {
                       child: DropdownSearch<String>(
                         selectedItem: selectedSubModule,
                         items: (filter, _) async => rdProvider.subModules.map((s) => s.text).toList(),
-                        popupProps: PopupProps.bottomSheet(
+                        popupProps: PopupProps.menu(
+                          showSearchBox: true,
                           fit: FlexFit.loose,
                           constraints: const BoxConstraints(maxHeight: 250),
+                          searchFieldProps: TextFieldProps(
+                            decoration: InputDecoration(
+                              labelText: "Search",
+                              prefixIcon:const Icon(Icons.search),
+                              border: const OutlineInputBorder(),
+                              enabledBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                              ),
+                              focusedBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                              ),
+                              // border:const OutlineInputBorder(border),
+                            ),
+                            style: const TextStyle(fontSize: 14),
+                          ),
                         ),
                         dropdownBuilder: (context, selectedItem) => Center(
                           child: Align(

@@ -305,10 +305,25 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                               .name,
                       items: (filter, infiniteScrollProps) =>
                           provider.projects.map((e) => e.name).toList(),
-                      popupProps: PopupProps.bottomSheet(
-                        showSearchBox: false,
+                      popupProps: PopupProps.menu(
+                        showSearchBox: true,
                         fit: FlexFit.loose,
                         constraints: BoxConstraints(maxHeight: 250),
+                          searchFieldProps: TextFieldProps(
+                            decoration: InputDecoration(
+                              labelText: "Search",
+                              prefixIcon:const Icon(Icons.search),
+                              border: const OutlineInputBorder(),
+                              enabledBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                              ),
+                              focusedBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                              ),
+                             // border:const OutlineInputBorder(border),
+                            ),
+                            style: const TextStyle(fontSize: 14),
+                          ),
                       ),
                       dropdownBuilder: (context, selectedItem) => Align(
                         alignment: Alignment.centerLeft,
@@ -368,10 +383,25 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                               .name,
                       items: (filter, infiniteScrollProps) =>
                           provider.modules.map((e) => e.name).toList(),
-                      popupProps: PopupProps.bottomSheet(
-                        showSearchBox: false,
+                      popupProps: PopupProps.menu(
+                        showSearchBox: true,
                         fit: FlexFit.loose,
                         constraints: BoxConstraints(maxHeight: 250),
+                        searchFieldProps: TextFieldProps(
+                          decoration: InputDecoration(
+                            labelText: "Search",
+                            prefixIcon:const Icon(Icons.search),
+                            border: const OutlineInputBorder(),
+                            enabledBorder: const OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                            ),
+                            focusedBorder: const OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                            ),
+                            // border:const OutlineInputBorder(border),
+                          ),
+                          style: const TextStyle(fontSize: 14),
+                        ),
                       ),
                       dropdownBuilder: (context, selectedItem) => Align(
                         alignment: Alignment.centerLeft,
@@ -434,10 +464,25 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                                 .name,
                         items: (filter, infiniteScrollProps) =>
                             provider.subModules.map((e) => e.name).toList(),
-                        popupProps: PopupProps.bottomSheet(
-                          showSearchBox: false,
+                        popupProps: PopupProps.menu(
+                          showSearchBox: true,
                           fit: FlexFit.loose,
                           constraints: BoxConstraints(maxHeight: 250),
+                          searchFieldProps: TextFieldProps(
+                            decoration: InputDecoration(
+                              labelText: "Search",
+                              prefixIcon:const Icon(Icons.search),
+                              border: const OutlineInputBorder(),
+                              enabledBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                              ),
+                              focusedBorder: const OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                              ),
+                              // border:const OutlineInputBorder(border),
+                            ),
+                            style: const TextStyle(fontSize: 14),
+                          ),
                         ),
                         dropdownBuilder: (context, selectedItem) => Align(
                           alignment: Alignment.centerLeft,
@@ -489,10 +534,25 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                               .name,
                       items: (filter, infiniteScrollProps) =>
                           provider.taskTypes.map((e) => e.name).toList(),
-                      popupProps: PopupProps.bottomSheet(
-                        showSearchBox: false,
+                      popupProps: PopupProps.menu(
+                        showSearchBox: true,
                         fit: FlexFit.loose,
                         constraints: BoxConstraints(maxHeight: 250),
+                        searchFieldProps: TextFieldProps(
+                          decoration: InputDecoration(
+                            labelText: "Search",
+                            prefixIcon:const Icon(Icons.search),
+                            border: const OutlineInputBorder(),
+                            enabledBorder: const OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                            ),
+                            focusedBorder: const OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                            ),
+                            // border:const OutlineInputBorder(border),
+                          ),
+                          style: const TextStyle(fontSize: 14),
+                        ),
                       ),
                       dropdownBuilder: (context, selectedItem) => Align(
                         alignment: Alignment.centerLeft,

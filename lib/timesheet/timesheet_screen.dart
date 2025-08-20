@@ -102,15 +102,15 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
             Navigator.of(context).pop(false);
           }
         },
-        // actions: [
+         actions: [
         //   // LanguageToggleSwitch(),
         //   SvgPicture.asset(
         //     'assets/icons/notification.svg',
         //     width: 24,
         //     height: 24,
         //   ),
-        //   SizedBox(width: 10),
-        // ],
+           SizedBox(width: 50),
+         ],
       ),
 
       body: SafeArea(
@@ -145,10 +145,40 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                       //  print("Selected date${selectedDay}");
                       //  print("Selected day${focusedDay}");
                       //  print("Selected date${widget.status}");
+
+                      // Normalize the date to check provider.statuses
+                      final normalizedDay = DateTime(
+                          selectedDay.year, selectedDay.month, selectedDay.day);
+                      final dayColor = provider.statuses[normalizedDay];
+
                       if (widget.status != "daily" && !isWeekend) {
-                        print("showNoTaskBottomSheet4444");
-                        provider.showSelectDateBottomSheet(
-                            context, "Add Leave", provider.selectedDay!, 0.6);
+                        // print("showNoTaskBottomSheet4444");
+                        // provider.showSelectDateBottomSheet(
+                        //     context, "Add Leave", provider.selectedDay!, 0.6);
+                        if (dayColor != null &&
+                            dayColor.value.toRadixString(16).toUpperCase().contains("C39BD3")) {
+                          // Show alert if holiday
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text("Alert"),
+                              backgroundColor: Colors.white,
+                              content: const Text("You can't apply leave on holiday."),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text("OK"),
+                                ),
+                              ],
+                            ),
+                          );
+                        } else {
+                          // Otherwise show bottom sheet
+                          print("showNoTaskBottomSheet4444");
+                          provider.showSelectDateBottomSheet(
+                              context, "Add Leave", provider.selectedDay!, 0.6);
+                        }
+
                       } else if (widget.status != "daily" && isWeekend) {
                         // Optional: show toast/snackbar or do nothing
                         showDialog(
@@ -427,11 +457,11 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                 ],
               ),
               //),
-              const Icon(
-                Icons.chevron_right,
-                size: 28,
-                color: Color(0xFF69695D),
-              ),
+              // const Icon(
+              //   Icons.chevron_right,
+              //   size: 28,
+              //   color: Color(0xFF69695D),
+              // ),
             ],
           ),
         );

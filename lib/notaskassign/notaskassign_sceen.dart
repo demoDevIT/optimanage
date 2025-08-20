@@ -94,14 +94,14 @@ class _NoTaskAssignScreenState extends State<NoTaskAssignScreen> {
       appBar: common.Appbar(
         title: "No Task Assigned",
         callback: () => Navigator.of(context).pop(false),
-        // actions: [
+         actions: [
         //   SvgPicture.asset(
         //     'assets/icons/notification.svg',
         //     width: 24,
         //     height: 24,
         //   ),
-        //   const SizedBox(width: 10),
-        // ],
+           const SizedBox(width: 50),
+         ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),

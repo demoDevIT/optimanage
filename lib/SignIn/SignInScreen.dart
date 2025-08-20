@@ -92,16 +92,16 @@ class _SignInScreenState extends State<SignInScreen> {
 
                     const SizedBox(height: 8),
 
-                    Text(
-                      "It was popularised in the 1960s with the release of\n"
-                          "Letraset sheets containing Lorem Ipsum.",
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                    // Text(
+                    //   "It was popularised in the 1960s with the release of\n"
+                    //       "Letraset sheets containing Lorem Ipsum.",
+                    //   style: TextStyle(
+                    //     fontSize: 15,
+                    //     fontWeight: FontWeight.w500,
+                    //     color: Colors.grey,
+                    //   ),
+                    //   textAlign: TextAlign.center,
+                    // ),
 
                     const SizedBox(height: 16),
 

@@ -40,20 +40,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: common.Appbar(
         title: "Profile",
         callback: () => Navigator.of(context).pop(false),
-        // actions: [
-        //   SvgPicture.asset(
-        //     'assets/icons/notification.svg',
-        //     width: 24,
-        //     height: 24,
-        //   ),
-        //   const SizedBox(width: 10),
-        // ],
+         actions: [
+          // SvgPicture.asset(
+          //   'assets/icons/notification.svg',
+          //   width: 24,
+          //   height: 24,
+          // ),
+          const SizedBox(width: 60),
+         ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
         child: profile == null
             ? const Center(child: CircularProgressIndicator())
-            : Column(
+            : SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 20),
             Center(
@@ -95,11 +98,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 16),
             _buildReadOnlyField(profile.EmployeeCode),
             const SizedBox(height: 16),
+            _buildReadOnlyField(profile.MobileNumber),
+            const SizedBox(height: 16),
+            _buildReadOnlyField(profile.Email),
+            const SizedBox(height: 16),
+            _buildReadOnlyField(profile.DOB),
+            const SizedBox(height: 16),
+            _buildReadOnlyField(profile.Gender),
+            const SizedBox(height: 16),
+            _buildReadOnlyField(profile.DOJ),
+            const SizedBox(height: 16),
+            _buildReadOnlyField(profile.ExpYear),
+            const SizedBox(height: 16),
+            _buildReadOnlyField(profile.Designation),
+            const SizedBox(height: 16),
             _buildReadOnlyField(profile.RoleName),
             const SizedBox(height: 30),
             _buildButtons(context),
           ],
         ),
+      ),
       ),
       bottomNavigationBar: _buildBottomNavBar(),
     );

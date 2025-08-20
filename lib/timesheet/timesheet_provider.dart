@@ -182,14 +182,15 @@ class timesheet_provider extends ChangeNotifier {
             builder: (BuildContext context, StateSetter setState) {
               getHeight = (type == 'No Task Assigned') ? 0.3 : leaveType == 'Full Day' ? 0.45 : 0.60; // tweak
           //String? timeError;
-          return DraggableScrollableSheet(
-              expand: false,
-              initialChildSize: getHeight ,//0.3, // 60% of screen height
-              minChildSize:getHeight,
-              maxChildSize: 0.95,
-              builder: (context, scrollController){
-                return Scaffold(
-              body: SingleChildScrollView(
+        //  return DraggableScrollableSheet(
+        //       expand: false,
+        //       initialChildSize: getHeight ,//0.3, // 60% of screen height
+        //       minChildSize:getHeight,
+        //       maxChildSize: 0.95,
+            //  builder: (context, scrollController){
+                return
+                  //Scaffold(
+              SingleChildScrollView(
               padding: EdgeInsets.all(10.0),
               child:Padding(
               padding: MediaQuery.of(context).viewInsets,
@@ -375,9 +376,24 @@ class timesheet_provider extends ChangeNotifier {
                                                 "Full Day",
                                                 "Early Going",
                                                 "Late Coming"],
-                                              popupProps: PopupProps.bottomSheet(
+                                              popupProps: PopupProps.modalBottomSheet(
+                                                showSearchBox: true,
                                                 fit: FlexFit.loose,
-                                                constraints: BoxConstraints(maxHeight: 250),
+                                                searchFieldProps: TextFieldProps(
+                                                  decoration: InputDecoration(
+                                                    labelText: "Search",
+                                                    prefixIcon:const Icon(Icons.search),
+                                                    border: const OutlineInputBorder(),
+                                                    enabledBorder: const OutlineInputBorder(
+                                                      borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                                                    ),
+                                                    focusedBorder: const OutlineInputBorder(
+                                                      borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                                                    ),
+                                                    // border:const OutlineInputBorder(border),
+                                                  ),
+                                                  style: const TextStyle(fontSize: 14),
+                                                ),
                                               ),
 
                                               dropdownBuilder: (context, selectedItem) => Padding(
@@ -507,9 +523,11 @@ class timesheet_provider extends ChangeNotifier {
                                 TextFormField(
                                   controller: remarksController,
                                   maxLines: 4,
+                                  autofocus: true,
                                   decoration: InputDecoration(
                                     hintText: 'Description',
                                     filled: true,
+
                                     fillColor: Color(0xFFF5F9FE),
                                     // Light fill background
                                     contentPadding: const EdgeInsets.all(10),
@@ -684,8 +702,13 @@ class timesheet_provider extends ChangeNotifier {
                 ),
               ],
             )
-          )));
-        });});
+          )
+
+
+                );
+      //  }
+       // );
+            });
       },
     );
   }
