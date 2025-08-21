@@ -105,14 +105,14 @@ class _AssignedTaskScreenState extends State<AssignedTaskScreen> {
         callback: () {
           Navigator.of(context).pop(false);
         },
-         actions: [
+        // actions: [
         //   SvgPicture.asset(
         //     'assets/icons/notification.svg',
         //     width: 24,
         //     height: 24,
         //   ),
-           const SizedBox(width: 50),
-         ],
+        //   const SizedBox(width: 10),
+        // ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),

@@ -456,12 +456,32 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                       style: const TextStyle(color: Colors.grey)),
                 ],
               ),
-              //),
-              // const Icon(
-              //   Icons.chevron_right,
-              //   size: 28,
-              //   color: Color(0xFF69695D),
-              // ),
+             // ),
+              const SizedBox(width: 70),
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: GestureDetector(
+                  onTap: () {
+                    print(date);
+                    provider.showCancelLeaveBottomSheet(
+                      context,
+                      "Cancellation Leave",
+                      date, // dynamically pass leave date
+                      0.55, // height factor
+                    );
+                    // provider.showNoTaskBottomSheet(
+                    //     context, "No Task Assigned", provider.selectedDay!, 0.3);
+                    // provider.showNoTaskBottomSheet(
+                    //     context, "Add Leave", DateTime(2025, 4, 30), 550);
+                  },
+                  child: SvgPicture.asset(
+                    'assets/icons/delete.svg',
+                    width: 24,
+                    height: 24,
+                  ),
+                ),
+              ),
+
             ],
           ),
         );

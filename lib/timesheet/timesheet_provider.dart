@@ -178,7 +178,9 @@ class timesheet_provider extends ChangeNotifier {
         borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
       ),
       builder: (context) {
+        String? leaveTypeError;
         return  StatefulBuilder(// You need this, notice the parameters below:
+
             builder: (BuildContext context, StateSetter setState) {
               getHeight = (type == 'No Task Assigned') ? 0.3 : leaveType == 'Full Day' ? 0.45 : 0.60; // tweak
           //String? timeError;
@@ -376,6 +378,7 @@ class timesheet_provider extends ChangeNotifier {
                                                 "Full Day",
                                                 "Early Going",
                                                 "Late Coming"],
+
                                               popupProps: PopupProps.modalBottomSheet(
                                                 showSearchBox: true,
                                                 fit: FlexFit.loose,
@@ -406,62 +409,20 @@ class timesheet_provider extends ChangeNotifier {
                                                   ),
                                                 ),
                                               ),
-
-
-
-                                              onChanged: (val){
+                                              onChanged: (val) {
                                                 if (val != null) {
                                                   leaveType = val;
-                                                  notifyListeners();
                                                   setState(() {});
                                                 }
                                               },
-
-                                              validator: (val) =>
-                                              (val == null || val.isEmpty)
-                                                  ? 'Please select leave type'
-                                                  : null,
+                                              validator: (val) {
+                                                if (val == null || val.isEmpty) {
+                                                  return 'Please select leave type';
+                                                }
+                                                return null;
+                                              },
                                             ),),
                                         ),),]),
-                                // DropdownButtonFormField<String>(
-                                //   value: leaveType,
-                                //   icon: const SizedBox.shrink(),
-                                //   decoration: InputDecoration(
-                                //     filled: true,
-                                //     fillColor: const Color(0xFFF5F9FE),
-                                //     border: OutlineInputBorder(
-                                //       borderRadius: BorderRadius.circular(12),
-                                //       borderSide: BorderSide.none,
-                                //     ),
-                                //     suffixIcon: const Icon(
-                                //       Icons.arrow_drop_down,
-                                //       size: 30,
-                                //       color: Color(0xFF25507C),
-                                //     ),
-                                //   ),
-                                //   items: [
-                                //     "Half Day",
-                                //     "Full Day",
-                                //     "Early Going",
-                                //     "Late Coming"
-                                //   ]
-                                //       .map((type) => DropdownMenuItem(
-                                //     value: type,
-                                //     child: Text(type),
-                                //   ))
-                                //       .toList(),
-                                //   onChanged: (val) {
-                                //     if (val != null) {
-                                //       leaveType = val;
-                                //       notifyListeners();
-                                //       setState(() {});
-                                //     }
-                                //   },
-                                //   validator: (val) =>
-                                //   (val == null || val.isEmpty)
-                                //       ? 'Please select leave type'
-                                //       : null,
-                                // ),
 
                                 const SizedBox(height: 16),
                                 if (leaveType == "Half Day" ||
@@ -517,6 +478,18 @@ class timesheet_provider extends ChangeNotifier {
                                               "Leave Minute", leaveMinute)),
                                     ],
                                   ),
+                                  if (leaveTypeError != null)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 6, left: 4),
+                                      child: Text(
+                                        leaveTypeError!,
+                                        style: const TextStyle(
+                                          color: Colors.red,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                    ),
                                   const SizedBox(height: 16),
                                 ],
 
@@ -606,6 +579,23 @@ class timesheet_provider extends ChangeNotifier {
                                           });
                                         }
 
+                                        print("leaveType-$leaveType");
+                                        print("leaveHour-$leaveHours");
+                                        print("leaveminutes-$leaveMinutes");
+                                        // ✅ Half Day validation here (instead of dialog)
+                                        if (leaveType == "Half Day" &&
+                                            !(leaveHours == 4 && leaveMinutes == 0)) {
+                                          setState(() {
+                                            leaveTypeError = 'Half Day leave should be exactly 4 hours';
+                                          });
+                                          return;
+                                        }
+                                        else {
+                                          setState(() {
+                                            leaveTypeError = null;
+                                          });
+                                        }
+
                                         leaveDate = date;
 
                                         try {
@@ -664,7 +654,10 @@ class timesheet_provider extends ChangeNotifier {
                                           //     focusedDay.year,
                                           //     userId);
 
+                                         // Navigator.pop(navigatorKey.currentState!.context);
+
                                           resetLeaveForm();
+                                          //Navigator.pop(navigatorKey.currentState!.context);
                                         } catch (e) {
                                           debugPrint("❌ Save button error: $e");
                                         }
@@ -712,6 +705,154 @@ class timesheet_provider extends ChangeNotifier {
       },
     );
   }
+
+  void _updateLeaveDuration(StateSetter setState) {
+    if (startTime != null && endTime != null && leaveDate != null) {
+      final start = DateTime(
+        leaveDate!.year,
+        leaveDate!.month,
+        leaveDate!.day,
+        startTime!.hour,
+        startTime!.minute,
+      );
+      final end = DateTime(
+        leaveDate!.year,
+        leaveDate!.month,
+        leaveDate!.day,
+        endTime!.hour,
+        endTime!.minute,
+      );
+
+      final duration = end.difference(start);
+      setState(() {
+        leaveHours = duration.inHours;
+        leaveMinutes = duration.inMinutes % 60;
+      });
+    }
+  }
+
+
+  void showCancelLeaveBottomSheet(
+      BuildContext context, String type, DateTime date, double getHeight) {
+    resetLeaveForm();
+    final _formKey = GlobalKey<FormState>();
+    final TextEditingController remarksController = TextEditingController();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+
+            return Padding(
+              padding: MediaQuery.of(context).viewInsets,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // --- Header with title + close ---
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "$type (${DateFormat('yyyy-MM-dd').format(date)})",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+
+                    // --- Description field ---
+                    TextFormField(
+                      controller: remarksController,
+                      maxLines: 3,
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return "Please add description";
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        hintText: "Description",
+                        filled: true,
+                        fillColor: Colors.grey.shade100,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // --- Action Buttons ---
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        OutlinedButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(
+                            'Close',
+                            style: TextStyle(
+                              color: Color(0xFF25507C),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF25507C),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          onPressed: () {
+                            FocusScope.of(context).unfocus(); // hide keyboard
+                            final isValid = _formKey.currentState?.validate() ?? false;
+                            if (!isValid) return;            // ❌ show error under field and stop
+
+                            // ✅ proceed only when valid
+                            print("Cancelled leave on ${date.toIso8601String()} "
+                                "with reason: ${remarksController.text}");
+                            Navigator.pop(context);
+                          },
+                          child: Text(
+                            'Cancel Leave',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
 
   void resetLeaveForm() {
     leaveType = "Half Day";
@@ -791,9 +932,16 @@ class timesheet_provider extends ChangeNotifier {
 
         if (endMinutes > startMinutes) {
           final diff = endMinutes - startMinutes;
-          leaveHour = (diff ~/ 60).toString();
-          leaveMinute = (diff % 60).toString();
+
+          // ✅ update both string and int values
+          leaveHours = diff ~/ 60;
+          leaveMinutes = diff % 60;
+
+          leaveHour = leaveHours.toString();
+          leaveMinute = leaveMinutes.toString();
         } else {
+          leaveHours = 0;
+          leaveMinutes = 0;
           leaveHour = "0";
           leaveMinute = "0";
         }
@@ -1000,6 +1148,31 @@ class timesheet_provider extends ChangeNotifier {
     required int userId,
   }) async {
     try {
+
+      // // ✅ Parse StartTime & EndTime into DateTime
+      // final start = DateTime.parse("$startTime");
+      // final end = DateTime.parse("$endTime");
+      // final difference = end.difference(start).inMinutes;
+
+
+      // ✅ Check condition for Half Day leave
+      // if (leaveType == "Half Day" && leaveHours != 4 && leaveMinutes != 0) {
+      //   showDialog(
+      //     context: context,
+      //     builder: (context) => AlertDialog(
+      //       title: Text("Alert"),
+      //       content: Text("Half Day leave should be 4 hours."),
+      //       actions: [
+      //         TextButton(
+      //           onPressed: () => Navigator.pop(context),
+      //           child: Text("OK"),
+      //         ),
+      //       ],
+      //     ),
+      //   );
+      //   return;
+      // }
+
       final body = {
         "LeaveID": 0,
         "LeaveType": leaveType,
