@@ -733,7 +733,7 @@ class timesheet_provider extends ChangeNotifier {
 
 
   void showCancelLeaveBottomSheet(
-      BuildContext context, String type, DateTime date, double getHeight) {
+      BuildContext context, String type, leaveID, DateTime date, double getHeight) {
     resetLeaveForm();
     final _formKey = GlobalKey<FormState>();
     final TextEditingController remarksController = TextEditingController();
@@ -822,15 +822,28 @@ class timesheet_provider extends ChangeNotifier {
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                          onPressed: () {
-                            FocusScope.of(context).unfocus(); // hide keyboard
-                            final isValid = _formKey.currentState?.validate() ?? false;
-                            if (!isValid) return;            // ❌ show error under field and stop
+                          onPressed: () async {
+                            FocusScope.of(context).unfocus();
+                            if (_formKey.currentState?.validate() ?? false) {
 
-                            // ✅ proceed only when valid
-                            print("Cancelled leave on ${date.toIso8601String()} "
-                                "with reason: ${remarksController.text}");
-                            Navigator.pop(context);
+                              final userId =
+                                  await PrefUtil.getPrefUserId() ??
+                                      0;
+                              Navigator.pop(context);
+                              await cancelLeaveRequest(
+                              context: context,
+                              leaveId: leaveID,
+                                userId: userId,// 👈 pass from your leave list
+                              cancelReason: remarksController.text.trim(),
+                              );
+                            }// hide keyboard
+                            // final isValid = _formKey.currentState?.validate() ?? false;
+                            // if (!isValid) return;            // ❌ show error under field and stop
+                            //
+                            // // ✅ proceed only when valid
+                            // print("Cancelled leave on ${date.toIso8601String()} "
+                            //     "with reason: ${remarksController.text}");
+                            // Navigator.pop(context);
                           },
                           child: Text(
                             'Cancel Leave',
@@ -851,6 +864,58 @@ class timesheet_provider extends ChangeNotifier {
         );
       },
     );
+  }
+
+  Future<void> cancelLeaveRequest({
+    required BuildContext context,
+    required int leaveId,
+    required int userId,
+    required String cancelReason,
+  }) async {
+    try {
+      final body = {
+        "LeaveID": leaveId,
+        "CancelReason": cancelReason,
+      };
+
+      print("📤 Cancel Leave Request body: $body");
+
+      HttpService http = HttpService(Constants.baseurl, context);
+      final response =
+      await http.postRequest("/api/Timesheet/AddLeaveCancellation", body);
+
+      print("✅ Cancel Leave Response: ${response.data}");
+
+      if (response.data['State'].toString() == "1" &&
+          response.data['Status'].toString() == "true") {
+        UtilityClass.showSnackBar(
+          navigatorKey.currentState!.context,
+          response.data['Message'] ?? "Leave cancelled successfully",
+          kPrimaryDark,
+        );
+
+        // 🔄 Refresh timesheet data after cancel
+        await fetchTimesheetData(
+          navigatorKey.currentState!.context,
+          focusedDay.month,
+          focusedDay.year,
+          userId,
+        );
+
+        notifyListeners(); // ✅ Close bottomsheet after success
+      } else {
+        UtilityClass.showSnackBar(
+          navigatorKey.currentState!.context,
+          response.data['ErrorMessage'] ?? "Failed to cancel leave",
+          Colors.red,
+        );
+      }
+
+      notifyListeners();
+    } catch (e) {
+      debugPrint("❌ Cancel leave error: $e");
+      UtilityClass.showSnackBar(context, "Error occurred", Colors.red);
+    }
   }
 
 

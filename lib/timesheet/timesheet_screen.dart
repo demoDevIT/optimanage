@@ -466,6 +466,7 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                     provider.showCancelLeaveBottomSheet(
                       context,
                       "Cancellation Leave",
+                      leave.LeaveId,
                       date, // dynamically pass leave date
                       0.55, // height factor
                     );
