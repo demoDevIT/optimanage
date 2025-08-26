@@ -108,8 +108,8 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
 
                   SvgPicture.asset(
                     _obscureNewPassword
-                        ? 'assets/icons/eyeOn.svg'
-                        : 'assets/icons/eyeOff.svg',
+                        ? 'assets/icons/eyeOff.svg'
+                        : 'assets/icons/eyeOn.svg',
                     width: 15,
                     height: 15,
                   ),
@@ -147,8 +147,8 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
 
                   SvgPicture.asset(
                     _obscureConfirmPassword
-                        ? 'assets/icons/eyeOn.svg'
-                        : 'assets/icons/eyeOff.svg',
+                        ? 'assets/icons/eyeOff.svg'
+                        : 'assets/icons/eyeOn.svg',
                     width: 15,
                     height: 15,
                   ),

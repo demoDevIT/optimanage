@@ -176,7 +176,7 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                           // Otherwise show bottom sheet
                           print("showNoTaskBottomSheet4444");
                           provider.showSelectDateBottomSheet(
-                              context, "Add Leave", provider.selectedDay!, 0.6);
+                              context,  "Add Leave", provider.selectedDay!, 0.6);
                         }
 
                       } else if (widget.status != "daily" && isWeekend) {
@@ -441,7 +441,8 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
               const SizedBox(width: 12),
               // Expanded(
               // child:
-              Column(
+              Expanded(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -456,24 +457,25 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                       style: const TextStyle(color: Colors.grey)),
                 ],
               ),
+              ),
              // ),
-              const SizedBox(width: 70),
+              const SizedBox(width: 50),
+              // Padding(
+              //   padding: const EdgeInsets.only(top: 12),
+              //   child:
+
+              // Delete icon aligned a little lower
               Padding(
-                padding: const EdgeInsets.only(top: 12),
+                padding: const EdgeInsets.only(top: 12), // adjust this value (8 → 12 → 16) as needed
                 child: GestureDetector(
                   onTap: () {
-                    print(date);
                     provider.showCancelLeaveBottomSheet(
                       context,
                       "Cancellation Leave",
                       leave.LeaveId,
-                      date, // dynamically pass leave date
-                      0.55, // height factor
+                      date,
+                      0.55,
                     );
-                    // provider.showNoTaskBottomSheet(
-                    //     context, "No Task Assigned", provider.selectedDay!, 0.3);
-                    // provider.showNoTaskBottomSheet(
-                    //     context, "Add Leave", DateTime(2025, 4, 30), 550);
                   },
                   child: SvgPicture.asset(
                     'assets/icons/delete.svg',
@@ -482,6 +484,8 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                   ),
                 ),
               ),
+
+              // ),
 
             ],
           ),
@@ -559,8 +563,7 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
             //     context, DateTime(2025, 4, 30)); // or selectedDate
             print("showNoTaskBottomSheet1111");
 
-            provider.showNoTaskBottomSheet(
-                context, "Add Leave", DateTime(2025, 4, 30), 550);
+            provider.showSelectDateBottomSheet(context,  "Add Leave", DateTime(2025, 4, 30),550);
           } else if (label == 'No Task Assigned' ||
               label == 'R&D' ||
               label == 'Assigned Task') {
@@ -585,8 +588,8 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
             if (label == 'No Task Assigned') {
               //showNoTaskDialog(context);
               print("showNoTaskBottomSheet2222");
-              provider.showNoTaskBottomSheet(
-                  context, "No Task Assigned", provider.selectedDay!, 0.3);
+              provider.showSelectDateBottomSheet(
+                  context,  "No Task Assigned", provider.selectedDay!, 0.3);
             } else if (label == 'R&D') {
               Navigator.push(
                 context,

@@ -38,6 +38,13 @@ class _RdScreenState extends State<RdScreen> {
   @override
   void initState() {
     super.initState();
+
+    final rdProvider = Provider.of<RdProvider>(context, listen: false);
+
+    // Clear previous state on fresh load
+    rdProvider.modules.clear();
+    rdProvider.subModules.clear();
+
     Future.microtask(() =>
         Provider.of<RdProvider>(context, listen: false).fetchProjectList(context));
   }
@@ -271,6 +278,10 @@ class _RdScreenState extends State<RdScreen> {
     final rdProvider = Provider.of<RdProvider>(context);
     final formattedDate = DateFormat('dd-MM-yyyy').format(widget.selectedDate);
 
+    bool _isProjectPopupOpen = false;
+    bool _isModulePopupOpen = false;
+    bool _isSubModulePopupOpen = false;
+
     return GestureDetector(
      // onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
@@ -301,7 +312,6 @@ class _RdScreenState extends State<RdScreen> {
                   ),
                   SizedBox(height: 16),
                 Container(
-                  // height: 48,
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   decoration: BoxDecoration(
                     color: const Color(0xFFF5F7FA),
@@ -326,32 +336,136 @@ class _RdScreenState extends State<RdScreen> {
                         showSearchBox: true,
                         fit: FlexFit.loose,
                         constraints: const BoxConstraints(maxHeight: 250),
+                        menuProps: MenuProps(
+                          // this makes the opened list 2 px inset on left and right
+                          margin: const EdgeInsets.symmetric(horizontal: -12, vertical: -4),
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(12),
+                              topRight: Radius.circular(12),
+                              bottomLeft: Radius.circular(12),
+                              bottomRight: Radius.circular(12),
+                            ),
+                          ),
+                          backgroundColor: const Color(0xFFF5F8FF), // same bg as your field
+                          elevation: 0,
+                        ),
                         searchFieldProps: TextFieldProps(
+                          style: const TextStyle(
+                              color: Color(0xFF555555),
+                              fontWeight: FontWeight.w500,// 👈 search text in grey
+                              fontSize: 14,
+                              fontFamily: 'Inter'
+                          ),
                           decoration: InputDecoration(
-                            labelText: "Search",
-                            prefixIcon:const Icon(Icons.search),
-                            border: const OutlineInputBorder(),
-                            enabledBorder: const OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                            hintText: "Search",
+                            hintStyle: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500, // 👈 make hint (Search) also boldish
+                              color: Color(0xFF555555),
                             ),
-                            focusedBorder: const OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                            isDense: true,
+                            suffixIcon: const Icon(Icons.search, size: 20),
+                            suffixIconConstraints: const BoxConstraints(minWidth: 40, minHeight: 24),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                            border: const UnderlineInputBorder(
+                              borderSide: BorderSide(color: Color(0xFFDDDDDD)),
+                              borderRadius: BorderRadius.zero,
                             ),
-                            // border:const OutlineInputBorder(border),
-                          ),
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                      ),
-                      dropdownBuilder: (context, selectedItem) => Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          selectedItem ?? 'Project Name',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: selectedItem == null ? Colors.grey : Colors.black,
+                            enabledBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide(color: Color(0xFFDDDDDD)),
+                              borderRadius: BorderRadius.zero,
+                            ),
+
+                            focusedBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide(color: Color(0xFFDDDDDD), width: 1.2), // 👈 same as enabled, no highlight
+                              borderRadius: BorderRadius.zero,
+                            ),
+
                           ),
                         ),
+                        listViewProps: const ListViewProps(
+                          padding: EdgeInsets.zero, // 👈 remove gap above list
+                        ),
+                        itemBuilder: (context, item, isSelected, isFocused) {
+
+                          // final items = ["Item 1", "Item 2", "Item 3"]; // your actual list
+                          final isLast = item.indexOf(item.toString()) == item.length - 1;
+                          final items = rdProvider.projects.map((e) => e.fieldName).toList(); // your list
+                          final index = items.indexOf(item); // current item index
+
+                          return Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 23),
+                                child: Align(
+                                  alignment: Alignment.centerLeft, // force left align
+                                  child: Text(
+                                    item.toString(),
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: isSelected ? Colors.blue : const Color(0xFF444444),
+                                      //fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              if (index != items.length - 1)
+                                const Divider(
+                                  height: 1,
+                                  thickness: 0.8,
+                                  color: Color(0xFFEEEEEE),
+                                  // indent: 12,
+                                  // endIndent: 12,
+                                ),
+                            ],
+                          );
+                        },
+                        onDismissed: () => setState(() => _isProjectPopupOpen = false),
+                        containerBuilder: (ctx, popupWidget) {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            if (!_isProjectPopupOpen) {
+                              setState(() => _isProjectPopupOpen = true);
+                            }
+                          });
+                          return Material(
+                            color: const Color(0xFFF5F8FF),
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(0),
+                                topRight: Radius.circular(0),
+                                bottomLeft: Radius.circular(12),
+                                bottomRight: Radius.circular(12),
+                              ),
+                            ),
+                            child: popupWidget,
+                          );
+                        },
                       ),
+                      dropdownBuilder: (context, selectedItem) {
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF5F8FF),
+                            borderRadius: BorderRadius.only(
+                              topLeft: const Radius.circular(12),
+                              topRight: const Radius.circular(12),
+                              bottomLeft: Radius.circular(_isProjectPopupOpen ? 0 : 12), // flatten bottom when open
+                              bottomRight: Radius.circular(_isProjectPopupOpen ? 0 : 12),
+                            ),
+                          ),
+                          padding: const EdgeInsets.only(left: 0, top: 4, bottom: 14, right: 12),
+                          child: Text(
+                            selectedItem ?? "Project Name",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: selectedItem == null ? Colors.grey : Colors.black,
+                            ),
+                          ),
+                        );
+                      },
                       onChanged: (val) {
                         if (val != null) {
                           setState(() {
@@ -393,36 +507,141 @@ class _RdScreenState extends State<RdScreen> {
                       selectedItem: selectedModule,
                       items: (filter, infiniteScrollProps) =>
                           rdProvider.modules.map((m) => m.text).toList(),
+                     // enabled: provider.selectedProjectId != null,
                       popupProps: PopupProps.menu(
                         showSearchBox: true,
                         fit: FlexFit.loose,
                         constraints: const BoxConstraints(maxHeight: 250),
+                        menuProps: MenuProps(
+                          // this makes the opened list 2 px inset on left and right
+                          margin: const EdgeInsets.symmetric(horizontal: -12, vertical: -4),
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(12),
+                              topRight: Radius.circular(12),
+                              bottomLeft: Radius.circular(12),
+                              bottomRight: Radius.circular(12),
+                            ),
+                          ),
+                          backgroundColor: const Color(0xFFF5F8FF), // same bg as your field
+                          elevation: 0,
+                        ),
                         searchFieldProps: TextFieldProps(
+                          style: const TextStyle(
+                              color: Color(0xFF555555),
+                              fontWeight: FontWeight.w500,// 👈 search text in grey
+                              fontSize: 14,
+                              fontFamily: 'Inter'
+                          ),
                           decoration: InputDecoration(
-                            labelText: "Search",
-                            prefixIcon:const Icon(Icons.search),
-                            border: const OutlineInputBorder(),
-                            enabledBorder: const OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.grey, width: 1.0),
+                            hintText: "Search",
+                            hintStyle: const TextStyle(
+                              fontFamily: 'Inter',
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500, // 👈 make hint (Search) also boldish
+                              color: Color(0xFF555555),
                             ),
-                            focusedBorder: const OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.blue, width: 2.0),
+                            isDense: true,
+                            suffixIcon: const Icon(Icons.search, size: 20),
+                            suffixIconConstraints: const BoxConstraints(minWidth: 40, minHeight: 24),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                            border: const UnderlineInputBorder(
+                              borderSide: BorderSide(color: Color(0xFFDDDDDD)),
+                              borderRadius: BorderRadius.zero,
                             ),
-                            // border:const OutlineInputBorder(border),
-                          ),
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                      ),
-                      dropdownBuilder: (context, selectedItem) => Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          selectedItem ?? 'Module',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: selectedItem == null ? Colors.grey : Colors.black,
+                            enabledBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide(color: Color(0xFFDDDDDD)),
+                              borderRadius: BorderRadius.zero,
+                            ),
+
+                            focusedBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide(color: Color(0xFFDDDDDD), width: 1.2), // 👈 same as enabled, no highlight
+                              borderRadius: BorderRadius.zero,
+                            ),
+
                           ),
                         ),
+                        listViewProps: const ListViewProps(
+                          padding: EdgeInsets.zero, // 👈 remove gap above list
+                        ),
+                        itemBuilder: (context, item, isSelected, isFocused) {
+
+                          // final items = ["Item 1", "Item 2", "Item 3"]; // your actual list
+                          final isLast = item.indexOf(item.toString()) == item.length - 1;
+                          final items = rdProvider.projects.map((e) => e.fieldName).toList();
+                          final index = items.indexOf(item); // current item index
+
+                          return Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 23),
+                                child: Align(
+                                  alignment: Alignment.centerLeft, // force left align
+                                  child: Text(
+                                    item.toString(),
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: isSelected ? Colors.blue : const Color(0xFF444444),
+                                      //fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              if (index != items.length - 1)
+                                const Divider(
+                                  height: 1,
+                                  thickness: 0.8,
+                                  color: Color(0xFFEEEEEE),
+                                  // indent: 12,
+                                  // endIndent: 12,
+                                ),
+                            ],
+                          );
+                        },
+                        onDismissed: () => setState(() => _isModulePopupOpen = false),
+                        containerBuilder: (ctx, popupWidget) {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            if (!_isModulePopupOpen) {
+                              setState(() => _isModulePopupOpen = true);
+                            }
+                          });
+                          return Material(
+                            color: const Color(0xFFF5F8FF),
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(0),
+                                topRight: Radius.circular(0),
+                                bottomLeft: Radius.circular(12),
+                                bottomRight: Radius.circular(12),
+                              ),
+                            ),
+                            child: popupWidget,
+                          );
+                        },
                       ),
+                      dropdownBuilder: (context, selectedItem) {
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF5F8FF),
+                            borderRadius: BorderRadius.only(
+                              topLeft: const Radius.circular(12),
+                              topRight: const Radius.circular(12),
+                              bottomLeft: Radius.circular(_isModulePopupOpen ? 0 : 12), // flatten bottom when open
+                              bottomRight: Radius.circular(_isModulePopupOpen ? 0 : 12),
+                            ),
+                          ),
+                          padding: const EdgeInsets.only(left: 0, top: 4, bottom: 14, right: 12),
+                          child: Text(
+                            selectedItem ?? "Module Name",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: selectedItem == null ? Colors.grey : Colors.black,
+                            ),
+                          ),
+                        );
+                      },
                       onChanged: (val) async {
                         if (val != null) {
                           setState(() {
@@ -446,55 +665,169 @@ class _RdScreenState extends State<RdScreen> {
 
                   if (rdProvider.subModules.isNotEmpty)
                     Container(
-                      height: 56,
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF5F7FA),
+                        color: const Color(0xFFF5F8FF),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: DropdownSearch<String>(
-                        selectedItem: selectedSubModule,
-                        items: (filter, _) async => rdProvider.subModules.map((s) => s.text).toList(),
-                        popupProps: PopupProps.menu(
-                          showSearchBox: true,
-                          fit: FlexFit.loose,
-                          constraints: const BoxConstraints(maxHeight: 250),
-                          searchFieldProps: TextFieldProps(
-                            decoration: InputDecoration(
-                              labelText: "Search",
-                              prefixIcon:const Icon(Icons.search),
-                              border: const OutlineInputBorder(),
-                              enabledBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.grey, width: 1.0),
-                              ),
-                              focusedBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.blue, width: 2.0),
-                              ),
-                              // border:const OutlineInputBorder(border),
-                            ),
-                            style: const TextStyle(fontSize: 14),
+                      child: Theme(
+                        data: Theme.of(context).copyWith(
+                          inputDecorationTheme: const InputDecorationTheme(
+                            border: InputBorder.none,
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            errorBorder: InputBorder.none,
+                            disabledBorder: InputBorder.none,
+                            contentPadding: EdgeInsets.zero,
                           ),
                         ),
-                        dropdownBuilder: (context, selectedItem) => Center(
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              selectedItem ?? 'Submodule',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: selectedItem == null ? Colors.grey : Colors.black,
+                        child: DropdownSearch<String>(
+                          selectedItem: selectedSubModule,
+                          items: (filter, _) async => rdProvider.subModules.map((s) => s.text).toList(),
+                          // enabled: provider.selectedModuleId != null,
+                          popupProps: PopupProps.menu(
+                            showSearchBox: true,
+                            fit: FlexFit.loose,
+                            constraints: const BoxConstraints(maxHeight: 250),
+                            menuProps: MenuProps(
+                              // this makes the opened list 2 px inset on left and right
+                              margin: const EdgeInsets.symmetric(horizontal: -12, vertical: -4),
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(12),
+                                  topRight: Radius.circular(12),
+                                  bottomLeft: Radius.circular(12),
+                                  bottomRight: Radius.circular(12),
+                                ),
+                              ),
+                              backgroundColor: const Color(0xFFF5F8FF), // same bg as your field
+                              elevation: 0,
+                            ),
+                            searchFieldProps: TextFieldProps(
+                              style: const TextStyle(
+                                  color: Color(0xFF555555),
+                                  fontWeight: FontWeight.w500,// 👈 search text in grey
+                                  fontSize: 14,
+                                  fontFamily: 'Inter'
+                              ),
+                              decoration: InputDecoration(
+                                hintText: "Search",
+                                hintStyle: const TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500, // 👈 make hint (Search) also boldish
+                                  color: Color(0xFF555555),
+                                ),
+                                isDense: true,
+                                suffixIcon: const Icon(Icons.search, size: 20),
+                                suffixIconConstraints: const BoxConstraints(minWidth: 40, minHeight: 24),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                                border: const UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Color(0xFFDDDDDD)),
+                                  borderRadius: BorderRadius.zero,
+                                ),
+                                enabledBorder: const UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Color(0xFFDDDDDD)),
+                                  borderRadius: BorderRadius.zero,
+                                ),
+
+                                focusedBorder: const UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Color(0xFFDDDDDD), width: 1.2), // 👈 same as enabled, no highlight
+                                  borderRadius: BorderRadius.zero,
+                                ),
+
                               ),
                             ),
+                            listViewProps: const ListViewProps(
+                              padding: EdgeInsets.zero, // 👈 remove gap above list
+                            ),
+                            itemBuilder: (context, item, isSelected, isFocused) {
+
+                              // final items = ["Item 1", "Item 2", "Item 3"]; // your actual list
+                              final isLast = item.indexOf(item.toString()) == item.length - 1;
+                              final items = rdProvider.projects.map((e) => e.fieldName).toList(); // your list
+                              final index = items.indexOf(item); // current item index
+
+                              return Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 23),
+                                    child: Align(
+                                      alignment: Alignment.centerLeft, // force left align
+                                      child: Text(
+                                        item.toString(),
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: isSelected ? Colors.blue : const Color(0xFF444444),
+                                          //fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  if (index != items.length - 1)
+                                    const Divider(
+                                      height: 1,
+                                      thickness: 0.8,
+                                      color: Color(0xFFEEEEEE),
+                                      // indent: 12,
+                                      // endIndent: 12,
+                                    ),
+                                ],
+                              );
+                            },
+                            onDismissed: () => setState(() => _isSubModulePopupOpen = false),
+                            containerBuilder: (ctx, popupWidget) {
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (!_isModulePopupOpen) {
+                                  setState(() => _isModulePopupOpen = true);
+                                }
+                              });
+                              return Material(
+                                color: const Color(0xFFF5F8FF),
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(0),
+                                    topRight: Radius.circular(0),
+                                    bottomLeft: Radius.circular(12),
+                                    bottomRight: Radius.circular(12),
+                                  ),
+                                ),
+                                child: popupWidget,
+                              );
+                            },
                           ),
+                          dropdownBuilder: (context, selectedItem) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF5F8FF),
+                                borderRadius: BorderRadius.only(
+                                  topLeft: const Radius.circular(12),
+                                  topRight: const Radius.circular(12),
+                                  bottomLeft: Radius.circular(_isModulePopupOpen ? 0 : 12), // flatten bottom when open
+                                  bottomRight: Radius.circular(_isModulePopupOpen ? 0 : 12),
+                                ),
+                              ),
+                              padding: const EdgeInsets.only(left: 0, top: 4, bottom: 14, right: 12),
+                              child: Text(
+                                selectedItem ?? "Submodule Name",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: selectedItem == null ? Colors.grey : Colors.black,
+                                ),
+                              ),
+                            );
+                          },
+                          onChanged: (val) {
+                            if (val != null) {
+                              setState(() => selectedSubModule = val);
+                            }
+                          },
+                          validator: (val) =>
+                          (val == null || val.isEmpty) ? 'Please select submodule' : null,
                         ),
-                        onChanged: (val) {
-                          if (val != null) {
-                            setState(() => selectedSubModule = val);
-                          }
-                        },
-                        validator: (val) =>
-                        (val == null || val.isEmpty) ? 'Please select submodule' : null,
-                      ),
+                      )
                     ),
 
                   _textInput(

@@ -4,6 +4,7 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:optimanage/timesheet/CalendraModel.dart';
+import 'package:optimanage/timesheet/drop_down_screen.dart';
 
 import '../main.dart';
 import '../notaskassign/notaskassign_provider.dart';
@@ -33,6 +34,9 @@ class timesheet_provider extends ChangeNotifier {
   bool _showdailyDetails = false;
   BuildContext context;
   String leaveType = "Half Day";
+  List<TaskSummaryModalPopup> taskSummaries = [];
+  bool _isSnackBarVisible = false;
+  List<LeaveSummaryModalPopup> leaveSummaries = [];
 
   timesheet_provider(this.context) {}
 
@@ -40,7 +44,19 @@ class timesheet_provider extends ChangeNotifier {
 
   bool get showdailyDetails => _showdailyDetails;
 
+  Map<String, Color> get statusColorMap => {};
+
   // String get leaveType => _leaveType;
+
+  final List<String> leaveTypes = [
+    "Half Day",
+    "Full Day",
+    "Early Going",
+    "Late Coming",
+  ];
+  bool status=false;
+  String query = "";
+  String? selectedLeave;
 
   set showLeaveDetails(bool status) {
     _showLeaveDetails = status;
@@ -144,13 +160,7 @@ class timesheet_provider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void showSelectDateBottomSheet(
-      BuildContext context, String status, DateTime focusedDay, double height) {
-    print("00Selected Date: $focusedDay");
-    print("showNoTaskBottomSheet3333");
-    showNoTaskBottomSheet(context, status, focusedDay, height);
-    notifyListeners();
-  }
+
 
   // void showSelectDateBottomSheet(
   //     BuildContext context, String title, DateTime date, double height) {
@@ -158,7 +168,53 @@ class timesheet_provider extends ChangeNotifier {
   //   notifyListeners();
   // }
 
-  void showNoTaskBottomSheet(
+  Future<void> showSelectDateBottomSheethjgh(
+      BuildContext context, {
+        required String status,
+        required DateTime focusedDay,
+        double topMargin = 50,
+      }) async {
+
+    // showDialog(
+    //   context: context,
+    //   builder: (context) {
+    //     return  Container(
+    //       margin: EdgeInsets.only(top: 50),
+    //       child: DropDownScreen(
+    //         type: status,
+    //         date: focusedDay,
+    //       ),
+    //     ); // call the custom dialog
+    //
+    //   },
+    //
+    // );
+
+    final result = await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent, // remove default rounded background
+      builder: (context) => FractionallySizedBox(
+        heightFactor: topMargin, // 60% of screen height
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+          ),
+          child: DropDownScreen(
+            type: status,
+            date: focusedDay,
+          ),
+        ),
+      ),
+    );
+
+    if (result != null) {
+      notifyListeners();
+    }
+  }
+
+  void showSelectDateBottomSheet(
       BuildContext context, String type, DateTime date, double getHeight) {
     print("11Selected Date: $type");
     print("showNoTaskBottomSheet5555");
@@ -166,10 +222,8 @@ class timesheet_provider extends ChangeNotifier {
     leaveType = "Half Day";
     final _formKey = GlobalKey<FormState>();
     final TextEditingController remarksController = TextEditingController();
-
     // final parentContext = context;
     String? timeError;
-
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -179,138 +233,135 @@ class timesheet_provider extends ChangeNotifier {
       ),
       builder: (context) {
         String? leaveTypeError;
-        return  StatefulBuilder(// You need this, notice the parameters below:
+        return SingleChildScrollView(
+            child: Padding(
+            padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 20,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+        ),
+          child: StatefulBuilder(// You need this, notice the parameters below:
+              builder: (BuildContext context, StateSetter setState) {
+                getHeight = (type == 'No Task Assigned') ? 0.3 : leaveType == 'Full Day' ? 0.45 : 0.60; // tweak
+                //String? timeError;
+                //  return DraggableScrollableSheet(
+                //       expand: false,
+                //       initialChildSize: getHeight ,//0.3, // 60% of screen height
+                //       minChildSize:getHeight,
+                //       maxChildSize: 0.95,
+                //  builder: (context, scrollController){
+                return Wrap(
+                    runSpacing: 7,
+                children: [
+                  Column(
+                    children: [
+                      Visibility(
+                        visible: type == "No Task Assigned",
 
-            builder: (BuildContext context, StateSetter setState) {
-              getHeight = (type == 'No Task Assigned') ? 0.3 : leaveType == 'Full Day' ? 0.45 : 0.60; // tweak
-          //String? timeError;
-        //  return DraggableScrollableSheet(
-        //       expand: false,
-        //       initialChildSize: getHeight ,//0.3, // 60% of screen height
-        //       minChildSize:getHeight,
-        //       maxChildSize: 0.95,
-            //  builder: (context, scrollController){
-                return
-                  //Scaffold(
-              SingleChildScrollView(
-              padding: EdgeInsets.all(10.0),
-              child:Padding(
-              padding: MediaQuery.of(context).viewInsets,
-            child: Column(
-              children: [
-                Visibility(
-                  visible: type == "No Task Assigned",
-
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                        top: 10, bottom: 10, left: 10, right: 10), // tighter padding
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Header
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Expanded(
-                              child: Text(
-                                'optimanage.devitsandbox.com Says',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 14),
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.close, size: 20),
-                              padding: EdgeInsets.zero, // Remove icon padding
-                              constraints: BoxConstraints(), // Shrink tap area
-                              onPressed: () => Navigator.of(context).pop(),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 5), // Smaller spacing
-
-                        // Warning Message
-                        const Text.rich(
-                          TextSpan(
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              top: 10, bottom: 10, left: 10, right: 10), // tighter padding
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              TextSpan(
-                                text: 'Warning: ',
-                                style: TextStyle(
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.bold,
+                              // Header
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Expanded(
+                                    child: Text(
+                                      'optimanage.devitsandbox.com Says',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold, fontSize: 14),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.close, size: 20),
+                                    padding: EdgeInsets.zero, // Remove icon padding
+                                    constraints: BoxConstraints(), // Shrink tap area
+                                    onPressed: () => Navigator.of(context).pop(),
+                                  ),
+                                ],
+                              ),
+
+                              const SizedBox(height: 5), // Smaller spacing
+
+                              // Warning Message
+                              const Text.rich(
+                                TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: 'Warning: ',
+                                      style: TextStyle(
+                                        color: Colors.red,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text:
+                                      'Kindly please add task carefully. If you haven\'t mapped with a Module then contact your team lead for the same. Task added in {No Task} will not be considered for your performance evaluation.',
+                                      style: TextStyle(
+                                        color: Colors.black87,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              TextSpan(
-                                text:
-                                'Kindly please add task carefully. If you haven\'t mapped with a Module then contact your team lead for the same. Task added in {No Task} will not be considered for your performance evaluation.',
-                                style: TextStyle(
-                                  color: Colors.black87,
-                                  fontWeight: FontWeight.bold,
+
+                              const SizedBox(height: 6),
+
+                              // OK Button aligned right
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: ElevatedButton(
+                                  onPressed: () async {
+                                    Navigator.pop(context);
+                                    int userId = await PrefUtil.getPrefUserId() ?? 0;
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => ChangeNotifierProvider(
+                                          create: (_) => NoTaskAssignProvider(),
+                                          child: NoTaskAssignScreen(
+                                            selectedDate: DateTime.now(),
+                                            userId: userId,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Color(0xFF25507C),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    minimumSize: Size(0, 0), // Important: Shrink button height
+                                  ),
+                                  child: const Text(
+                                    'OK',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ],
                           ),
                         ),
+                      ),
 
-                        const SizedBox(height: 6),
-
-                        // OK Button aligned right
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              Navigator.pop(context);
-                              int userId = await PrefUtil.getPrefUserId() ?? 0;
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => ChangeNotifierProvider(
-                                    create: (_) => NoTaskAssignProvider(),
-                                    child: NoTaskAssignScreen(
-                                      selectedDate: DateTime.now(),
-                                      userId: userId,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFF25507C),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              minimumSize: Size(0, 0), // Important: Shrink button height
-                            ),
-                            child: const Text(
-                              'OK',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // visible: type == "Add Leave" ? true : false,
-                Visibility(
-                    visible: type == "Add Leave" ? true : false,
-                    child: Form(
-                      key: _formKey,
-                    //  child: SafeArea(
-                        child: SingleChildScrollView(
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              maxHeight: MediaQuery.of(context).size.height *
-                                  0.6, // Adjust modal height
-                            ),
-                            //  child: IntrinsicHeight(
+                      // visible: type == "Add Leave" ? true : false,
+                      Visibility(
+                          visible: type == "Add Leave" ? true : false,
+                          child: Form(
+                            key: _formKey,
+                            //  child: SafeArea(
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -348,83 +399,86 @@ class timesheet_provider extends ChangeNotifier {
                                   // ✅ No left margin
                                   endIndent: 0, // ✅ No right margin
                                 ),
-
                                 const SizedBox(height: 12),
-
-                                Row(
-                                    children: [
-                                      Expanded(
-                                        child: Container(
-                                          padding: EdgeInsets.symmetric(horizontal: 12),
-                                          decoration: BoxDecoration(
-                                            color: Color(0xFFF5F7FA), // Light background like Screenshot 1
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
-                                          child: Theme(
-                                            data: Theme.of(context).copyWith(
-                                              inputDecorationTheme: InputDecorationTheme(
-                                                border: InputBorder.none,          // 💥 Remove border
-                                                enabledBorder: InputBorder.none,   // 💥 Remove border
-                                                focusedBorder: InputBorder.none,   // 💥 Remove border
-                                                errorBorder: InputBorder.none,
-                                                disabledBorder: InputBorder.none,
-                                                contentPadding: EdgeInsets.zero,
+                                InkWell(
+                                  onTap: () {
+                                    FocusScope.of(context).unfocus();
+                                    status = !status;
+                                    setState(() {});
+                                  },
+                                  child: DropdownButtonFormField<String>(
+                                    decoration: InputDecoration(
+                                      labelText: "Leave Type",
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    value: selectedLeave,
+                                    items: leaveTypes.map((type) {
+                                      return DropdownMenuItem(
+                                        value: type,
+                                        child: Text(type),
+                                      );
+                                    }).toList(),
+                                    onChanged: null,
+                                    icon: Icon(
+                                      status ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                                if (status) // only show when opened
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      border: Border.all(color: Colors.grey),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: ListView.builder(
+                                      shrinkWrap: true,
+                                      itemCount: leaveTypes.length + 1, // +1 for search box
+                                      itemBuilder: (context, index) {
+                                        if (index == 0) {
+                                          return Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: TextField(
+                                              decoration: InputDecoration(
+                                                hintText: "Search Leave Type",
+                                                prefixIcon: const Icon(Icons.search),
+                                                border: OutlineInputBorder(
+                                                  borderRadius: BorderRadius.circular(8),
+                                                ),
+                                                contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                                               ),
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  query = value;
+                                                });
+                                              },
                                             ),
-                                            child: DropdownSearch<String>(
-                                              selectedItem: "Half Day",
-                                              items: (filter, infiniteScrollProps) =>
-                                              ["Half Day",
-                                                "Full Day",
-                                                "Early Going",
-                                                "Late Coming"],
-
-                                              popupProps: PopupProps.modalBottomSheet(
-                                                showSearchBox: true,
-                                                fit: FlexFit.loose,
-                                                searchFieldProps: TextFieldProps(
-                                                  decoration: InputDecoration(
-                                                    labelText: "Search",
-                                                    prefixIcon:const Icon(Icons.search),
-                                                    border: const OutlineInputBorder(),
-                                                    enabledBorder: const OutlineInputBorder(
-                                                      borderSide: BorderSide(color: Colors.grey, width: 1.0),
-                                                    ),
-                                                    focusedBorder: const OutlineInputBorder(
-                                                      borderSide: BorderSide(color: Colors.blue, width: 2.0),
-                                                    ),
-                                                    // border:const OutlineInputBorder(border),
-                                                  ),
-                                                  style: const TextStyle(fontSize: 14),
-                                                ),
-                                              ),
-
-                                              dropdownBuilder: (context, selectedItem) => Padding(
-                                                padding: EdgeInsets.symmetric(vertical: 16),
-                                                child: Text(
-                                                  selectedItem ?? "Leave Type",
-                                                  style: TextStyle(
-                                                    fontSize: 16,
-                                                    color: selectedItem == null ? Colors.grey : Colors.black,
-                                                  ),
-                                                ),
-                                              ),
-                                              onChanged: (val) {
-                                                if (val != null) {
-                                                  leaveType = val;
-                                                  setState(() {});
-                                                }
-                                              },
-                                              validator: (val) {
-                                                if (val == null || val.isEmpty) {
-                                                  return 'Please select leave type';
-                                                }
-                                                return null;
-                                              },
-                                            ),),
-                                        ),),]),
-
+                                          );
+                                        }
+                                        final filteredList = leaveTypes
+                                            .where((type) => type.toLowerCase().contains(query.toLowerCase()))
+                                            .toList();
+                                        final itemIndex = index - 1;
+                                        if (itemIndex >= filteredList.length) return const SizedBox();
+                                        return ListTile(
+                                          title: Text(filteredList[itemIndex]),
+                                          onTap: () {
+                                            selectedLeave = filteredList[itemIndex];
+                                            status = false;
+                                            query = "";
+                                            setState(() {});
+                                          },
+                                        );
+                                      },
+                                    ),
+                                  ),
                                 const SizedBox(height: 16),
+
+
                                 if (leaveType == "Half Day" ||
                                     leaveType == "Early Going" ||
                                     leaveType == "Late Coming") ...[
@@ -654,7 +708,7 @@ class timesheet_provider extends ChangeNotifier {
                                           //     focusedDay.year,
                                           //     userId);
 
-                                         // Navigator.pop(navigatorKey.currentState!.context);
+                                          // Navigator.pop(navigatorKey.currentState!.context);
 
                                           resetLeaveForm();
                                           //Navigator.pop(navigatorKey.currentState!.context);
@@ -683,57 +737,266 @@ class timesheet_provider extends ChangeNotifier {
                                   ],
                                 )
                               ],
-                            ),
-                            //),
-                          ),
-                        ),
-                     // ),
+                            )
+                            // ),
 
-                    )
-                  // )
-                  // )
+                          )
+                        // )
+                        // )
+                      ),
+                    ],
+                  )
+                ],);
+
+
+                //  }
+                // );
+              }),
+        ));
+      },
+    );
+  }
+    void updateLeaveDuration(StateSetter setState) {
+      if (startTime != null && endTime != null && leaveDate != null) {
+        final start = DateTime(
+          leaveDate!.year,
+          leaveDate!.month,
+          leaveDate!.day,
+          startTime!.hour,
+          startTime!.minute,
+        );
+        final end = DateTime(
+          leaveDate!.year,
+          leaveDate!.month,
+          leaveDate!.day,
+          endTime!.hour,
+          endTime!.minute,
+        );
+
+        final duration = end.difference(start);
+        setState(() {
+          leaveHours = duration.inHours;
+          leaveMinutes = duration.inMinutes % 60;
+        });
+      }
+
+  }
+
+  void showtaskSummaryBottomSheet(BuildContext context, String type,
+      DateTime date, double getHeight,
+      List<TaskSummaryModalPopup> summaries) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        final screenHeight = MediaQuery
+            .of(context)
+            .size
+            .height;
+
+        return Container(
+          height: 500,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          padding: const EdgeInsets.all(16),
+          child: SingleChildScrollView(
+            child: Wrap(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Center(
+                      child: Text(
+                        "View Hour Summary",
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      "Date: ${DateFormat("dd/MM/yyyy").format(date)}",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    ...summaries
+                        .map((task) =>
+                        Container(
+                          width: double.infinity,
+                          margin: const EdgeInsets.only(bottom: 12),
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF5F9FE),
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 6,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                task.ProjectName,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              _buildRow("Timesheet Date", task.EntryDate),
+                              const Divider(
+                                thickness: 1,
+                                height: 1,
+                                color: Color(0xFFE2E2E2),
+                              ),
+                              const SizedBox(height: 10),
+                              _buildRow("Start Time", task.StartTime),
+                              const Divider(
+                                thickness: 1,
+                                height: 1,
+                                color: Color(0xFFE2E2E2),
+                              ),
+                              const SizedBox(height: 10),
+                              _buildRow("End Time", task.EndTime),
+                              const Divider(
+                                thickness: 1,
+                                height: 1,
+                                color: Color(0xFFE2E2E2),
+                              ),
+                              const SizedBox(height: 10),
+                              _buildRow("Task Time", task.TaskTime),
+                              const Divider(
+                                thickness: 1,
+                                height: 1,
+                                color: Color(0xFFE2E2E2),
+                              ),
+                              _buildRow(
+                                "Status",
+                                task.strTaskStauts,
+                                valueColor:
+                                task.strTaskStauts.toLowerCase() ==
+                                    "completed"
+                                    ? Colors.green
+                                    : Colors.black,
+                              ),
+                              const Divider(
+                                thickness: 1,
+                                height: 1,
+                                color: Color(0xFFE2E2E2),
+                              ),
+                              const SizedBox(height: 8),
+                              _buildRow("Entry Date/Time",
+                                  "${task.CreatedDate}, ${task.CreatedTime}"),
+                              const Divider(
+                                thickness: 1,
+                                height: 1,
+                                color: Color(0xFFE2E2E2),
+                              ),
+                              const SizedBox(height: 8),
+                              const Text(
+                                "Task Description",
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                task.TaskDescription,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                              const Divider(
+                                thickness: 1,
+                                height: 1,
+                                color: Color(0xFFE2E2E2),
+                              ),
+                              const SizedBox(height: 8),
+                              const Text(
+                                "Subtask Description",
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                task.SubTaskDescription,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ))
+                        .toList()
+                  ],
                 ),
               ],
-            )
-          )
-
-
-                );
-      //  }
-       // );
-            });
+            ),
+          ),
+        );
       },
     );
   }
 
-  void _updateLeaveDuration(StateSetter setState) {
-    if (startTime != null && endTime != null && leaveDate != null) {
-      final start = DateTime(
-        leaveDate!.year,
-        leaveDate!.month,
-        leaveDate!.day,
-        startTime!.hour,
-        startTime!.minute,
-      );
-      final end = DateTime(
-        leaveDate!.year,
-        leaveDate!.month,
-        leaveDate!.day,
-        endTime!.hour,
-        endTime!.minute,
-      );
-
-      final duration = end.difference(start);
-      setState(() {
-        leaveHours = duration.inHours;
-        leaveMinutes = duration.inMinutes % 60;
-      });
-    }
+  Widget _buildRow(String label, String value, {Color? valueColor}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.normal,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: valueColor ?? Colors.black,
+            ),
+            textAlign: TextAlign.right,
+          ),
+        ],
+      ),
+    );
   }
 
+  void resetLeaveForm() {
+    leaveType = "Half Day";
+    startTime = TimeOfDay(hour: 10, minute: 0);
+    endTime = TimeOfDay(hour: 19, minute: 30);
+    leaveHour = "0";
+    leaveMinute = "0";
+    remarks = "";
+    notifyListeners();
+  }
 
-  void showCancelLeaveBottomSheet(
-      BuildContext context, String type, leaveID, DateTime date, double getHeight) {
+  void showCancelLeaveBottomSheet(BuildContext context, String type, leaveID,
+      DateTime date, double getHeight) {
     resetLeaveForm();
     final _formKey = GlobalKey<FormState>();
     final TextEditingController remarksController = TextEditingController();
@@ -748,116 +1011,119 @@ class timesheet_provider extends ChangeNotifier {
       builder: (context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
-
             return Padding(
-              padding: MediaQuery.of(context).viewInsets,
+              padding: MediaQuery
+                  .of(context)
+                  .viewInsets,
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
                 child: Form(
                   key: _formKey,
                   child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // --- Header with title + close ---
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "$type (${DateFormat('yyyy-MM-dd').format(date)})",
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // --- Header with title + close ---
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "$type (${DateFormat('yyyy-MM-dd').format(date)})",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
+                          IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
 
-                    // --- Description field ---
-                    TextFormField(
-                      controller: remarksController,
-                      maxLines: 3,
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return "Please add description";
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                        hintText: "Description",
-                        filled: true,
-                        fillColor: Colors.grey.shade100,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: BorderSide.none,
+                      // --- Description field ---
+                      TextFormField(
+                        controller: remarksController,
+                        maxLines: 3,
+                        validator: (value) {
+                          if (value == null || value
+                              .trim()
+                              .isEmpty) {
+                            return "Please add description";
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          hintText: "Description",
+                          filled: true,
+                          fillColor: Colors.grey.shade100,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide.none,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
-                    // --- Action Buttons ---
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        OutlinedButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: Text(
-                            'Close',
-                            style: TextStyle(
-                              color: Color(0xFF25507C),
-                              fontWeight: FontWeight.w500,
+                      // --- Action Buttons ---
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          OutlinedButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text(
+                              'Close',
+                              style: TextStyle(
+                                color: Color(0xFF25507C),
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 10),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF25507C),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                          const SizedBox(width: 10),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF25507C),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            onPressed: () async {
+                              FocusScope.of(context).unfocus();
+                              if (_formKey.currentState?.validate() ?? false) {
+                                final userId =
+                                    await PrefUtil.getPrefUserId() ??
+                                        0;
+                                Navigator.pop(context);
+                                await cancelLeaveRequest(
+                                  context: context,
+                                  leaveId: leaveID,
+                                  userId: userId,
+                                  // 👈 pass from your leave list
+                                  cancelReason: remarksController.text.trim(),
+                                );
+                              } // hide keyboard
+                              // final isValid = _formKey.currentState?.validate() ?? false;
+                              // if (!isValid) return;            // ❌ show error under field and stop
+                              //
+                              // // ✅ proceed only when valid
+                              // print("Cancelled leave on ${date.toIso8601String()} "
+                              //     "with reason: ${remarksController.text}");
+                              // Navigator.pop(context);
+                            },
+                            child: Text(
+                              'Cancel Leave',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
-                          onPressed: () async {
-                            FocusScope.of(context).unfocus();
-                            if (_formKey.currentState?.validate() ?? false) {
-
-                              final userId =
-                                  await PrefUtil.getPrefUserId() ??
-                                      0;
-                              Navigator.pop(context);
-                              await cancelLeaveRequest(
-                              context: context,
-                              leaveId: leaveID,
-                                userId: userId,// 👈 pass from your leave list
-                              cancelReason: remarksController.text.trim(),
-                              );
-                            }// hide keyboard
-                            // final isValid = _formKey.currentState?.validate() ?? false;
-                            // if (!isValid) return;            // ❌ show error under field and stop
-                            //
-                            // // ✅ proceed only when valid
-                            // print("Cancelled leave on ${date.toIso8601String()} "
-                            //     "with reason: ${remarksController.text}");
-                            // Navigator.pop(context);
-                          },
-                          child: Text(
-                            'Cancel Leave',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
               ),
             );
           },
@@ -865,6 +1131,7 @@ class timesheet_provider extends ChangeNotifier {
       },
     );
   }
+
 
   Future<void> cancelLeaveRequest({
     required BuildContext context,
@@ -918,16 +1185,315 @@ class timesheet_provider extends ChangeNotifier {
     }
   }
 
+  Future<void> fetchTimesheetData(BuildContext context, int month, int year,
+      int userId) async {
+    try {
+      HttpService http = HttpService(Constants.baseurl, context);
 
-  void resetLeaveForm() {
-    leaveType = "Half Day";
-    startTime = TimeOfDay(hour: 10, minute: 0);
-    endTime = TimeOfDay(hour: 19, minute: 30);
-    leaveHour = "0";
-    leaveMinute = "0";
-    remarks = "";
-    notifyListeners();
+      Map<String, dynamic> inputText = {
+        "MonthId": month,
+        "YearId": year,
+        "UserId": userId,
+        //  "RoleId": 5,
+      };
+
+      final response = await http.postRequest(
+        "/api/Timesheet/GetTimesheetList",
+        inputText,
+      );
+
+      print("✅ calendar Response: ${response.data}");
+
+      CalendraModel getresponse = CalendraModel.fromJson(response.data);
+
+      _dayColorHexes.clear();
+      statuses.clear();
+
+      if (getresponse.result != null && getresponse.result!.isNotEmpty) {
+        final List<dynamic> resultList = jsonDecode(getresponse.result!);
+        final Map<String, dynamic> employeeData = resultList[0];
+
+        for (int i = 1; i <= 31; i++) {
+          String dayKey = 'Day$i';
+          String dateKey = 'Date$i';
+
+          if (employeeData.containsKey(dayKey) &&
+              employeeData.containsKey(dateKey)) {
+            String colorHex =
+            employeeData[dayKey].toString().replaceAll('#', '');
+            String dateStr = employeeData[dateKey]
+                .toString()
+                .replaceAll('[', '')
+                .replaceAll(']', '')
+                .trim();
+
+            try {
+              final date = DateTime.parse(dateStr);
+              final color = Color(int.parse('0xFF$colorHex'));
+              _dayColorHexes[date] = colorHex;
+              statuses[date] = color;
+            } catch (e) {
+              print("❌ Error parsing Day$i → $e");
+            }
+          }
+        }
+        await fetchLeaveSummary(focusedDay, userId);
+
+        notifyListeners();
+      } else {
+        print("❌ No data found in Result.");
+      }
+    } catch (e) {
+      print("❌ Exception while calling API: $e");
+
+      UtilityClass.askForInput(
+        'Error',
+        'API call failed: $e',
+        'OK',
+        'Cancel',
+        true,
+      );
+    }
   }
+
+  void _showSnackBarOnce(String message) {
+    if (!_isSnackBarVisible) {
+      _isSnackBarVisible = true;
+      ScaffoldMessenger
+          .of(navigatorKey.currentState!.context)
+          .showSnackBar(SnackBar(content: Text(message)))
+          .closed
+          .then((_) => _isSnackBarVisible = false); // reset after it disappears
+    }
+  }
+
+  Future<void> fetchLeaveSummary(DateTime date, int userId) async {
+    leaveSummaries = [];
+    try {
+      HttpService http = HttpService(
+        Constants.baseurl, navigatorKey.currentState!.context,);
+
+      final body = {
+        "LeaveMonth": date.month,
+        "LeaveYear": date.year,
+        "UserId": userId
+      };
+
+      final response = await http.postRequest(
+        "/api/Timesheet/GetLeaveSummaryList",
+        body,
+      );
+      if (response.data['State'].toString() == "1" &&
+          response.data['Status'].toString() == "true") {
+        final resultString = response.data['Result'];
+
+        if (resultString != null) {
+          final List decodedList = jsonDecode(resultString);
+
+          leaveSummaries = decodedList
+              .map((item) => LeaveSummaryModalPopup.fromJson(item))
+              .toList();
+        } else {
+          leaveSummaries = [];
+        }
+      }
+      else {
+
+      }
+      notifyListeners();
+    } catch (e) {
+      debugPrint("❌ Error fetching leave summary: $e");
+      leaveSummaries = [];
+      notifyListeners();
+    }
+  }
+
+  Future<void> submitLeaveRequest({
+    required BuildContext context,
+    required String leaveType,
+    required String leaveDate,
+    required String startTime,
+    required String endTime,
+    required int leaveHours,
+    required int leaveMinutes,
+    required int leaveTimeInMinutes,
+    required String remarks,
+    required int userId,
+  }) async {
+    try {
+      // // ✅ Parse StartTime & EndTime into DateTime
+      // final start = DateTime.parse("$startTime");
+      // final end = DateTime.parse("$endTime");
+      // final difference = end.difference(start).inMinutes;
+
+
+      // ✅ Check condition for Half Day leave
+      // if (leaveType == "Half Day" && leaveHours != 4 && leaveMinutes != 0) {
+      //   showDialog(
+      //     context: context,
+      //     builder: (context) => AlertDialog(
+      //       title: Text("Alert"),
+      //       content: Text("Half Day leave should be 4 hours."),
+      //       actions: [
+      //         TextButton(
+      //           onPressed: () => Navigator.pop(context),
+      //           child: Text("OK"),
+      //         ),
+      //       ],
+      //     ),
+      //   );
+      //   return;
+      // }
+
+      final body = {
+        "LeaveID": 0,
+        "LeaveType": leaveType,
+        "LeaveDate": leaveDate,
+        "StartTime": startTime,
+        "EndTime": endTime,
+        "LeaveHours": leaveHours,
+        "LeaveMinutes": leaveMinutes,
+        "LeaveTimeInMinutes": leaveTimeInMinutes,
+        "Remarks": remarks,
+        "IsApproved": 0,
+        "UserId": userId,
+      };
+
+      print("📤 Request body: $body");
+
+      HttpService http = HttpService(Constants.baseurl, context);
+      final response = await http.postRequest(
+          "/api/Timesheet/AddResourceLeave", body);
+      print("✅ Response: ${response.data}");
+
+      //final success = response.data['State'];
+      // final errorMessage =response.data['ErrorMessage'] ?? "Failed to add leave";
+
+      if (response.data['State'].toString() == "1" &&
+          response.data['Status'].toString() == "true") {
+        UtilityClass.showSnackBar(navigatorKey.currentState!.context,
+            response.data['Message'] ?? "Leave added", kPrimaryDark);
+        print("1111111111111");
+
+        // Refresh calendar + timesheet data
+        await fetchTimesheetData(
+            navigatorKey.currentState!.context, focusedDay.month,
+            focusedDay.year, userId);
+        // Close modal
+      } else {
+        print("2222222222222");
+        UtilityClass.showSnackBar(navigatorKey.currentState!.context,
+            response.data['ErrorMessage'].toString(), Colors.red);
+        // await fetchLeaveSummary(focusedDay, userId);
+        // await fetchTimesheetData(
+        //     context, focusedDay.month, focusedDay.year, userId);
+      }
+      notifyListeners();
+    } catch (e) {
+      debugPrint("❌ Submit leave error: $e");
+      UtilityClass.showSnackBar(context, "Error occurred", Colors.red);
+    }
+  }
+
+  Future<void> fetchTaskSummary(DateTime date, int userId,
+      BuildContext context) async {
+    taskSummaries.clear();
+    try {
+      HttpService http = HttpService(Constants.baseurl, context);
+
+      print("✅ GetHourSummaryList request date: ${date}");
+
+      final formattedDate = DateFormat('yyyy-MM-dd').format(date);
+
+      final body = {
+        "FromDate": formattedDate, //"2025-06-18",
+        "ToDate": formattedDate, //"2025-06-18",
+        "UserId": userId // 55
+      };
+
+      final response = await http.postRequest(
+        "/api/Timesheet/GetHourSummaryList",
+        body,
+      );
+
+
+      if (response.data['State'].toString() == "1" &&
+          response.data['Status'].toString() == "true") {
+        final resultString = response.data['Result'];
+
+        final List decodedList = jsonDecode(resultString);
+
+        taskSummaries = decodedList
+            .map((item) => TaskSummaryModalPopup.fromJson(item))
+            .toList();
+
+        if (taskSummaries.isNotEmpty) {
+
+          showtaskSummaryBottomSheet(
+            context,
+            "Add Leave",
+            selectedDay!,
+            0.75,
+            taskSummaries,
+          );
+        } else {
+          _showSnackBarOnce("No task summary available.");
+          // ScaffoldMessenger.of(navigatorKey.currentState!.context).showSnackBar(
+          //   SnackBar(content: Text("No task summary available.")),
+          // );
+        }
+      } else {
+        _showSnackBarOnce("No task summary available.");
+        // ScaffoldMessenger.of(navigatorKey.currentState!.context).showSnackBar(
+        //   SnackBar(content: Text("No task summary available.")),
+        // );
+        taskSummaries = [];
+      }
+
+      notifyListeners();
+    } catch (e) {
+      debugPrint("❌ Error fetching task summary: $e");
+      taskSummaries = [];
+      notifyListeners();
+    }
+  }
+  Future<void> selectTime(
+      BuildContext context, bool isStart, StateSetter setState) async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: isStart ? startTime! : endTime!,
+    );
+
+    if (picked != null) {
+      setState(() {
+        if (isStart) {
+          startTime = picked;
+        } else {
+          endTime = picked;
+        }
+
+        final startMinutes = startTime!.hour * 60 + startTime!.minute;
+        final endMinutes = endTime!.hour * 60 + endTime!.minute;
+
+        if (endMinutes > startMinutes) {
+          final diff = endMinutes - startMinutes;
+
+          // ✅ update both string and int values
+       leaveHours = diff ~/ 60;
+       leaveMinutes = diff % 60;
+
+       leaveHour = leaveHours.toString();
+       leaveMinute = leaveMinutes.toString();
+        } else {
+          leaveHours = 0;
+          leaveMinutes = 0;
+           leaveHour = "0";
+          leaveMinute = "0";
+        }
+      });
+    }
+  }
+
 
   Widget _timeInfo(String label, String value) {
     return Wrap(
@@ -976,509 +1542,5 @@ class timesheet_provider extends ChangeNotifier {
       ],
     );
   }
-
-  Future<void> selectTime(
-      BuildContext context, bool isStart, StateSetter setState) async {
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: isStart ? startTime! : endTime!,
-    );
-
-    if (picked != null) {
-      setState(() {
-        if (isStart) {
-          startTime = picked;
-        } else {
-          endTime = picked;
-        }
-
-        final startMinutes = startTime!.hour * 60 + startTime!.minute;
-        final endMinutes = endTime!.hour * 60 + endTime!.minute;
-
-        if (endMinutes > startMinutes) {
-          final diff = endMinutes - startMinutes;
-
-          // ✅ update both string and int values
-          leaveHours = diff ~/ 60;
-          leaveMinutes = diff % 60;
-
-          leaveHour = leaveHours.toString();
-          leaveMinute = leaveMinutes.toString();
-        } else {
-          leaveHours = 0;
-          leaveMinutes = 0;
-          leaveHour = "0";
-          leaveMinute = "0";
-        }
-      });
-    }
-  }
-
-  Future<void> fetchTimesheetData(BuildContext context, int month, int year, int userId) async {
-    try {
-
-      HttpService http = HttpService(Constants.baseurl,context);
-
-      Map<String, dynamic> inputText = {
-        "MonthId": month,
-        "YearId": year,
-        "UserId": userId,
-        //  "RoleId": 5,
-      };
-
-      final response = await http.postRequest(
-        "/api/Timesheet/GetTimesheetList",
-        inputText,
-      );
-
-      print("✅ calendar Response: ${response.data}");
-
-      CalendraModel getresponse = CalendraModel.fromJson(response.data);
-
-      _dayColorHexes.clear();
-      statuses.clear();
-
-      if (getresponse.result != null && getresponse.result!.isNotEmpty) {
-        final List<dynamic> resultList = jsonDecode(getresponse.result!);
-        final Map<String, dynamic> employeeData = resultList[0];
-
-        for (int i = 1; i <= 31; i++) {
-          String dayKey = 'Day$i';
-          String dateKey = 'Date$i';
-
-          if (employeeData.containsKey(dayKey) &&
-              employeeData.containsKey(dateKey)) {
-            String colorHex =
-                employeeData[dayKey].toString().replaceAll('#', '');
-            String dateStr = employeeData[dateKey]
-                .toString()
-                .replaceAll('[', '')
-                .replaceAll(']', '')
-                .trim();
-
-            try {
-              final date = DateTime.parse(dateStr);
-              final color = Color(int.parse('0xFF$colorHex'));
-              _dayColorHexes[date] = colorHex;
-              statuses[date] = color;
-            } catch (e) {
-              print("❌ Error parsing Day$i → $e");
-            }
-          }
-        }
-        await fetchLeaveSummary(focusedDay, userId);
-
-        notifyListeners();
-      } else {
-        print("❌ No data found in Result.");
-      }
-    } catch (e) {
-      print("❌ Exception while calling API: $e");
-
-      UtilityClass.askForInput(
-        'Error',
-        'API call failed: $e',
-        'OK',
-        'Cancel',
-        true,
-      );
-    }
-  }
-
-  List<TaskSummaryModalPopup> taskSummaries = [];
-  bool _isSnackBarVisible = false;
-
-  Future<void> fetchTaskSummary(DateTime date, int userId, BuildContext context) async {
-    taskSummaries.clear();
-    try {
-      HttpService http = HttpService(Constants.baseurl,context);
-
-      print("✅ GetHourSummaryList request date: ${date}");
-
-      final formattedDate = DateFormat('yyyy-MM-dd').format(date);
-
-      final body = {
-        "FromDate": formattedDate, //"2025-06-18",
-        "ToDate": formattedDate, //"2025-06-18",
-        "UserId": userId // 55
-      };
-
-      final response = await http.postRequest(
-        "/api/Timesheet/GetHourSummaryList",
-        body,
-      );
-
-
-      if (response.data['State'].toString() == "1" &&  response.data['Status'].toString() == "true") {
-        final resultString = response.data['Result'];
-
-        final List decodedList = jsonDecode(resultString);
-
-        taskSummaries = decodedList
-            .map((item) => TaskSummaryModalPopup.fromJson(item))
-            .toList();
-
-        if (taskSummaries.isNotEmpty) {
-          showtaskSummaryBottomSheet(
-            context,
-            "Add Leave",
-            selectedDay!,
-            0.75,
-            taskSummaries,
-          );
-        } else {
-          _showSnackBarOnce("No task summary available.");
-          // ScaffoldMessenger.of(navigatorKey.currentState!.context).showSnackBar(
-          //   SnackBar(content: Text("No task summary available.")),
-          // );
-        }
-      } else {
-        _showSnackBarOnce("No task summary available.");
-        // ScaffoldMessenger.of(navigatorKey.currentState!.context).showSnackBar(
-        //   SnackBar(content: Text("No task summary available.")),
-        // );
-        taskSummaries = [];
-      }
-
-      notifyListeners();
-    } catch (e) {
-      debugPrint("❌ Error fetching task summary: $e");
-      taskSummaries = [];
-      notifyListeners();
-    }
-  }
-
-  void _showSnackBarOnce(String message) {
-    if (!_isSnackBarVisible) {
-      _isSnackBarVisible = true;
-      ScaffoldMessenger.of(navigatorKey.currentState!.context)
-          .showSnackBar(SnackBar(content: Text(message)))
-          .closed
-          .then((_) => _isSnackBarVisible = false); // reset after it disappears
-    }
-  }
-
-  List<LeaveSummaryModalPopup> leaveSummaries = [];
-
-  Future<void> fetchLeaveSummary(DateTime date, int userId) async {
-    leaveSummaries = [];
-    try {
-      HttpService http = HttpService(Constants.baseurl,navigatorKey.currentState!.context,);
-
-      final body = {
-        "LeaveMonth": date.month,
-        "LeaveYear": date.year,
-        "UserId": userId
-      };
-
-      final response = await http.postRequest(
-        "/api/Timesheet/GetLeaveSummaryList",
-        body,
-      );
-      if (response.data['State'].toString() == "1" &&  response.data['Status'].toString() == "true") {
-      final resultString = response.data['Result'];
-
-      if (resultString != null) {
-        final List decodedList = jsonDecode(resultString);
-
-        leaveSummaries = decodedList
-            .map((item) => LeaveSummaryModalPopup.fromJson(item))
-            .toList();
-
-      } else {
-        leaveSummaries = [];
-      }}
-      else {
-
-      }
-      notifyListeners();
-
-    } catch (e) {
-      debugPrint("❌ Error fetching leave summary: $e");
-      leaveSummaries = [];
-      notifyListeners();
-    }
-  }
-
-  Future<void> submitLeaveRequest({
-    required BuildContext context,
-    required String leaveType,
-    required String leaveDate,
-    required String startTime,
-    required String endTime,
-    required int leaveHours,
-    required int leaveMinutes,
-    required int leaveTimeInMinutes,
-    required String remarks,
-    required int userId,
-  }) async {
-    try {
-
-      // // ✅ Parse StartTime & EndTime into DateTime
-      // final start = DateTime.parse("$startTime");
-      // final end = DateTime.parse("$endTime");
-      // final difference = end.difference(start).inMinutes;
-
-
-      // ✅ Check condition for Half Day leave
-      // if (leaveType == "Half Day" && leaveHours != 4 && leaveMinutes != 0) {
-      //   showDialog(
-      //     context: context,
-      //     builder: (context) => AlertDialog(
-      //       title: Text("Alert"),
-      //       content: Text("Half Day leave should be 4 hours."),
-      //       actions: [
-      //         TextButton(
-      //           onPressed: () => Navigator.pop(context),
-      //           child: Text("OK"),
-      //         ),
-      //       ],
-      //     ),
-      //   );
-      //   return;
-      // }
-
-      final body = {
-        "LeaveID": 0,
-        "LeaveType": leaveType,
-        "LeaveDate": leaveDate,
-        "StartTime": startTime,
-        "EndTime": endTime,
-        "LeaveHours": leaveHours,
-        "LeaveMinutes": leaveMinutes,
-        "LeaveTimeInMinutes": leaveTimeInMinutes,
-        "Remarks": remarks,
-        "IsApproved": 0,
-        "UserId": userId,
-      };
-
-      print("📤 Request body: $body");
-
-      HttpService http = HttpService(Constants.baseurl,context);
-      final response = await http.postRequest("/api/Timesheet/AddResourceLeave", body);
-      print("✅ Response: ${response.data}");
-
-      //final success = response.data['State'];
-     // final errorMessage =response.data['ErrorMessage'] ?? "Failed to add leave";
-
-      if (response.data['State'].toString() == "1" && response.data['Status'].toString() == "true") {
-        UtilityClass.showSnackBar(navigatorKey.currentState!.context, response.data['Message'] ?? "Leave added", kPrimaryDark);
-        print("1111111111111");
-
-        // Refresh calendar + timesheet data
-        await fetchTimesheetData(navigatorKey.currentState!.context, focusedDay.month, focusedDay.year, userId);
-        // Close modal
-      } else {
-        print("2222222222222");
-        UtilityClass.showSnackBar(navigatorKey.currentState!.context, response.data['ErrorMessage'].toString(), Colors.red);
-        // await fetchLeaveSummary(focusedDay, userId);
-        // await fetchTimesheetData(
-        //     context, focusedDay.month, focusedDay.year, userId);
-      }
-      notifyListeners();
-    } catch (e) {
-      debugPrint("❌ Submit leave error: $e");
-      UtilityClass.showSnackBar(context, "Error occurred", Colors.red);
-    }
-  }
-
-  void showtaskSummaryBottomSheet(BuildContext context, String type,
-      DateTime date, double getHeight, List<TaskSummaryModalPopup> summaries) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        final screenHeight = MediaQuery.of(context).size.height;
-
-        return Container(
-          height: 500,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          padding: const EdgeInsets.all(16),
-          child: SingleChildScrollView(
-            child: Wrap(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Center(
-                      child: Text(
-                        "View Hour Summary",
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      "Date: ${DateFormat("dd/MM/yyyy").format(date)}",
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    ...summaries
-                        .map((task) => Container(
-                              width: double.infinity,
-                              margin: const EdgeInsets.only(bottom: 12),
-                              padding: const EdgeInsets.all(14),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF5F9FE),
-                                borderRadius: BorderRadius.circular(12),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 6,
-                                    offset: Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    task.ProjectName,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  _buildRow("Timesheet Date", task.EntryDate),
-                                  const Divider(
-                                    thickness: 1,
-                                    height: 1,
-                                    color: Color(0xFFE2E2E2),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  _buildRow("Start Time", task.StartTime),
-                                  const Divider(
-                                    thickness: 1,
-                                    height: 1,
-                                    color: Color(0xFFE2E2E2),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  _buildRow("End Time", task.EndTime),
-                                  const Divider(
-                                    thickness: 1,
-                                    height: 1,
-                                    color: Color(0xFFE2E2E2),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  _buildRow("Task Time", task.TaskTime),
-                                  const Divider(
-                                    thickness: 1,
-                                    height: 1,
-                                    color: Color(0xFFE2E2E2),
-                                  ),
-                                  _buildRow(
-                                    "Status",
-                                    task.strTaskStauts,
-                                    valueColor:
-                                        task.strTaskStauts.toLowerCase() ==
-                                                "completed"
-                                            ? Colors.green
-                                            : Colors.black,
-                                  ),
-                                  const Divider(
-                                    thickness: 1,
-                                    height: 1,
-                                    color: Color(0xFFE2E2E2),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  _buildRow("Entry Date/Time",
-                                      "${task.CreatedDate}, ${task.CreatedTime}"),
-                                  const Divider(
-                                    thickness: 1,
-                                    height: 1,
-                                    color: Color(0xFFE2E2E2),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  const Text(
-                                    "Task Description",
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.normal,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    task.TaskDescription,
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-                                  const Divider(
-                                    thickness: 1,
-                                    height: 1,
-                                    color: Color(0xFFE2E2E2),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  const Text(
-                                    "Subtask Description",
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.normal,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    task.SubTaskDescription,
-                                    style: const TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ))
-                        .toList()
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Map<String, Color> get statusColorMap => {};
-
-  Widget _buildRow(String label, String value, {Color? valueColor}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.normal,
-              color: Colors.black87,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-              color: valueColor ?? Colors.black,
-            ),
-            textAlign: TextAlign.right,
-          ),
-        ],
-      ),
-    );
-  }
 }
+

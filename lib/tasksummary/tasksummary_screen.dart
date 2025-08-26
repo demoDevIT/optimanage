@@ -59,7 +59,7 @@ class _TaskSummaryScreenState extends State<TaskSummaryScreen> {
          ],
       ),
       body: task == null
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(child: Container()) //? const Center(child: CircularProgressIndicator())
           : Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: SingleChildScrollView(
