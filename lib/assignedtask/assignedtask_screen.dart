@@ -209,6 +209,7 @@ class _AssignedTaskScreenState extends State<AssignedTaskScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: selectedTask == null ? null : () {
+                  print("go to task summary page with this date - ${widget.selectedDate}");
                   Navigator.push(
                     context,
                     MaterialPageRoute(

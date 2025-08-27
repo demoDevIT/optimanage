@@ -308,8 +308,9 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
   }
 
   Widget _dropdownInput() {
-    final provider = Provider.of<DailyTaskProvider>(context);
 
+    final provider = Provider.of<DailyTaskProvider>(context);
+    print("status list----->${provider.statusList}");
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(

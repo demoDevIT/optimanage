@@ -576,8 +576,7 @@ class timesheet_provider extends ChangeNotifier {
                                     ),
                                   ),
                                   validator: (val) =>
-                                  (val == null || val.isEmpty)
-                                      ? 'Please enter a description'
+                                  (val == null || val.isEmpty) ? 'Please enter a description'
                                       : null,
                                 ),
                                 const SizedBox(height: 20),
@@ -612,115 +611,107 @@ class timesheet_provider extends ChangeNotifier {
                                     // Space between buttons
                                     ElevatedButton(
                                       onPressed: () async {
-                                        if (!_formKey.currentState!
-                                            .validate()) {
-                                          debugPrint(
-                                              "❌ Form validation failed");
-                                          return;
-                                        }
-                                        Navigator.pop(navigatorKey.currentState!.context);
-
-                                        // Start-End Time Validation
-                                        final startMinutes =
-                                            startTime!.hour * 60 +
-                                                startTime!.minute;
-                                        final endMinutes = endTime!.hour * 60 +
-                                            endTime!.minute;
-
+                                        final startMinutes = startTime!.hour * 60 + startTime!.minute;
+                                        final endMinutes = endTime!.hour * 60 + endTime!.minute;
                                         if (startMinutes >= endMinutes) {
                                           setState(() {
-                                            timeError =
-                                            'Start time must be before end time';
+                                            timeError = 'Start time must be before end time';
                                           });
                                           return;
                                         } else {
                                           setState(() {
                                             timeError = null;
+
                                           });
                                         }
-
-                                        print("leaveType-$leaveType");
-                                        print("leaveHour-$leaveHours");
-                                        print("leaveminutes-$leaveMinutes");
-                                        // ✅ Half Day validation here (instead of dialog)
-                                        if (leaveType == "Half Day" &&
-                                            !(leaveHours == 4 && leaveMinutes == 0)) {
+                                        if (leaveType == "Half Day" && !(leaveHours == 4 && leaveMinutes == 0)) {
+                                          print("LH1-$leaveHours");
+                                          print("LM1-$leaveMinutes");
                                           setState(() {
                                             leaveTypeError = 'Half Day leave should be exactly 4 hours';
                                           });
                                           return;
                                         }
                                         else {
+                                          print("LH2-$leaveHours");
+                                          print("LM2-$leaveMinutes");
                                           setState(() {
                                             leaveTypeError = null;
                                           });
                                         }
 
-                                        leaveDate = date;
+                                        if (_formKey.currentState!.validate()) {
+                                          debugPrint("❌ Form validation failed");
 
-                                        try {
-                                          final start = DateTime(
-                                              leaveDate!.year,
-                                              leaveDate!.month,
-                                              leaveDate!.day,
-                                              startTime!.hour,
-                                              startTime!.minute);
-                                          final end = DateTime(
-                                              leaveDate!.year,
-                                              leaveDate!.month,
-                                              leaveDate!.day,
-                                              endTime!.hour,
-                                              endTime!.minute);
+                                          Navigator.pop(navigatorKey.currentState!.context);
+                                          leaveDate = date;
+                                          try {
+                                            final start = DateTime(
+                                                leaveDate!.year,
+                                                leaveDate!.month,
+                                                leaveDate!.day,
+                                                startTime!.hour,
+                                                startTime!.minute);
+                                            final end = DateTime(
+                                                leaveDate!.year,
+                                                leaveDate!.month,
+                                                leaveDate!.day,
+                                                endTime!.hour,
+                                                endTime!.minute);
 
-                                          final duration =
-                                          end.difference(start);
-                                          leaveHours = duration.inHours;
-                                          leaveMinutes =
-                                              duration.inMinutes % 60;
-                                          final totalMinutes =
-                                              duration.inMinutes;
+                                            final duration =
+                                            end.difference(start);
+                                            leaveHours = duration.inHours;
+                                            leaveMinutes =
+                                                duration.inMinutes % 60;
+                                            final totalMinutes =
+                                                duration.inMinutes;
 
-                                          final formattedDate =
-                                          formatDate(leaveDate!);
-                                          final formattedStart =
-                                          formatTimeOfDay(startTime!);
-                                          final formattedEnd =
-                                          formatTimeOfDay(endTime!);
-                                          final remarks =
-                                          remarksController.text.trim();
+                                            final formattedDate =
+                                            formatDate(leaveDate!);
+                                            final formattedStart =
+                                            formatTimeOfDay(startTime!);
+                                            final formattedEnd =
+                                            formatTimeOfDay(endTime!);
+                                            final remarks =
+                                            remarksController.text.trim();
 
-                                          final userId =
-                                              await PrefUtil.getPrefUserId() ??
-                                                  0;
+                                            final userId =
+                                                await PrefUtil.getPrefUserId() ??
+                                                    0;
 
-                                          await submitLeaveRequest(
-                                            context: context,
-                                            leaveType: leaveType,
-                                            leaveDate: formattedDate,
-                                            startTime: formattedStart,
-                                            endTime: formattedEnd,
-                                            leaveHours: leaveHours,
-                                            leaveMinutes: leaveMinutes,
-                                            leaveTimeInMinutes: totalMinutes,
-                                            remarks: remarks,
-                                            userId: userId,
-                                          );
+                                            await submitLeaveRequest(
+                                              context: context,
+                                              leaveType: leaveType,
+                                              leaveDate: formattedDate,
+                                              startTime: formattedStart,
+                                              endTime: formattedEnd,
+                                              leaveHours: leaveHours,
+                                              leaveMinutes: leaveMinutes,
+                                              leaveTimeInMinutes: totalMinutes,
+                                              remarks: remarks,
+                                              userId: userId,
+                                            );
+                                            setState(() {
 
-                                          // await fetchLeaveSummary(
-                                          //     focusedDay, userId);
-                                          // await fetchTimesheetData(
-                                          //     context,
-                                          //     focusedDay.month,
-                                          //     focusedDay.year,
-                                          //     userId);
+                                            });
+                                            // await fetchLeaveSummary(
+                                            //     focusedDay, userId);
+                                            // await fetchTimesheetData(
+                                            //     context,
+                                            //     focusedDay.month,
+                                            //     focusedDay.year,
+                                            //     userId);
 
-                                          // Navigator.pop(navigatorKey.currentState!.context);
+                                            // Navigator.pop(navigatorKey.currentState!.context);
 
-                                          resetLeaveForm();
-                                          //Navigator.pop(navigatorKey.currentState!.context);
-                                        } catch (e) {
-                                          debugPrint("❌ Save button error: $e");
+                                            resetLeaveForm();
+                                            //Navigator.pop(navigatorKey.currentState!.context);
+                                          } catch (e) {
+                                            debugPrint("❌ Save button error: $e");
+                                          }
                                         }
+
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Color(0xFF25507C),

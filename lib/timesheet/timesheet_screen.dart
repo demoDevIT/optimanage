@@ -79,6 +79,7 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       provider.showLeaveDetails = false;
       provider.showdailyDetails = false;
+
     });
     super.dispose();
   }
@@ -602,6 +603,7 @@ class _TimeSheetScreenState extends State<TimeSheetScreen> {
                 ),
               );
             } else if (label == 'Assigned Task') {
+              print("go to assign task page with this date - ${provider.selectedDay}");
               Navigator.push(
                 context,
                 MaterialPageRoute(
