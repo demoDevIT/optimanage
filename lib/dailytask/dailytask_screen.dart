@@ -310,68 +310,149 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
   Widget _dropdownInput() {
     final provider = Provider.of<DailyTaskProvider>(context);
 
-    return GestureDetector(
-      onTap: () async {
-        final result = await showModalBottomSheet<String>(
-          context: context,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5F8FF),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          inputDecorationTheme: const InputDecorationTheme(
+            border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            errorBorder: InputBorder.none,
+            disabledBorder: InputBorder.none,
+            contentPadding: EdgeInsets.zero,
           ),
-          builder: (context) {
-            return SafeArea(
-              child: ListView.builder(
-                shrinkWrap: true,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                itemCount: provider.statusList.length,
-                itemBuilder: (context, index) {
-                  final item = provider.statusList[index];
-                  final value = item.value ?? '';
-                  final label = (item.child is Text)
-                      ? (item.child as Text).data ?? value
-                      : value;
+        ),
+        child: DropdownSearch<String>(
+          selectedItem: _selectedStatus,
+          items: (filter, infiniteScrollProps) =>
+              provider.statusList.map((e) {
+                final value = e.value ?? '';
+                final label = (e.child is Text)
+                    ? (e.child as Text).data ?? value
+                    : value;
+                return label;
+              }).toList(),
+          popupProps: PopupProps.menu(
+            showSearchBox: true,
+            fit: FlexFit.loose,
+            constraints: const BoxConstraints(maxHeight: 250),
+            menuProps: const MenuProps(
+              margin: EdgeInsets.symmetric(horizontal: -12, vertical: -4),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(12)),
+              ),
+              backgroundColor: Color(0xFFF5F8FF),
+              elevation: 0,
+            ),
+            searchFieldProps: TextFieldProps(
+              style: const TextStyle(
+                  color: Color(0xFF555555),
+                  fontWeight: FontWeight.w500,
+                  fontSize: 14,
+                  fontFamily: 'Inter'),
+              decoration: InputDecoration(
+                hintText: "Search",
+                hintStyle: const TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF555555),
+                ),
+                isDense: true,
+                suffixIcon: const Icon(Icons.search, size: 20),
+                suffixIconConstraints:
+                const BoxConstraints(minWidth: 40, minHeight: 24),
+                contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                border: const UnderlineInputBorder(
+                  borderSide: BorderSide(color: Color(0xFFDDDDDD)),
+                ),
+                enabledBorder: const UnderlineInputBorder(
+                  borderSide: BorderSide(color: Color(0xFFDDDDDD)),
+                ),
+                focusedBorder: const UnderlineInputBorder(
+                  borderSide: BorderSide(color: Color(0xFFDDDDDD), width: 1.2),
+                ),
+              ),
+            ),
+            listViewProps: const ListViewProps(
+              padding: EdgeInsets.zero,
+            ),
+            itemBuilder: (context, item, isSelected, isFocused) {
+              final items = provider.statusList.map((e) {
+                final value = e.value ?? '';
+                final label = (e.child is Text)
+                    ? (e.child as Text).data ?? value
+                    : value;
+                return label;
+              }).toList();
 
-                  return ListTile(
-                    title: Text(label),
-                    onTap: () => Navigator.pop(context, value),
-                  );
-                },
+              final index = items.indexOf(item);
+
+              return Column(
+                children: [
+                  Padding(
+                    padding:
+                    const EdgeInsets.symmetric(vertical: 8, horizontal: 23),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        item.toString(),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: isSelected
+                              ? Colors.blue
+                              : const Color(0xFF444444),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (index != items.length - 1)
+                    const Divider(
+                      height: 1,
+                      thickness: 0.8,
+                      color: Color(0xFFEEEEEE),
+                    ),
+                ],
+              );
+            },
+          ),
+          dropdownBuilder: (context, selectedItem) {
+            return Container(
+              decoration: BoxDecoration(
+                color: const Color(0xFFF5F8FF),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding:
+              const EdgeInsets.only(left: 0, top: 4, bottom: 14, right: 12),
+              child: Text(
+                selectedItem ?? "Daily Task Status",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: selectedItem == null ? Colors.grey : Colors.black,
+                ),
               ),
             );
           },
-        );
-
-
-        if (result != null) {
-          setState(() => _selectedStatus = result);
-        }
-      },
-      child: AbsorbPointer(
-        child: DropdownButtonFormField<String>(
-          value: _selectedStatus,
+          onChanged: (val) {
+            if (val != null) {
+              setState(() => _selectedStatus = val);
+            }
+          },
           validator: (value) =>
           value == null ? 'Please select Daily Task Status' : null,
-          onChanged: (_) {},
-          items: provider.statusList,
-          decoration: InputDecoration(
-            hintText: "Daily Task Status",
-            hintStyle: TextStyle(
-                color: Color(0xFF6E6A7C), fontWeight: FontWeight.w500),
-            filled: true,
-            fillColor: Color(0xFFF5F8FF),
-            contentPadding:
-            EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
-            ),
-            errorStyle:
-            TextStyle(color: Colors.red.shade700, fontSize: 13),
-          ),
-          icon: Icon(Icons.keyboard_arrow_down),
         ),
       ),
     );
   }
+
 
 
 

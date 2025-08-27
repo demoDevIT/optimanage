@@ -220,6 +220,7 @@ class timesheet_provider extends ChangeNotifier {
     print("showNoTaskBottomSheet5555");
     resetLeaveForm();
     leaveType = "Half Day";
+    status = false;
     final _formKey = GlobalKey<FormState>();
     final TextEditingController remarksController = TextEditingController();
     // final parentContext = context;
@@ -406,76 +407,81 @@ class timesheet_provider extends ChangeNotifier {
                                     status = !status;
                                     setState(() {});
                                   },
-                                  child: DropdownButtonFormField<String>(
-                                    decoration: InputDecoration(
-                                      labelText: "Leave Type",
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
+                                  child:Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFF5F8FF),
+                                        borderRadius: BorderRadius.circular(8),
                                       ),
-                                    ),
-                                    value: selectedLeave,
+                                      child: Theme(
+                                        data: Theme.of(context).copyWith(
+                                          inputDecorationTheme: const InputDecorationTheme(
+                                            border: InputBorder.none,
+                                            enabledBorder: InputBorder.none,
+                                            focusedBorder: InputBorder.none,
+                                            errorBorder: InputBorder.none,
+                                            disabledBorder: InputBorder.none,
+                                            contentPadding: EdgeInsets.zero,
+                                          ),
+                                        ),
+                                  child:DropdownButtonFormField<String>(
+
+                                    value: leaveType,
                                     items: leaveTypes.map((type) {
                                       return DropdownMenuItem(
                                         value: type,
-                                        child: Text(type),
+                                        child: Text(
+                                          type,
+                                          style: const TextStyle(color: Colors.grey), // optional: grey text
+                                        ),
                                       );
                                     }).toList(),
                                     onChanged: null,
-                                    icon: Icon(
-                                      status ? Icons.arrow_drop_up : Icons.arrow_drop_down,
-                                      color: Colors.black,
+                                    decoration: const InputDecoration(
+                                      border: InputBorder.none,
+                                     // labelText: "Leave Type",// removes border
+                                      enabledBorder: InputBorder.none, // removes underline when not focused
+                                      focusedBorder: InputBorder.none, // removes underline when focused
+                                      errorBorder: InputBorder.none,   // removes underline when error
+                                      disabledBorder: InputBorder.none, // removes underline when disabled
+                                      contentPadding: EdgeInsets.zero, // optional: remove extra padding
                                     ),
-                                  ),
-                                ),
+                                    //dropdownColor: const Color(0xFFF5F8FF), // same bg as your field
+                                    elevation: 0,
+                                    icon: const Icon(
+                                      Icons.arrow_drop_down,
+                                      color: Colors.grey, // optional: grey icon
+                                    ),
+                                    disabledHint: Text(
+                                      leaveType ?? "Leave Type",
+                                      style: const TextStyle(color: Colors.grey), // hint when disabled
+                                    ),
+                                  ),),
+
+                                ),),
                                 if (status) // only show when opened
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      border: Border.all(color: Colors.grey),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: ListView.builder(
-                                      shrinkWrap: true,
-                                      itemCount: leaveTypes.length + 1, // +1 for search box
-                                      itemBuilder: (context, index) {
-                                        if (index == 0) {
-                                          return Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: TextField(
-                                              decoration: InputDecoration(
-                                                hintText: "Search Leave Type",
-                                                prefixIcon: const Icon(Icons.search),
-                                                border: OutlineInputBorder(
-                                                  borderRadius: BorderRadius.circular(8),
-                                                ),
-                                                contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                              ),
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  query = value;
-                                                });
-                                              },
-                                            ),
+                                  Transform.translate(
+                                    offset: const Offset(0, -8), // 👈 shifts the whole list up by 8 pixels
+                                    child: Container(
+                                      color: const Color(0xFFF5F8FF),
+                                      child: ListView.builder(
+                                        shrinkWrap: true,
+                                        itemCount: leaveTypes.length,
+                                        itemBuilder: (context, index) {
+                                          return ListTile(
+                                            title: Text(leaveTypes[index]),
+                                            onTap: () {
+                                              leaveType = leaveTypes[index];
+                                              status = false;
+                                              query = "";
+                                              setState(() {});
+                                            },
                                           );
-                                        }
-                                        final filteredList = leaveTypes
-                                            .where((type) => type.toLowerCase().contains(query.toLowerCase()))
-                                            .toList();
-                                        final itemIndex = index - 1;
-                                        if (itemIndex >= filteredList.length) return const SizedBox();
-                                        return ListTile(
-                                          title: Text(filteredList[itemIndex]),
-                                          onTap: () {
-                                            selectedLeave = filteredList[itemIndex];
-                                            status = false;
-                                            query = "";
-                                            setState(() {});
-                                          },
-                                        );
-                                      },
+                                        },
+                                      ),
                                     ),
                                   ),
+
                                 const SizedBox(height: 16),
 
 
