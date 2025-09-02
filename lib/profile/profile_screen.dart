@@ -52,7 +52,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
         child: profile == null
-            ? const Center(child: CircularProgressIndicator())
+            ? Center(child: Container()) //const Center(child: CircularProgressIndicator())
             : SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           child: Column(

@@ -365,6 +365,7 @@ class _AppDrawer extends State<AppDrawer> {
                   ),
                   title: const Text('Profile'),
                   onTap: () {
+                    Navigator.pop(context);
                     Navigator.push(
                       context,
                       MaterialPageRoute(

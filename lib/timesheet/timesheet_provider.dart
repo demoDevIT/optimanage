@@ -54,7 +54,7 @@ class timesheet_provider extends ChangeNotifier {
     "Early Going",
     "Late Coming",
   ];
-  bool status=false;
+  bool status = false;
   String query = "";
   String? selectedLeave;
 
@@ -160,8 +160,6 @@ class timesheet_provider extends ChangeNotifier {
     notifyListeners();
   }
 
-
-
   // void showSelectDateBottomSheet(
   //     BuildContext context, String title, DateTime date, double height) {
   //   showLeaveDetails = true;
@@ -169,12 +167,11 @@ class timesheet_provider extends ChangeNotifier {
   // }
 
   Future<void> showSelectDateBottomSheethjgh(
-      BuildContext context, {
-        required String status,
-        required DateTime focusedDay,
-        double topMargin = 50,
-      }) async {
-
+    BuildContext context, {
+    required String status,
+    required DateTime focusedDay,
+    double topMargin = 50,
+  }) async {
     // showDialog(
     //   context: context,
     //   builder: (context) {
@@ -236,131 +233,143 @@ class timesheet_provider extends ChangeNotifier {
         String? leaveTypeError;
         return SingleChildScrollView(
             child: Padding(
-            padding: EdgeInsets.only(
+          padding: EdgeInsets.only(
             left: 16,
             right: 16,
             top: 20,
             bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-        ),
+          ),
           child: StatefulBuilder(// You need this, notice the parameters below:
               builder: (BuildContext context, StateSetter setState) {
-                getHeight = (type == 'No Task Assigned') ? 0.3 : leaveType == 'Full Day' ? 0.45 : 0.60; // tweak
-                //String? timeError;
-                //  return DraggableScrollableSheet(
-                //       expand: false,
-                //       initialChildSize: getHeight ,//0.3, // 60% of screen height
-                //       minChildSize:getHeight,
-                //       maxChildSize: 0.95,
-                //  builder: (context, scrollController){
-                return Wrap(
-                    runSpacing: 7,
-                children: [
-                  Column(
-                    children: [
-                      Visibility(
-                        visible: type == "No Task Assigned",
+            getHeight = (type == 'No Task Assigned')
+                ? 0.3
+                : leaveType == 'Full Day'
+                    ? 0.45
+                    : 0.60; // tweak
+            //String? timeError;
+            //  return DraggableScrollableSheet(
+            //       expand: false,
+            //       initialChildSize: getHeight ,//0.3, // 60% of screen height
+            //       minChildSize:getHeight,
+            //       maxChildSize: 0.95,
+            //  builder: (context, scrollController){
+            return Wrap(
+              runSpacing: 7,
+              children: [
+                Column(
+                  children: [
+                    Visibility(
+                      visible: type == "No Task Assigned",
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            top: 10, bottom: 10, left: 10, right: 10),
+                        // tighter padding
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Header
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Expanded(
+                                  child: Text(
+                                    'optimanage.devitsandbox.com Says',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14),
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.close, size: 20),
+                                  padding: EdgeInsets.zero,
+                                  // Remove icon padding
+                                  constraints: BoxConstraints(),
+                                  // Shrink tap area
+                                  onPressed: () => Navigator.of(context).pop(),
+                                ),
+                              ],
+                            ),
 
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                              top: 10, bottom: 10, left: 10, right: 10), // tighter padding
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Header
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            const SizedBox(height: 5),
+                            // Smaller spacing
+
+                            // Warning Message
+                            const Text.rich(
+                              TextSpan(
                                 children: [
-                                  const Expanded(
-                                    child: Text(
-                                      'optimanage.devitsandbox.com Says',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold, fontSize: 14),
+                                  TextSpan(
+                                    text: 'Warning: ',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  IconButton(
-                                    icon: const Icon(Icons.close, size: 20),
-                                    padding: EdgeInsets.zero, // Remove icon padding
-                                    constraints: BoxConstraints(), // Shrink tap area
-                                    onPressed: () => Navigator.of(context).pop(),
+                                  TextSpan(
+                                    text:
+                                        'Kindly please add task carefully. If you haven\'t mapped with a Module then contact your team lead for the same. Task added in No Task will not be considered for your performance evaluation.',
+                                    style: TextStyle(
+                                      color: Colors.black87,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ],
                               ),
+                            ),
 
-                              const SizedBox(height: 5), // Smaller spacing
+                            const SizedBox(height: 6),
 
-                              // Warning Message
-                              const Text.rich(
-                                TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: 'Warning: ',
-                                      style: TextStyle(
-                                        color: Colors.red,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text:
-                                      'Kindly please add task carefully. If you haven\'t mapped with a Module then contact your team lead for the same. Task added in {No Task} will not be considered for your performance evaluation.',
-                                      style: TextStyle(
-                                        color: Colors.black87,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              const SizedBox(height: 6),
-
-                              // OK Button aligned right
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: ElevatedButton(
-                                  onPressed: () async {
-                                    Navigator.pop(context);
-                                    int userId = await PrefUtil.getPrefUserId() ?? 0;
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => ChangeNotifierProvider(
-                                          create: (_) => NoTaskAssignProvider(),
-                                          child: NoTaskAssignScreen(
-                                            selectedDate: DateTime.now(),
-                                            userId: userId,
-                                          ),
+                            // OK Button aligned right
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: ElevatedButton(
+                                onPressed: () async {
+                                  Navigator.pop(context);
+                                  int userId =
+                                      await PrefUtil.getPrefUserId() ?? 0;
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => ChangeNotifierProvider(
+                                        create: (_) => NoTaskAssignProvider(),
+                                        child: NoTaskAssignScreen(
+                                          selectedDate: DateTime.now(),
+                                          userId: userId,
                                         ),
                                       ),
-                                    );
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color(0xFF25507C),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
                                     ),
-                                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                    minimumSize: Size(0, 0), // Important: Shrink button height
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Color(0xFF25507C),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
-                                  child: const Text(
-                                    'OK',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 8),
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                  minimumSize: Size(
+                                      0, 0), // Important: Shrink button height
+                                ),
+                                child: const Text(
+                                  'OK',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
+                    ),
 
-                      // visible: type == "Add Leave" ? true : false,
-                      Visibility(
-                          visible: type == "Add Leave" ? true : false,
-                          child: Form(
+                    // visible: type == "Add Leave" ? true : false,
+                    Visibility(
+                        visible: type == "Add Leave" ? true : false,
+                        child: Form(
                             key: _formKey,
                             //  child: SafeArea(
                             child: Column(
@@ -407,67 +416,80 @@ class timesheet_provider extends ChangeNotifier {
                                     status = !status;
                                     setState(() {});
                                   },
-                                  child:Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFF5F8FF),
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(color: const Color(0xFFDDDDDD), width: 2),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFF5F8FF),
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                          color: const Color(0xFFDDDDDD),
+                                          width: 2),
+                                    ),
+                                    child: Theme(
+                                      data: Theme.of(context).copyWith(
+                                        inputDecorationTheme:
+                                            const InputDecorationTheme(
+                                          border: InputBorder.none,
+                                          enabledBorder: InputBorder.none,
+                                          focusedBorder: InputBorder.none,
+                                          errorBorder: InputBorder.none,
+                                          disabledBorder: InputBorder.none,
+                                          contentPadding: EdgeInsets.zero,
+                                        ),
                                       ),
-                                      child: Theme(
-                                        data: Theme.of(context).copyWith(
-                                          inputDecorationTheme: const InputDecorationTheme(
-                                            border: InputBorder.none,
-                                            enabledBorder: InputBorder.none,
-                                            focusedBorder: InputBorder.none,
-                                            errorBorder: InputBorder.none,
-                                            disabledBorder: InputBorder.none,
-                                            contentPadding: EdgeInsets.zero,
-                                          ),
+                                      child: DropdownButtonFormField<String>(
+                                        value: leaveType,
+                                        items: leaveTypes.map((type) {
+                                          return DropdownMenuItem(
+                                            value: type,
+                                            child: Text(
+                                              type,
+                                              style: const TextStyle(
+                                                  color: Colors
+                                                      .grey), // optional: grey text
+                                            ),
+                                          );
+                                        }).toList(),
+                                        onChanged: null,
+                                        decoration: const InputDecoration(
+                                          border: InputBorder.none,
+                                          // labelText: "Leave Type",// removes border
+                                          enabledBorder: InputBorder.none,
+                                          // removes underline when not focused
+                                          focusedBorder: InputBorder.none,
+                                          // removes underline when focused
+                                          errorBorder: InputBorder.none,
+                                          // removes underline when error
+                                          disabledBorder: InputBorder.none,
+                                          // removes underline when disabled
+                                          contentPadding: EdgeInsets
+                                              .zero, // optional: remove extra padding
                                         ),
-                                  child:DropdownButtonFormField<String>(
-
-                                    value: leaveType,
-                                    items: leaveTypes.map((type) {
-                                      return DropdownMenuItem(
-                                        value: type,
-                                        child: Text(
-                                          type,
-                                          style: const TextStyle(color: Colors.grey), // optional: grey text
+                                        //dropdownColor: const Color(0xFFF5F8FF), // same bg as your field
+                                        elevation: 0,
+                                        icon: const Icon(
+                                          Icons.arrow_drop_down,
+                                          color: Colors
+                                              .grey, // optional: grey icon
                                         ),
-                                      );
-                                    }).toList(),
-                                    onChanged: null,
-                                    decoration: const InputDecoration(
-                                      border: InputBorder.none,
-                                     // labelText: "Leave Type",// removes border
-                                      enabledBorder: InputBorder.none, // removes underline when not focused
-                                      focusedBorder: InputBorder.none, // removes underline when focused
-                                      errorBorder: InputBorder.none,   // removes underline when error
-                                      disabledBorder: InputBorder.none, // removes underline when disabled
-                                      contentPadding: EdgeInsets.zero, // optional: remove extra padding
+                                        disabledHint: Text(
+                                          leaveType ?? "Leave Type",
+                                          style: const TextStyle(
+                                            fontFamily: 'Inter',
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500,
+                                            color: Color(0xFF444444),
+                                          ), // hint when disabled
+                                        ),
+                                      ),
                                     ),
-                                    //dropdownColor: const Color(0xFFF5F8FF), // same bg as your field
-                                    elevation: 0,
-                                    icon: const Icon(
-                                      Icons.arrow_drop_down,
-                                      color: Colors.grey, // optional: grey icon
-                                    ),
-                                    disabledHint: Text(
-                                      leaveType ?? "Leave Type",
-                                      style: const TextStyle(
-                                        fontFamily: 'Inter',
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color(0xFF444444),
-                                      ), // hint when disabled
-                                    ),
-                                  ),),
-
-                                ),),
+                                  ),
+                                ),
                                 if (status) // only show when opened
                                   Transform.translate(
-                                    offset: const Offset(0, -8), // 👈 shifts the whole list up by 8 pixels
+                                    offset: const Offset(0, -8),
+                                    // 👈 shifts the whole list up by 8 pixels
                                     child: Container(
                                       //color: const Color(0xFFF5F8FF),
                                       decoration: const BoxDecoration(
@@ -477,9 +499,15 @@ class timesheet_provider extends ChangeNotifier {
                                           bottomRight: Radius.circular(8),
                                         ),
                                         border: Border(
-                                          left: BorderSide(color: Color(0xFFDDDDDD), width: 2),
-                                          right: BorderSide(color: Color(0xFFDDDDDD), width: 2),
-                                          bottom: BorderSide(color: Color(0xFFDDDDDD), width: 2),
+                                          left: BorderSide(
+                                              color: Color(0xFFDDDDDD),
+                                              width: 2),
+                                          right: BorderSide(
+                                              color: Color(0xFFDDDDDD),
+                                              width: 2),
+                                          bottom: BorderSide(
+                                              color: Color(0xFFDDDDDD),
+                                              width: 2),
                                         ),
                                       ),
 
@@ -502,7 +530,6 @@ class timesheet_provider extends ChangeNotifier {
                                   ),
 
                                 const SizedBox(height: 16),
-
 
                                 if (leaveType == "Half Day" ||
                                     leaveType == "Early Going" ||
@@ -559,7 +586,8 @@ class timesheet_provider extends ChangeNotifier {
                                   ),
                                   if (leaveTypeError != null)
                                     Padding(
-                                      padding: const EdgeInsets.only(top: 6, left: 4),
+                                      padding: const EdgeInsets.only(
+                                          top: 6, left: 4),
                                       child: Text(
                                         leaveTypeError!,
                                         style: const TextStyle(
@@ -578,8 +606,10 @@ class timesheet_provider extends ChangeNotifier {
                                   autofocus: true,
                                   decoration: InputDecoration(
                                     //hintText: 'Description',
-                                    labelText: 'Description', // 👈 Label name at top-left inside border
-                                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                                    labelText: 'Description',
+                                    // 👈 Label name at top-left inside border
+                                    floatingLabelBehavior:
+                                        FloatingLabelBehavior.always,
                                     labelStyle: const TextStyle(
                                       color: Color(0xFF6E6A7C),
                                       fontWeight: FontWeight.w700,
@@ -602,8 +632,9 @@ class timesheet_provider extends ChangeNotifier {
                                     ),
                                   ),
                                   validator: (val) =>
-                                  (val == null || val.isEmpty) ? 'Please enter a description'
-                                      : null,
+                                      (val == null || val.isEmpty)
+                                          ? 'Please enter a description'
+                                          : null,
                                 ),
                                 const SizedBox(height: 20),
                                 Row(
@@ -620,7 +651,7 @@ class timesheet_provider extends ChangeNotifier {
                                             color: Color(0xFF25507C)),
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
-                                          BorderRadius.circular(12),
+                                              BorderRadius.circular(12),
                                         ),
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 24, vertical: 10),
@@ -637,28 +668,33 @@ class timesheet_provider extends ChangeNotifier {
                                     // Space between buttons
                                     ElevatedButton(
                                       onPressed: () async {
-                                        final startMinutes = startTime!.hour * 60 + startTime!.minute;
-                                        final endMinutes = endTime!.hour * 60 + endTime!.minute;
+                                        final startMinutes =
+                                            startTime!.hour * 60 +
+                                                startTime!.minute;
+                                        final endMinutes = endTime!.hour * 60 +
+                                            endTime!.minute;
                                         if (startMinutes >= endMinutes) {
                                           setState(() {
-                                            timeError = 'Start time must be before end time';
+                                            timeError =
+                                                'Start time must be before end time';
                                           });
                                           return;
                                         } else {
                                           setState(() {
                                             timeError = null;
-
                                           });
                                         }
-                                        if (leaveType == "Half Day" && !(leaveHours == 4 && leaveMinutes == 0)) {
+                                        if (leaveType == "Half Day" &&
+                                            !(leaveHours == 4 &&
+                                                leaveMinutes == 0)) {
                                           print("LH1-$leaveHours");
                                           print("LM1-$leaveMinutes");
                                           setState(() {
-                                            leaveTypeError = 'Half Day leave should be exactly 4 hours';
+                                            leaveTypeError =
+                                                'Half Day leave should be exactly 4 hours';
                                           });
                                           return;
-                                        }
-                                        else {
+                                        } else {
                                           print("LH2-$leaveHours");
                                           print("LM2-$leaveMinutes");
                                           setState(() {
@@ -667,9 +703,11 @@ class timesheet_provider extends ChangeNotifier {
                                         }
 
                                         if (_formKey.currentState!.validate()) {
-                                          debugPrint("❌ Form validation failed");
+                                          debugPrint(
+                                              "❌ Form validation failed");
 
-                                          Navigator.pop(navigatorKey.currentState!.context);
+                                          Navigator.pop(navigatorKey
+                                              .currentState!.context);
                                           leaveDate = date;
                                           try {
                                             final start = DateTime(
@@ -686,7 +724,7 @@ class timesheet_provider extends ChangeNotifier {
                                                 endTime!.minute);
 
                                             final duration =
-                                            end.difference(start);
+                                                end.difference(start);
                                             leaveHours = duration.inHours;
                                             leaveMinutes =
                                                 duration.inMinutes % 60;
@@ -694,17 +732,17 @@ class timesheet_provider extends ChangeNotifier {
                                                 duration.inMinutes;
 
                                             final formattedDate =
-                                            formatDate(leaveDate!);
+                                                formatDate(leaveDate!);
                                             final formattedStart =
-                                            formatTimeOfDay(startTime!);
+                                                formatTimeOfDay(startTime!);
                                             final formattedEnd =
-                                            formatTimeOfDay(endTime!);
+                                                formatTimeOfDay(endTime!);
                                             final remarks =
-                                            remarksController.text.trim();
+                                                remarksController.text.trim();
 
-                                            final userId =
-                                                await PrefUtil.getPrefUserId() ??
-                                                    0;
+                                            final userId = await PrefUtil
+                                                    .getPrefUserId() ??
+                                                0;
 
                                             await submitLeaveRequest(
                                               context: context,
@@ -718,9 +756,7 @@ class timesheet_provider extends ChangeNotifier {
                                               remarks: remarks,
                                               userId: userId,
                                             );
-                                            setState(() {
-
-                                            });
+                                            setState(() {});
                                             // await fetchLeaveSummary(
                                             //     focusedDay, userId);
                                             // await fetchTimesheetData(
@@ -734,17 +770,17 @@ class timesheet_provider extends ChangeNotifier {
                                             resetLeaveForm();
                                             //Navigator.pop(navigatorKey.currentState!.context);
                                           } catch (e) {
-                                            debugPrint("❌ Save button error: $e");
+                                            debugPrint(
+                                                "❌ Save button error: $e");
                                           }
                                         }
-
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Color(0xFF25507C),
                                         // Save button color
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
-                                          BorderRadius.circular(12),
+                                              BorderRadius.circular(12),
                                         ),
                                         padding: EdgeInsets.symmetric(
                                             horizontal: 24, vertical: 10),
@@ -763,51 +799,50 @@ class timesheet_provider extends ChangeNotifier {
                             )
                             // ),
 
-                          )
+                            )
                         // )
                         // )
-                      ),
-                    ],
-                  )
-                ],);
+                        ),
+                  ],
+                )
+              ],
+            );
 
-
-                //  }
-                // );
-              }),
+            //  }
+            // );
+          }),
         ));
       },
     );
   }
-    void updateLeaveDuration(StateSetter setState) {
-      if (startTime != null && endTime != null && leaveDate != null) {
-        final start = DateTime(
-          leaveDate!.year,
-          leaveDate!.month,
-          leaveDate!.day,
-          startTime!.hour,
-          startTime!.minute,
-        );
-        final end = DateTime(
-          leaveDate!.year,
-          leaveDate!.month,
-          leaveDate!.day,
-          endTime!.hour,
-          endTime!.minute,
-        );
 
-        final duration = end.difference(start);
-        setState(() {
-          leaveHours = duration.inHours;
-          leaveMinutes = duration.inMinutes % 60;
-        });
-      }
+  void updateLeaveDuration(StateSetter setState) {
+    if (startTime != null && endTime != null && leaveDate != null) {
+      final start = DateTime(
+        leaveDate!.year,
+        leaveDate!.month,
+        leaveDate!.day,
+        startTime!.hour,
+        startTime!.minute,
+      );
+      final end = DateTime(
+        leaveDate!.year,
+        leaveDate!.month,
+        leaveDate!.day,
+        endTime!.hour,
+        endTime!.minute,
+      );
 
+      final duration = end.difference(start);
+      setState(() {
+        leaveHours = duration.inHours;
+        leaveMinutes = duration.inMinutes % 60;
+      });
+    }
   }
 
   void showtaskSummaryBottomSheet(BuildContext context, String type,
-      DateTime date, double getHeight,
-      List<TaskSummaryModalPopup> summaries) {
+      DateTime date, double getHeight, List<TaskSummaryModalPopup> summaries) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -815,10 +850,7 @@ class timesheet_provider extends ChangeNotifier {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        final screenHeight = MediaQuery
-            .of(context)
-            .size
-            .height;
+        final screenHeight = MediaQuery.of(context).size.height;
 
         return Container(
           height: 500,
@@ -850,124 +882,123 @@ class timesheet_provider extends ChangeNotifier {
                     ),
                     const SizedBox(height: 10),
                     ...summaries
-                        .map((task) =>
-                        Container(
-                          width: double.infinity,
-                          margin: const EdgeInsets.only(bottom: 12),
-                          padding: const EdgeInsets.all(14),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF5F9FE),
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black12,
-                                blurRadius: 6,
-                                offset: Offset(0, 2),
+                        .map((task) => Container(
+                              width: double.infinity,
+                              margin: const EdgeInsets.only(bottom: 12),
+                              padding: const EdgeInsets.all(14),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF5F9FE),
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    blurRadius: 6,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                task.ProjectName,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 16,
-                                ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    task.ProjectName,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  _buildRow("Timesheet Date", task.EntryDate),
+                                  const Divider(
+                                    thickness: 1,
+                                    height: 1,
+                                    color: Color(0xFFE2E2E2),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  _buildRow("Start Time", task.StartTime),
+                                  const Divider(
+                                    thickness: 1,
+                                    height: 1,
+                                    color: Color(0xFFE2E2E2),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  _buildRow("End Time", task.EndTime),
+                                  const Divider(
+                                    thickness: 1,
+                                    height: 1,
+                                    color: Color(0xFFE2E2E2),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  _buildRow("Task Time", task.TaskTime),
+                                  const Divider(
+                                    thickness: 1,
+                                    height: 1,
+                                    color: Color(0xFFE2E2E2),
+                                  ),
+                                  _buildRow(
+                                    "Status",
+                                    task.strTaskStauts,
+                                    valueColor:
+                                        task.strTaskStauts.toLowerCase() ==
+                                                "completed"
+                                            ? Colors.green
+                                            : Colors.black,
+                                  ),
+                                  const Divider(
+                                    thickness: 1,
+                                    height: 1,
+                                    color: Color(0xFFE2E2E2),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  _buildRow("Entry Date/Time",
+                                      "${task.CreatedDate}, ${task.CreatedTime}"),
+                                  const Divider(
+                                    thickness: 1,
+                                    height: 1,
+                                    color: Color(0xFFE2E2E2),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  const Text(
+                                    "Task Description",
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    task.TaskDescription,
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  const Divider(
+                                    thickness: 1,
+                                    height: 1,
+                                    color: Color(0xFFE2E2E2),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  const Text(
+                                    "Subtask Description",
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    task.SubTaskDescription,
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(height: 10),
-                              _buildRow("Timesheet Date", task.EntryDate),
-                              const Divider(
-                                thickness: 1,
-                                height: 1,
-                                color: Color(0xFFE2E2E2),
-                              ),
-                              const SizedBox(height: 10),
-                              _buildRow("Start Time", task.StartTime),
-                              const Divider(
-                                thickness: 1,
-                                height: 1,
-                                color: Color(0xFFE2E2E2),
-                              ),
-                              const SizedBox(height: 10),
-                              _buildRow("End Time", task.EndTime),
-                              const Divider(
-                                thickness: 1,
-                                height: 1,
-                                color: Color(0xFFE2E2E2),
-                              ),
-                              const SizedBox(height: 10),
-                              _buildRow("Task Time", task.TaskTime),
-                              const Divider(
-                                thickness: 1,
-                                height: 1,
-                                color: Color(0xFFE2E2E2),
-                              ),
-                              _buildRow(
-                                "Status",
-                                task.strTaskStauts,
-                                valueColor:
-                                task.strTaskStauts.toLowerCase() ==
-                                    "completed"
-                                    ? Colors.green
-                                    : Colors.black,
-                              ),
-                              const Divider(
-                                thickness: 1,
-                                height: 1,
-                                color: Color(0xFFE2E2E2),
-                              ),
-                              const SizedBox(height: 8),
-                              _buildRow("Entry Date/Time",
-                                  "${task.CreatedDate}, ${task.CreatedTime}"),
-                              const Divider(
-                                thickness: 1,
-                                height: 1,
-                                color: Color(0xFFE2E2E2),
-                              ),
-                              const SizedBox(height: 8),
-                              const Text(
-                                "Task Description",
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                task.TaskDescription,
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                              const Divider(
-                                thickness: 1,
-                                height: 1,
-                                color: Color(0xFFE2E2E2),
-                              ),
-                              const SizedBox(height: 8),
-                              const Text(
-                                "Subtask Description",
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                task.SubTaskDescription,
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ))
+                            ))
                         .toList()
                   ],
                 ),
@@ -1035,9 +1066,7 @@ class timesheet_provider extends ChangeNotifier {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return Padding(
-              padding: MediaQuery
-                  .of(context)
-                  .viewInsets,
+              padding: MediaQuery.of(context).viewInsets,
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
                 child: Form(
@@ -1070,9 +1099,7 @@ class timesheet_provider extends ChangeNotifier {
                         controller: remarksController,
                         maxLines: 3,
                         validator: (value) {
-                          if (value == null || value
-                              .trim()
-                              .isEmpty) {
+                          if (value == null || value.trim().isEmpty) {
                             return "Please add description";
                           }
                           return null;
@@ -1115,8 +1142,7 @@ class timesheet_provider extends ChangeNotifier {
                               FocusScope.of(context).unfocus();
                               if (_formKey.currentState?.validate() ?? false) {
                                 final userId =
-                                    await PrefUtil.getPrefUserId() ??
-                                        0;
+                                    await PrefUtil.getPrefUserId() ?? 0;
                                 Navigator.pop(context);
                                 await cancelLeaveRequest(
                                   context: context,
@@ -1155,7 +1181,6 @@ class timesheet_provider extends ChangeNotifier {
     );
   }
 
-
   Future<void> cancelLeaveRequest({
     required BuildContext context,
     required int leaveId,
@@ -1172,7 +1197,7 @@ class timesheet_provider extends ChangeNotifier {
 
       HttpService http = HttpService(Constants.baseurl, context);
       final response =
-      await http.postRequest("/api/Timesheet/AddLeaveCancellation", body);
+          await http.postRequest("/api/Timesheet/AddLeaveCancellation", body);
 
       print("✅ Cancel Leave Response: ${response.data}");
 
@@ -1208,8 +1233,8 @@ class timesheet_provider extends ChangeNotifier {
     }
   }
 
-  Future<void> fetchTimesheetData(BuildContext context, int month, int year,
-      int userId) async {
+  Future<void> fetchTimesheetData(
+      BuildContext context, int month, int year, int userId) async {
     try {
       HttpService http = HttpService(Constants.baseurl, context);
 
@@ -1243,7 +1268,7 @@ class timesheet_provider extends ChangeNotifier {
           if (employeeData.containsKey(dayKey) &&
               employeeData.containsKey(dateKey)) {
             String colorHex =
-            employeeData[dayKey].toString().replaceAll('#', '');
+                employeeData[dayKey].toString().replaceAll('#', '');
             String dateStr = employeeData[dateKey]
                 .toString()
                 .replaceAll('[', '')
@@ -1282,8 +1307,7 @@ class timesheet_provider extends ChangeNotifier {
   void _showSnackBarOnce(String message) {
     if (!_isSnackBarVisible) {
       _isSnackBarVisible = true;
-      ScaffoldMessenger
-          .of(navigatorKey.currentState!.context)
+      ScaffoldMessenger.of(navigatorKey.currentState!.context)
           .showSnackBar(SnackBar(content: Text(message)))
           .closed
           .then((_) => _isSnackBarVisible = false); // reset after it disappears
@@ -1294,7 +1318,9 @@ class timesheet_provider extends ChangeNotifier {
     leaveSummaries = [];
     try {
       HttpService http = HttpService(
-        Constants.baseurl, navigatorKey.currentState!.context,);
+        Constants.baseurl,
+        navigatorKey.currentState!.context,
+      );
 
       final body = {
         "LeaveMonth": date.month,
@@ -1319,10 +1345,7 @@ class timesheet_provider extends ChangeNotifier {
         } else {
           leaveSummaries = [];
         }
-      }
-      else {
-
-      }
+      } else {}
       notifyListeners();
     } catch (e) {
       debugPrint("❌ Error fetching leave summary: $e");
@@ -1348,7 +1371,6 @@ class timesheet_provider extends ChangeNotifier {
       // final start = DateTime.parse("$startTime");
       // final end = DateTime.parse("$endTime");
       // final difference = end.difference(start).inMinutes;
-
 
       // ✅ Check condition for Half Day leave
       // if (leaveType == "Half Day" && leaveHours != 4 && leaveMinutes != 0) {
@@ -1385,8 +1407,8 @@ class timesheet_provider extends ChangeNotifier {
       print("📤 Request body: $body");
 
       HttpService http = HttpService(Constants.baseurl, context);
-      final response = await http.postRequest(
-          "/api/Timesheet/AddResourceLeave", body);
+      final response =
+          await http.postRequest("/api/Timesheet/AddResourceLeave", body);
       print("✅ Response: ${response.data}");
 
       //final success = response.data['State'];
@@ -1399,9 +1421,8 @@ class timesheet_provider extends ChangeNotifier {
         print("1111111111111");
 
         // Refresh calendar + timesheet data
-        await fetchTimesheetData(
-            navigatorKey.currentState!.context, focusedDay.month,
-            focusedDay.year, userId);
+        await fetchTimesheetData(navigatorKey.currentState!.context,
+            focusedDay.month, focusedDay.year, userId);
         // Close modal
       } else {
         print("2222222222222");
@@ -1418,8 +1439,8 @@ class timesheet_provider extends ChangeNotifier {
     }
   }
 
-  Future<void> fetchTaskSummary(DateTime date, int userId,
-      BuildContext context) async {
+  Future<void> fetchTaskSummary(
+      DateTime date, int userId, BuildContext context) async {
     taskSummaries.clear();
     try {
       HttpService http = HttpService(Constants.baseurl, context);
@@ -1439,7 +1460,6 @@ class timesheet_provider extends ChangeNotifier {
         body,
       );
 
-
       if (response.data['State'].toString() == "1" &&
           response.data['Status'].toString() == "true") {
         final resultString = response.data['Result'];
@@ -1451,7 +1471,6 @@ class timesheet_provider extends ChangeNotifier {
             .toList();
 
         if (taskSummaries.isNotEmpty) {
-
           showtaskSummaryBottomSheet(
             context,
             "Add Leave",
@@ -1480,6 +1499,7 @@ class timesheet_provider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
   Future<void> selectTime(
       BuildContext context, bool isStart, StateSetter setState) async {
     final picked = await showTimePicker(
@@ -1502,21 +1522,20 @@ class timesheet_provider extends ChangeNotifier {
           final diff = endMinutes - startMinutes;
 
           // ✅ update both string and int values
-       leaveHours = diff ~/ 60;
-       leaveMinutes = diff % 60;
+          leaveHours = diff ~/ 60;
+          leaveMinutes = diff % 60;
 
-       leaveHour = leaveHours.toString();
-       leaveMinute = leaveMinutes.toString();
+          leaveHour = leaveHours.toString();
+          leaveMinute = leaveMinutes.toString();
         } else {
           leaveHours = 0;
           leaveMinutes = 0;
-           leaveHour = "0";
+          leaveHour = "0";
           leaveMinute = "0";
         }
       });
     }
   }
-
 
   Widget _timeInfo(String label, String value) {
     return Wrap(
@@ -1566,4 +1585,3 @@ class timesheet_provider extends ChangeNotifier {
     );
   }
 }
-
