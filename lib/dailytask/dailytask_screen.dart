@@ -1,6 +1,7 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:optimanage/dailytask/TaskStatusModel.dart';
 import 'package:provider/provider.dart';
 import '../assignedtask/AssignedTaskModel.dart';
 import 'dailytask_provider.dart';
@@ -42,7 +43,8 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
     projectId = widget.task.projectId;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<DailyTaskProvider>(context, listen: false).fetchTaskStatusList(context);
+      Provider.of<DailyTaskProvider>(context, listen: false)
+          .fetchTaskStatusList(context);
     });
   }
 
@@ -73,8 +75,10 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
     if (_startTime == null || _endTime == null) return;
 
     final now = DateTime.now();
-    final start = DateTime(now.year, now.month, now.day, _startTime!.hour, _startTime!.minute);
-    final end = DateTime(now.year, now.month, now.day, _endTime!.hour, _endTime!.minute);
+    final start = DateTime(
+        now.year, now.month, now.day, _startTime!.hour, _startTime!.minute);
+    final end = DateTime(
+        now.year, now.month, now.day, _endTime!.hour, _endTime!.minute);
 
     Duration duration = end.difference(start);
     if (duration.isNegative) duration += Duration(days: 1);
@@ -94,7 +98,7 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
 
   @override
   Widget build(BuildContext context) {
-   // print("📄 DailyTaskScreen -> TaskIssueID: ${task.taskIssueID}");
+    // print("📄 DailyTaskScreen -> TaskIssueID: ${task.taskIssueID}");
     return Scaffold(
       resizeToAvoidBottomInset: true, // ✅ Important for keyboard push
       backgroundColor: Colors.white,
@@ -126,19 +130,16 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildTextField("PROJECT NAME", value: widget.task.projectName),
+                _buildTextField("Project Name", value: widget.task.projectName),
                 const SizedBox(height: 12),
-
                 _textInput(
                   hint: 'Daily Task Details',
                   controller: taskDetailsController,
                   maxLines: 3,
                 ),
                 const SizedBox(height: 12),
-
                 _dropdownInput(),
-                const SizedBox(height: 12),
-
+                const SizedBox(height: 18),
                 Row(
                   children: [
                     _timePickerField(
@@ -165,7 +166,6 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
                   ],
                 ),
                 const SizedBox(height: 12),
-
                 _textInput(
                   hint: 'Task Hour',
                   controller: taskHourController,
@@ -173,7 +173,6 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
                   readOnly: true,
                 ),
                 const SizedBox(height: 8),
-
                 _textInput(
                   hint: 'Task Minute',
                   controller: taskMinuteController,
@@ -181,7 +180,6 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
                   readOnly: true,
                 ),
                 const SizedBox(height: 20),
-
                 SizedBox(
                   width: double.infinity,
                   height: 48,
@@ -209,7 +207,6 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
         ),
       ),
     );
-
   }
 
   Widget _buildTextField(String hint, {String? value}) {
@@ -217,56 +214,62 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
       readOnly: true,
       controller: TextEditingController(text: value),
       decoration: InputDecoration(
-        hintText: hint,
-        hintStyle: const TextStyle(color: Color(0xFF6E6A7C)),
+        labelText: hint,
+        // 👈 Label name at top-left inside border
+        labelStyle: const TextStyle(
+          color: Color(0xFF6E6A7C),
+          fontWeight: FontWeight.w700,
+          fontSize: 18,
+        ),
+        // hintText: hint,
+        // hintStyle: const TextStyle(color: Color(0xFF6E6A7C)),
         filled: true,
         fillColor: const Color(0xFFF5F9FE),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
     );
   }
 
-
-
-  Widget _buildDropdown() {
-    final provider = Provider.of<DailyTaskProvider>(context);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F9FE),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          isExpanded: true,
-          value: _selectedStatus,
-          hint: const Text(
-            "Daily Task Status",
-            style: TextStyle(
-              color: Color(0xFF6E6A7C),
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          icon: const Icon(
-            Icons.arrow_drop_down,
-            size: 30,
-            color: Colors.black,
-          ),
-          onChanged: (String? newValue) {
-            setState(() {
-              _selectedStatus = newValue;
-            });
-          },
-          items: provider.statusList,
-        ),
-      ),
-    );
-  }
+  // Widget _buildDropdown() {
+  //   final provider = Provider.of<DailyTaskProvider>(context);
+  //
+  //   return Container(
+  //     padding: const EdgeInsets.symmetric(horizontal: 16),
+  //     decoration: BoxDecoration(
+  //       color: const Color(0xFFF5F9FE),
+  //       borderRadius: BorderRadius.circular(12),
+  //     ),
+  //     child: DropdownButtonHideUnderline(
+  //       child: DropdownButton<String>(
+  //         isExpanded: true,
+  //         value: _selectedStatus,
+  //         hint: const Text(
+  //           "Daily Task Status",
+  //           style: TextStyle(
+  //             color: Color(0xFF6E6A7C),
+  //             fontWeight: FontWeight.w500,
+  //           ),
+  //         ),
+  //         icon: const Icon(
+  //           Icons.arrow_drop_down,
+  //           size: 30,
+  //           color: Colors.black,
+  //         ),
+  //         onChanged: (String? newValue) {
+  //           setState(() {
+  //             _selectedStatus = newValue;
+  //           });
+  //         },
+  //         items: provider.statusList,
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _textInput({
     required String hint,
@@ -285,15 +288,23 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
         readOnly: readOnly,
         validator: isRequired
             ? (value) {
-          if (value == null || value.trim().isEmpty) {
-            return 'This field is required';
-          }
-          return null;
-        }
+                if (value == null || value.trim().isEmpty) {
+                  return 'This field is required';
+                }
+                return null;
+              }
             : null,
         decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: TextStyle(color: Color(0xFF6E6A7C), fontWeight: FontWeight.w500),
+          labelText: hint,
+          // 👈 Label name at top-left inside border
+          floatingLabelBehavior: FloatingLabelBehavior.always,
+          labelStyle: const TextStyle(
+            color: Color(0xFF6E6A7C),
+            fontWeight: FontWeight.w700,
+            fontSize: 18,
+          ),
+          // hintText: hint,
+          // hintStyle: TextStyle(color: Color(0xFF6E6A7C), fontWeight: FontWeight.w500),
           filled: true,
           fillColor: Color(0xFFF5F8FF),
           contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -308,14 +319,14 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
   }
 
   Widget _dropdownInput() {
-
     final provider = Provider.of<DailyTaskProvider>(context);
-    print("status list----->${provider.statusList}");
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         color: const Color(0xFFF5F8FF),
         borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFFDDDDDD), width: 2),
       ),
       child: Theme(
         data: Theme.of(context).copyWith(
@@ -328,22 +339,21 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
             contentPadding: EdgeInsets.zero,
           ),
         ),
-        child: DropdownSearch<String>(
-          selectedItem: _selectedStatus,
-          items: (filter, infiniteScrollProps) =>
-              provider.statusList.map((e) {
-                final value = e.value ?? '';
-                final label = (e.child is Text)
-                    ? (e.child as Text).data ?? value
-                    : value;
-                return label;
-              }).toList(),
+        child: DropdownSearch<TaskStatusModel>(
+          selectedItem: provider.statusList.firstWhere(
+            (e) => e.id.toString() == _selectedStatus,
+            orElse: () => provider.statusList.isNotEmpty
+                ? provider.statusList.first
+                : TaskStatusModel(id: 0, text: ""),
+          ),
+          compareFn: (TaskStatusModel a, TaskStatusModel b) => a.id == b.id,
+          items: (filter, _) => provider.statusList,
           popupProps: PopupProps.menu(
             showSearchBox: true,
             fit: FlexFit.loose,
             constraints: const BoxConstraints(maxHeight: 250),
             menuProps: const MenuProps(
-              margin: EdgeInsets.symmetric(horizontal: -12, vertical: -4),
+              margin: EdgeInsets.symmetric(horizontal: -14, vertical: -4),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(12)),
               ),
@@ -352,59 +362,51 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
             ),
             searchFieldProps: TextFieldProps(
               style: const TextStyle(
-                  color: Color(0xFF555555),
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14,
-                  fontFamily: 'Inter'),
-              decoration: InputDecoration(
+                color: Color(0xFF555555),
+                fontWeight: FontWeight.w500,
+                fontSize: 14,
+                fontFamily: 'Inter',
+              ),
+              decoration: const InputDecoration(
                 hintText: "Search",
-                hintStyle: const TextStyle(
+                hintStyle: TextStyle(
                   fontFamily: 'Inter',
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: Color(0xFF555555),
                 ),
                 isDense: true,
-                suffixIcon: const Icon(Icons.search, size: 20),
+                suffixIcon: Icon(Icons.search, size: 20),
                 suffixIconConstraints:
-                const BoxConstraints(minWidth: 40, minHeight: 24),
+                    BoxConstraints(minWidth: 40, minHeight: 24),
                 contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-                border: const UnderlineInputBorder(
+                    EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                border: UnderlineInputBorder(
                   borderSide: BorderSide(color: Color(0xFFDDDDDD)),
                 ),
-                enabledBorder: const UnderlineInputBorder(
+                enabledBorder: UnderlineInputBorder(
                   borderSide: BorderSide(color: Color(0xFFDDDDDD)),
                 ),
-                focusedBorder: const UnderlineInputBorder(
+                focusedBorder: UnderlineInputBorder(
                   borderSide: BorderSide(color: Color(0xFFDDDDDD), width: 1.2),
                 ),
               ),
             ),
-            listViewProps: const ListViewProps(
-              padding: EdgeInsets.zero,
-            ),
-            itemBuilder: (context, item, isSelected, isFocused) {
-              final items = provider.statusList.map((e) {
-                final value = e.value ?? '';
-                final label = (e.child is Text)
-                    ? (e.child as Text).data ?? value
-                    : value;
-                return label;
-              }).toList();
-
-              final index = items.indexOf(item);
-
+            listViewProps: const ListViewProps(padding: EdgeInsets.zero),
+            itemBuilder:
+                (context, TaskStatusModel item, isSelected, isFocused) {
+              final index = provider.statusList.indexOf(item);
               return Column(
                 children: [
                   Padding(
                     padding:
-                    const EdgeInsets.symmetric(vertical: 8, horizontal: 23),
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 23),
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        item.toString(),
+                        item.text,
                         style: TextStyle(
+                          fontFamily: 'Inter',
                           fontSize: 14,
                           color: isSelected
                               ? Colors.blue
@@ -414,7 +416,7 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
                       ),
                     ),
                   ),
-                  if (index != items.length - 1)
+                  if (index != provider.statusList.length - 1)
                     const Divider(
                       height: 1,
                       thickness: 0.8,
@@ -423,63 +425,90 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
                 ],
               );
             },
+            //onDismissed: () => setState(() => _isProjectPopupOpen = false),
+            containerBuilder: (ctx, popupWidget) {
+              // WidgetsBinding.instance.addPostFrameCallback((_) {
+              //   if (!_isProjectPopupOpen) {
+              //     setState(() => _isProjectPopupOpen = true);
+              //   }
+              // });
+              return Material(
+                color: Colors.transparent,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F8FF),
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(8),
+                      bottomRight: Radius.circular(8),
+                    ),
+                    border: const Border(
+                      left: BorderSide(color: Color(0xFFDDDDDD), width: 2),
+                      right: BorderSide(color: Color(0xFFDDDDDD), width: 2),
+                      bottom: BorderSide(color: Color(0xFFDDDDDD), width: 2),
+                      top: BorderSide.none, // 👈 no top border
+                    ),
+                    //border: Border.all(color: const Color(0xFFDDDDDD), width: 2), // 👈 same border
+                    // borderTop: BorderSide.none, // 👈 avoid double border with top box
+                  ),
+                  child: popupWidget,
+                ),
+              );
+            },
           ),
-          dropdownBuilder: (context, selectedItem) {
+          dropdownBuilder: (context, TaskStatusModel? selectedItem) {
             return Container(
               decoration: BoxDecoration(
                 color: const Color(0xFFF5F8FF),
                 borderRadius: BorderRadius.circular(12),
               ),
               padding:
-              const EdgeInsets.only(left: 0, top: 4, bottom: 14, right: 12),
+                  const EdgeInsets.only(left: 0, top: 4, bottom: 14, right: 12),
               child: Text(
-                selectedItem ?? "Daily Task Status",
+                selectedItem?.text ?? "Daily Task Status",
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  color: selectedItem == null ? Colors.grey : Colors.black,
+                  color:
+                      selectedItem == null ? Color(0xFF6E6A7C) : Colors.black,
                 ),
               ),
             );
           },
-          onChanged: (val) {
-            if (val != null) {
-              setState(() => _selectedStatus = val);
+          onChanged: (TaskStatusModel? status) {
+            if (status != null) {
+              setState(() =>
+                  _selectedStatus = status.id.toString()); // ✅ store Value
             }
           },
           validator: (value) =>
-          value == null ? 'Please select Daily Task Status' : null,
+              value == null ? 'Please select Daily Task Status' : null,
         ),
       ),
     );
   }
 
-
-
-
-  Widget _dropdownInput1() {
-    final provider = Provider.of<DailyTaskProvider>(context);
-
-    return DropdownButtonFormField<String>(
-      value: _selectedStatus,
-      validator: (value) => value == null ? 'Please select Daily Task Status' : null,
-      onChanged: (val) => setState(() => _selectedStatus = val),
-      items: provider.statusList,
-      decoration: InputDecoration(
-        hintText: "Daily Task Status",
-        hintStyle: TextStyle(color: Color(0xFF6E6A7C), fontWeight: FontWeight.w500),
-        filled: true,
-        fillColor: Color(0xFFF5F8FF),
-        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-        errorStyle: TextStyle(color: Colors.red.shade700, fontSize: 13),
-      ),
-    );
-  }
-
+  // Widget _dropdownInput1() {
+  //   final provider = Provider.of<DailyTaskProvider>(context);
+  //
+  //   return DropdownButtonFormField<String>(
+  //     value: _selectedStatus,
+  //     validator: (value) => value == null ? 'Please select Daily Task Status' : null,
+  //     onChanged: (val) => setState(() => _selectedStatus = val),
+  //     items: provider.statusList,
+  //     decoration: InputDecoration(
+  //       hintText: "Daily Task Status",
+  //       hintStyle: TextStyle(color: Color(0xFF6E6A7C), fontWeight: FontWeight.w500),
+  //       filled: true,
+  //       fillColor: Color(0xFFF5F8FF),
+  //       contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+  //       border: OutlineInputBorder(
+  //         borderRadius: BorderRadius.circular(12),
+  //         borderSide: BorderSide.none,
+  //       ),
+  //       errorStyle: TextStyle(color: Colors.red.shade700, fontSize: 13),
+  //     ),
+  //   );
+  // }
 
   Widget _timePickerField({
     required String label,
@@ -509,19 +538,50 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
                     state.didChange(picked);
                   }
                 },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: Color(0xFFF5F8FF),
+                // child: Container(
+                //   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                //   decoration: BoxDecoration(
+                //     borderRadius: BorderRadius.circular(12),
+                //     color: Color(0xFFF5F8FF),
+                //   ),
+                //   child: Row(
+                //     children: [
+                //       Icon(Icons.access_time, size: 20),
+                //       SizedBox(width: 8),
+                //       Text(
+                //         time != null ? time.format(context) : 'Select $label',
+                //         style: TextStyle(fontSize: 14),
+                //       ),
+                //     ],
+                //   ),
+                // ),
+
+                child: InputDecorator(
+                  decoration: InputDecoration(
+                    labelText: label,
+                    // 👈 label now sits on border
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                    labelStyle: const TextStyle(
+                      color: Color(0xFF6E6A7C),
+                      fontWeight: FontWeight.w700,
+                      fontSize: 18,
+                    ),
+                    filled: true,
+                    fillColor: const Color(0xFFF5F8FF),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 14),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.access_time, size: 20),
-                      SizedBox(width: 8),
+                      const Icon(Icons.access_time, size: 20),
+                      const SizedBox(width: 8),
                       Text(
                         time != null ? time.format(context) : 'Select $label',
-                        style: TextStyle(fontSize: 14),
+                        style: const TextStyle(fontSize: 14),
                       ),
                     ],
                   ),
@@ -543,19 +603,25 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
   }
 
   Future<void> _submitForm() async {
-    if (!_formKey.currentState!.validate() || _startTime == null || _endTime == null) {
+    if (!_formKey.currentState!.validate() ||
+        _startTime == null ||
+        _endTime == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all required fields including time')),
+        const SnackBar(
+            content: Text('Please fill all required fields including time')),
       );
       return;
     }
 
     final now = DateTime.now();
-    final startDateTime = DateTime(now.year, now.month, now.day, _startTime!.hour, _startTime!.minute);
-    final endDateTime = DateTime(now.year, now.month, now.day, _endTime!.hour, _endTime!.minute);
+    final startDateTime = DateTime(
+        now.year, now.month, now.day, _startTime!.hour, _startTime!.minute);
+    final endDateTime = DateTime(
+        now.year, now.month, now.day, _endTime!.hour, _endTime!.minute);
 
     // 🔐 Same validation as R&D screen
-    if (endDateTime.isBefore(startDateTime) || endDateTime.isAtSameMomentAs(startDateTime)) {
+    if (endDateTime.isBefore(startDateTime) ||
+        endDateTime.isAtSameMomentAs(startDateTime)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('End time must be after start time')),
       );
@@ -569,32 +635,40 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
     final taskMinute = int.tryParse(taskMinuteController.text.trim()) ?? 0;
     final taskStatus = int.tryParse(_selectedStatus ?? '0') ?? 0;
 
-    final entryDate = "${now.month.toString().padLeft(2, '0')}/${now.day.toString().padLeft(2, '0')}/${now.year}";
+    final entryDate =
+        "${now.month.toString().padLeft(2, '0')}/${now.day.toString().padLeft(2, '0')}/${now.year}";
     final duration = (taskHour * 60) + taskMinute;
 
-    final String startStr = _startTime!.hour.toString().padLeft(2, '0') + ':' + _startTime!.minute.toString().padLeft(2, '0');
-    final String endStr = _endTime!.hour.toString().padLeft(2, '0') + ':' + _endTime!.minute.toString().padLeft(2, '0');
+    final String startStr = _startTime!.hour.toString().padLeft(2, '0') +
+        ':' +
+        _startTime!.minute.toString().padLeft(2, '0');
+    final String endStr = _endTime!.hour.toString().padLeft(2, '0') +
+        ':' +
+        _endTime!.minute.toString().padLeft(2, '0');
 
     final formattedDate = DateFormat('yyyy-MM-dd').format(widget.selectedDate);
 
     await provider.submitDailyTask(
-      context: context,
-      taskId: widget.task.taskIssueID ?? 0,
-      description: description,
-      startTime: startStr,
-      endTime: endStr,
-      taskHour: taskHour,
-      taskMinutes: taskMinute,
-      taskStatus: taskStatus,
-      projectId: projectId,
-      moduleId: 0, // Replace with actual moduleId if needed
-      userId: widget.userId,  // Replace with actual userId
-      selectedDate: formattedDate
-    );
+        context: context,
+        taskId: widget.task.taskIssueID ?? 0,
+        description: description,
+        startTime: startStr,
+        endTime: endStr,
+        taskHour: taskHour,
+        taskMinutes: taskMinute,
+        taskStatus: taskStatus,
+        projectId: projectId,
+        moduleId: 0,
+        // Replace with actual moduleId if needed
+        userId: widget.userId,
+        // Replace with actual userId
+        selectedDate: formattedDate);
   }
 
-
-  Widget _buildTimePicker({required String label, required TimeOfDay time, required VoidCallback onTap}) {
+  Widget _buildTimePicker(
+      {required String label,
+      required TimeOfDay time,
+      required VoidCallback onTap}) {
     return InkWell(
       onTap: onTap,
       child: Container(

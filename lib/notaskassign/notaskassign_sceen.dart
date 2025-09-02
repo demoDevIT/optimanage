@@ -120,7 +120,7 @@ class _NoTaskAssignScreenState extends State<NoTaskAssignScreen> {
 
               // Description
               _buildTextFormField(controller: _descriptionController, hintText: 'Daily Task Details', maxLines: 4),
-              const SizedBox(height: 16),
+              const SizedBox(height: 18),
 
               // Start/End Time Pickers
               GestureDetector(
@@ -129,18 +129,18 @@ class _NoTaskAssignScreenState extends State<NoTaskAssignScreen> {
                   child: _buildTextFormField(controller: _startTimeController, hintText: 'Start Time'),
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
               GestureDetector(
                 onTap: () => _selectTime(context, false),
                 child: AbsorbPointer(
                   child: _buildTextFormField(controller: _endTimeController, hintText: 'End Time'),
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
 
               // Auto-calculated Hours/Minutes
               _buildTextFormField(controller: _taskHourController, hintText: 'Task Hour', readOnly: true),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
               _buildTextFormField(controller: _taskMinuteController, hintText: 'Task Minute', readOnly: true),
               const SizedBox(height: 24),
 
@@ -176,9 +176,16 @@ class _NoTaskAssignScreenState extends State<NoTaskAssignScreen> {
       readOnly: readOnly,
       validator: (value) => value == null || value.isEmpty ? 'Required field' : null,
       decoration: InputDecoration(
-        hintText: hintText,
+        labelText: hintText, // 👈 Label name at top-left inside border
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        labelStyle: const TextStyle(
+          color: Color(0xFF6E6A7C),
+          fontWeight: FontWeight.w700,
+          fontSize: 18,
+        ),
+        // hintText: hintText,
         filled: true,
-        fillColor: const Color(0xFFF3F7FE),
+        fillColor: const Color(0xFFF3F7FF),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),

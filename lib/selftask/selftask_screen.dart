@@ -152,12 +152,19 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
               }
             : null,
         decoration: InputDecoration(
-          hintText: hint,
-          hintStyle:
-              TextStyle(color: Color(0xFF6E6A7C), fontWeight: FontWeight.w500),
+          // hintText: hint,
+          // hintStyle:
+          //     TextStyle(color: Color(0xFF6E6A7C), fontWeight: FontWeight.w500),
+          labelText: hint, // 👈 Label name at top-left inside border
+          floatingLabelBehavior: FloatingLabelBehavior.always,
+          labelStyle: const TextStyle(
+            color: Color(0xFF6E6A7C),
+            fontWeight: FontWeight.w700,
+            fontSize: 18,
+          ),
           filled: true,
           fillColor: Color(0xFFF5F8FF),
-          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
@@ -233,18 +240,18 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
 
   String _monthName(int month) {
     const List<String> months = [
-      "January",
-      "February",
-      "March",
-      "April",
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
       "May",
       "June",
       "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December"
+      "Aug",
+      "Sept",
+      "Oct",
+      "Nov",
+      "Dec"
     ];
     return months[month - 1];
   }
@@ -289,6 +296,7 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                   decoration: BoxDecoration(
                     color: const Color(0xFFF5F8FF),
                     borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFDDDDDD), width: 2),
                   ),
                   child: Theme(
                     data: Theme.of(context).copyWith(
@@ -318,7 +326,7 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                         constraints: BoxConstraints(maxHeight: 250),
                         menuProps: MenuProps(
                           // this makes the opened list 2 px inset on left and right
-                          margin: const EdgeInsets.symmetric(horizontal: -12, vertical: -4),
+                          margin: const EdgeInsets.symmetric(horizontal: -14, vertical: -4),
                           shape: const RoundedRectangleBorder(
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(12),
@@ -384,6 +392,7 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                                   child: Text(
                                     item.toString(),
                                     style: TextStyle(
+                                      fontFamily: 'Inter',
                                       fontSize: 14,
                                       color: isSelected ? Colors.blue : const Color(0xFF444444),
                                       //fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
@@ -412,16 +421,26 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                             }
                           });
                           return Material(
-                            color: const Color(0xFFF5F8FF),
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(0),
-                                topRight: Radius.circular(0),
-                                bottomLeft: Radius.circular(12),
-                                bottomRight: Radius.circular(12),
+                            color: Colors.transparent,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF5F8FF),
+                                borderRadius: const BorderRadius.only(
+                                  bottomLeft: Radius.circular(8),
+                                  bottomRight: Radius.circular(8),
+                                ),
+                                border: const Border(
+                                  left: BorderSide(color: Color(0xFFDDDDDD), width: 2),
+                                  right: BorderSide(color: Color(0xFFDDDDDD), width: 2),
+                                  bottom: BorderSide(color: Color(0xFFDDDDDD), width: 2),
+                                  top: BorderSide.none, // 👈 no top border
+                                ),
+                                //border: Border.all(color: const Color(0xFFDDDDDD), width: 2), // 👈 same border
+                               // borderTop: BorderSide.none, // 👈 avoid double border with top box
                               ),
+                              child: popupWidget,
                             ),
-                            child: popupWidget,
+
                           );
                         },
 
@@ -431,19 +450,21 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                           decoration: BoxDecoration(
                             color: const Color(0xFFF5F8FF),
                             borderRadius: BorderRadius.only(
-                              topLeft: const Radius.circular(12),
-                              topRight: const Radius.circular(12),
-                              bottomLeft: Radius.circular(_isProjectPopupOpen ? 0 : 12), // flatten bottom when open
-                              bottomRight: Radius.circular(_isProjectPopupOpen ? 0 : 12),
+                              topLeft: const Radius.circular(8),
+                              topRight: const Radius.circular(8),
+                              bottomLeft: Radius.circular(_isProjectPopupOpen ? 0 : 8), // flatten bottom when open
+                              bottomRight: Radius.circular(_isProjectPopupOpen ? 0 : 8),
                             ),
+
                           ),
                           padding: const EdgeInsets.only(left: 0, top: 4, bottom: 14, right: 12),
                           child: Text(
                             selectedItem ?? "Project Name",
                             style: TextStyle(
+                              fontFamily: 'Inter',
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
-                              color: selectedItem == null ? Colors.grey : Colors.black,
+                              color: selectedItem == null ? Color(0xFF6E6A7C) : Colors.black,
                             ),
                           ),
                         );
@@ -473,6 +494,7 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                   decoration: BoxDecoration(
                     color: const Color(0xFFF5F8FF),
                     borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFDDDDDD), width: 2),
                   ),
                   child: Theme(
                     data: Theme.of(context).copyWith(
@@ -501,7 +523,7 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                         constraints: BoxConstraints(maxHeight: 250),
                         menuProps: MenuProps(
                           // this makes the opened list 2 px inset on left and right
-                          margin: const EdgeInsets.symmetric(horizontal: -12, vertical: -4),
+                          margin: const EdgeInsets.symmetric(horizontal: -14, vertical: -4),
                           shape: const RoundedRectangleBorder(
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(12),
@@ -567,6 +589,7 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                                   child: Text(
                                     item.toString(),
                                     style: TextStyle(
+                                      fontFamily: 'Inter',
                                       fontSize: 14,
                                       color: isSelected ? Colors.blue : const Color(0xFF444444),
                                       //fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
@@ -594,16 +617,25 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                             }
                           });
                           return Material(
-                            color: const Color(0xFFF5F8FF),
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(0),
-                                topRight: Radius.circular(0),
-                                bottomLeft: Radius.circular(12),
-                                bottomRight: Radius.circular(12),
+                            color: Colors.transparent,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF5F8FF),
+                                borderRadius: const BorderRadius.only(
+                                  bottomLeft: Radius.circular(8),
+                                  bottomRight: Radius.circular(8),
+                                ),
+                                border: const Border(
+                                  left: BorderSide(color: Color(0xFFDDDDDD), width: 2),
+                                  right: BorderSide(color: Color(0xFFDDDDDD), width: 2),
+                                  bottom: BorderSide(color: Color(0xFFDDDDDD), width: 2),
+                                  top: BorderSide.none, // 👈 no top border
+                                ),
+                                //border: Border.all(color: const Color(0xFFDDDDDD), width: 2), // 👈 same border
+                                // borderTop: BorderSide.none, // 👈 avoid double border with top box
                               ),
+                              child: popupWidget,
                             ),
-                            child: popupWidget,
                           );
                         },
                       ),
@@ -614,17 +646,18 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                             borderRadius: BorderRadius.only(
                               topLeft: const Radius.circular(12),
                               topRight: const Radius.circular(12),
-                              bottomLeft: Radius.circular(_isModulePopupOpen ? 0 : 12), // flatten bottom when open
-                              bottomRight: Radius.circular(_isModulePopupOpen ? 0 : 12),
+                              bottomLeft: Radius.circular(_isModulePopupOpen ? 0 : 8), // flatten bottom when open
+                              bottomRight: Radius.circular(_isModulePopupOpen ? 0 : 8),
                             ),
                           ),
                           padding: const EdgeInsets.only(left: 0, top: 4, bottom: 14, right: 12),
                           child: Text(
                             selectedItem ?? "Module Name",
                             style: TextStyle(
+                              fontFamily: 'Inter',
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
-                              color: selectedItem == null ? Colors.grey : Colors.black,
+                              color: selectedItem == null ? Color(0xFF6E6A7C) : Colors.black,
                             ),
                           ),
                         );
@@ -657,6 +690,7 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                     decoration: BoxDecoration(
                       color: const Color(0xFFF5F8FF),
                       borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0xFFDDDDDD), width: 2),
                     ),
                     child: Theme(
                       data: Theme.of(context).copyWith(
@@ -685,7 +719,7 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                           constraints: BoxConstraints(maxHeight: 250),
                           menuProps: MenuProps(
                             // this makes the opened list 2 px inset on left and right
-                            margin: const EdgeInsets.symmetric(horizontal: -12, vertical: -4),
+                            margin: const EdgeInsets.symmetric(horizontal: -14, vertical: -4),
                             shape: const RoundedRectangleBorder(
                               borderRadius: BorderRadius.only(
                                 topLeft: Radius.circular(12),
@@ -751,6 +785,7 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                                     child: Text(
                                       item.toString(),
                                       style: TextStyle(
+                                        fontFamily: 'Inter',
                                         fontSize: 14,
                                         color: isSelected ? Colors.blue : const Color(0xFF444444),
                                         //fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
@@ -778,16 +813,25 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                               }
                             });
                             return Material(
-                              color: const Color(0xFFF5F8FF),
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(0),
-                                  topRight: Radius.circular(0),
-                                  bottomLeft: Radius.circular(12),
-                                  bottomRight: Radius.circular(12),
+                              color: Colors.transparent,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF5F8FF),
+                                  borderRadius: const BorderRadius.only(
+                                    bottomLeft: Radius.circular(8),
+                                    bottomRight: Radius.circular(8),
+                                  ),
+                                  border: const Border(
+                                    left: BorderSide(color: Color(0xFFDDDDDD), width: 2),
+                                    right: BorderSide(color: Color(0xFFDDDDDD), width: 2),
+                                    bottom: BorderSide(color: Color(0xFFDDDDDD), width: 2),
+                                    top: BorderSide.none, // 👈 no top border
+                                  ),
+                                  //border: Border.all(color: const Color(0xFFDDDDDD), width: 2), // 👈 same border
+                                  // borderTop: BorderSide.none, // 👈 avoid double border with top box
                                 ),
+                                child: popupWidget,
                               ),
-                              child: popupWidget,
                             );
                           },
                         ),
@@ -806,9 +850,10 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                             child: Text(
                               selectedItem ?? "Submodule Name",
                               style: TextStyle(
+                                fontFamily: 'Inter',
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
-                                color: selectedItem == null ? Colors.grey : Colors.black,
+                                color: selectedItem == null ? Color(0xFF6E6A7C) : Colors.black,
                               ),
                             ),
                           );
@@ -830,6 +875,7 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                   decoration: BoxDecoration(
                     color: const Color(0xFFF5F8FF),
                     borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFDDDDDD), width: 2),
                   ),
                   child: Theme(
                     data: Theme.of(context).copyWith(
@@ -858,7 +904,7 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                         constraints: BoxConstraints(maxHeight: 250),
                         menuProps: MenuProps(
                           // this makes the opened list 2 px inset on left and right
-                          margin: const EdgeInsets.symmetric(horizontal: -12, vertical: -4),
+                          margin: const EdgeInsets.symmetric(horizontal: -14, vertical: -4),
                           shape: const RoundedRectangleBorder(
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(12),
@@ -924,6 +970,7 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                                   child: Text(
                                     item.toString(),
                                     style: TextStyle(
+                                      fontFamily: 'Inter',
                                       fontSize: 14,
                                       color: isSelected ? Colors.blue : const Color(0xFF444444),
                                       //fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
@@ -951,16 +998,25 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                             }
                           });
                           return Material(
-                            color: const Color(0xFFF5F8FF),
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(0),
-                                topRight: Radius.circular(0),
-                                bottomLeft: Radius.circular(12),
-                                bottomRight: Radius.circular(12),
+                            color: Colors.transparent,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF5F8FF),
+                                borderRadius: const BorderRadius.only(
+                                  bottomLeft: Radius.circular(8),
+                                  bottomRight: Radius.circular(8),
+                                ),
+                                border: const Border(
+                                  left: BorderSide(color: Color(0xFFDDDDDD), width: 2),
+                                  right: BorderSide(color: Color(0xFFDDDDDD), width: 2),
+                                  bottom: BorderSide(color: Color(0xFFDDDDDD), width: 2),
+                                  top: BorderSide.none, // 👈 no top border
+                                ),
+                                //border: Border.all(color: const Color(0xFFDDDDDD), width: 2), // 👈 same border
+                                // borderTop: BorderSide.none, // 👈 avoid double border with top box
                               ),
+                              child: popupWidget,
                             ),
-                            child: popupWidget,
                           );
                         },
                       ),
@@ -980,9 +1036,10 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                           child: Text(
                             selectedItem ?? "Task Type",
                             style: TextStyle(
+                              fontFamily: 'Inter',
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
-                              color: selectedItem == null ? Colors.grey : Colors.black,
+                              color: selectedItem == null ? Color(0xFF6E6A7C) : Colors.black,
                             ),
                           ),
                         );
@@ -997,10 +1054,11 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                     ),
                   ),
                 ),
-
+                const SizedBox(height: 10),
 
                 _buildTextField('Task Name', taskNameController,
                     isRequired: true),
+                const SizedBox(height: 4),
                 _buildTextField('Description', descriptionController,
                     maxLines: 3, isRequired: true),
                 Row(
@@ -1011,10 +1069,11 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                         'End Date', endDate, () => _selectDate(context, false)),
                   ],
                 ),
-
+                const SizedBox(height: 6),
                 _buildTextField(
                     'Estimated Time (In Hours)', estimatedTimeController,
                     isRequired: true, keyboardType: TextInputType.number),
+                const SizedBox(height: 4),
                 _buildTextField('Notes', notesController),
 
                 CheckboxListTile(

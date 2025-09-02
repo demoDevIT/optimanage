@@ -5,10 +5,11 @@ import '../utils/UtilityClass.dart';
 import 'package:optimanage/services/HttpService.dart';
 import 'package:optimanage/constant/Constants.dart';
 
-class DailyTaskProvider with ChangeNotifier {
-  List<DropdownMenuItem<String>> _statusList = [];
+import 'TaskStatusModel.dart';
 
-  List<DropdownMenuItem<String>> get statusList => _statusList;
+class DailyTaskProvider with ChangeNotifier {
+  List<TaskStatusModel> _statusList = [];
+  List<TaskStatusModel> get statusList => _statusList;
 
   Future<void> fetchTaskStatusList(BuildContext context) async {
     try {
@@ -23,12 +24,7 @@ class DailyTaskProvider with ChangeNotifier {
 
       if (response.data["Status"] == true && response.data["Result"] != null) {
         final List<dynamic> list = jsonDecode(response.data["Result"]);
-        _statusList = list.map<DropdownMenuItem<String>>((e) {
-          return DropdownMenuItem<String>(
-            value: e['Value'].toString(), // value = status ID
-            child: Text(e['Text']),       // display text
-          );
-        }).toList();
+        _statusList = list.map((e) => TaskStatusModel.fromJson(e)).toList();
 
         notifyListeners();
       } else {

@@ -94,25 +94,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             const SizedBox(height: 30),
-            _buildReadOnlyField(profile.EmployeeNameEn),
+            _buildReadOnlyField(profile.EmployeeNameEn, "Name"),
             const SizedBox(height: 16),
-            _buildReadOnlyField(profile.EmployeeCode),
+            _buildReadOnlyField(profile.EmployeeCode, "Emp Code"),
             const SizedBox(height: 16),
-            _buildReadOnlyField(profile.MobileNumber),
+            _buildReadOnlyField(profile.MobileNumber, "Mobile"),
             const SizedBox(height: 16),
-            _buildReadOnlyField(profile.Email),
+            _buildReadOnlyField(profile.Email, "Email"),
             const SizedBox(height: 16),
-            _buildReadOnlyField(profile.DOB),
+            _buildReadOnlyField(profile.DOB, "Date of Birth"),
             const SizedBox(height: 16),
-            _buildReadOnlyField(profile.Gender),
+            _buildReadOnlyField(profile.Gender, "Gender"),
             const SizedBox(height: 16),
-            _buildReadOnlyField(profile.DOJ),
+            _buildReadOnlyField(profile.DOJ, "Date of Joining"),
             const SizedBox(height: 16),
-            _buildReadOnlyField(profile.ExpYear),
+            _buildReadOnlyField(profile.ExpYear, "Exp Year"),
             const SizedBox(height: 16),
-            _buildReadOnlyField(profile.Designation),
+            _buildReadOnlyField(profile.Designation, "Designation"),
             const SizedBox(height: 16),
-            _buildReadOnlyField(profile.RoleName),
+            _buildReadOnlyField(profile.RoleName, "Role"),
             const SizedBox(height: 30),
             _buildButtons(context),
           ],
@@ -123,11 +123,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildReadOnlyField(String value) {
+  Widget _buildReadOnlyField(String value, labelName) {
     return TextField(
       readOnly: true,
       controller: TextEditingController(text: value),
       decoration: InputDecoration(
+        labelText: labelName, // 👈 Label name at top-left inside border
+        labelStyle: const TextStyle(
+          color: Color(0xFF6E6A7C),
+          fontWeight: FontWeight.w700,
+          fontSize: 16,
+        ),
         filled: true,
         fillColor: const Color(0xFFF3F7FF),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),

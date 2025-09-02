@@ -111,19 +111,30 @@ class _RdScreenState extends State<RdScreen> {
                     state.didChange(picked);
                   }
                 },
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: Color(0xFFF5F8FF),
+                child: InputDecorator(
+                  decoration: InputDecoration(
+                    labelText: label, // 👈 label now sits on border
+                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                    labelStyle: const TextStyle(
+                      color: Color(0xFF6E6A7C),
+                      fontWeight: FontWeight.w700,
+                      fontSize: 18,
+                    ),
+                    filled: true,
+                    fillColor: const Color(0xFFF5F8FF),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.access_time, size: 20),
-                      SizedBox(width: 8),
+                      const Icon(Icons.access_time, size: 20),
+                      const SizedBox(width: 8),
                       Text(
                         time != null ? time.format(context) : 'Select $label',
-                        style: TextStyle(fontSize: 14),
+                        style: const TextStyle(fontSize: 14),
                       ),
                     ],
                   ),
@@ -169,11 +180,18 @@ class _RdScreenState extends State<RdScreen> {
         }
             : null,
         decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: TextStyle(color: Color(0xFF6E6A7C), fontWeight: FontWeight.w500),
+          labelText: hint, // 👈 Label name at top-left inside border
+          floatingLabelBehavior: FloatingLabelBehavior.always,
+          labelStyle: const TextStyle(
+            color: Color(0xFF6E6A7C),
+            fontWeight: FontWeight.w700,
+            fontSize: 18,
+          ),
+          // hintText: hint,
+          // hintStyle: TextStyle(color: Color(0xFF6E6A7C), fontWeight: FontWeight.w500),
           filled: true,
           fillColor: Color(0xFFF5F8FF),
-          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
@@ -316,6 +334,7 @@ class _RdScreenState extends State<RdScreen> {
                   decoration: BoxDecoration(
                     color: const Color(0xFFF5F7FA),
                     borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFDDDDDD), width: 2),
                   ),
                   child: Theme(
                     data: Theme.of(context).copyWith(
@@ -338,7 +357,7 @@ class _RdScreenState extends State<RdScreen> {
                         constraints: const BoxConstraints(maxHeight: 250),
                         menuProps: MenuProps(
                           // this makes the opened list 2 px inset on left and right
-                          margin: const EdgeInsets.symmetric(horizontal: -12, vertical: -4),
+                          margin: const EdgeInsets.symmetric(horizontal: -14, vertical: -4),
                           shape: const RoundedRectangleBorder(
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(12),
@@ -404,6 +423,7 @@ class _RdScreenState extends State<RdScreen> {
                                   child: Text(
                                     item.toString(),
                                     style: TextStyle(
+                                      fontFamily: 'Inter',
                                       fontSize: 14,
                                       color: isSelected ? Colors.blue : const Color(0xFF444444),
                                       //fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
@@ -431,16 +451,25 @@ class _RdScreenState extends State<RdScreen> {
                             }
                           });
                           return Material(
-                            color: const Color(0xFFF5F8FF),
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(0),
-                                topRight: Radius.circular(0),
-                                bottomLeft: Radius.circular(12),
-                                bottomRight: Radius.circular(12),
+                            color: Colors.transparent,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF5F8FF),
+                                borderRadius: const BorderRadius.only(
+                                  bottomLeft: Radius.circular(8),
+                                  bottomRight: Radius.circular(8),
+                                ),
+                                border: const Border(
+                                  left: BorderSide(color: Color(0xFFDDDDDD), width: 2),
+                                  right: BorderSide(color: Color(0xFFDDDDDD), width: 2),
+                                  bottom: BorderSide(color: Color(0xFFDDDDDD), width: 2),
+                                  top: BorderSide.none, // 👈 no top border
+                                ),
+                                //border: Border.all(color: const Color(0xFFDDDDDD), width: 2), // 👈 same border
+                                // borderTop: BorderSide.none, // 👈 avoid double border with top box
                               ),
+                              child: popupWidget,
                             ),
-                            child: popupWidget,
                           );
                         },
                       ),
@@ -459,9 +488,10 @@ class _RdScreenState extends State<RdScreen> {
                           child: Text(
                             selectedItem ?? "Project Name",
                             style: TextStyle(
+                              fontFamily: 'Inter',
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
-                              color: selectedItem == null ? Colors.grey : Colors.black,
+                              color: selectedItem == null ? Color(0xFF6E6A7C) : Colors.black,
                             ),
                           ),
                         );
@@ -491,6 +521,7 @@ class _RdScreenState extends State<RdScreen> {
                   decoration: BoxDecoration(
                     color: const Color(0xFFF5F7FA),
                     borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFDDDDDD), width: 2),
                   ),
                   child: Theme(
                     data: Theme.of(context).copyWith(
@@ -514,7 +545,7 @@ class _RdScreenState extends State<RdScreen> {
                         constraints: const BoxConstraints(maxHeight: 250),
                         menuProps: MenuProps(
                           // this makes the opened list 2 px inset on left and right
-                          margin: const EdgeInsets.symmetric(horizontal: -12, vertical: -4),
+                          margin: const EdgeInsets.symmetric(horizontal: -14, vertical: -4),
                           shape: const RoundedRectangleBorder(
                             borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(12),
@@ -580,6 +611,7 @@ class _RdScreenState extends State<RdScreen> {
                                   child: Text(
                                     item.toString(),
                                     style: TextStyle(
+                                      fontFamily: 'Inter',
                                       fontSize: 14,
                                       color: isSelected ? Colors.blue : const Color(0xFF444444),
                                       //fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
@@ -607,16 +639,25 @@ class _RdScreenState extends State<RdScreen> {
                             }
                           });
                           return Material(
-                            color: const Color(0xFFF5F8FF),
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(0),
-                                topRight: Radius.circular(0),
-                                bottomLeft: Radius.circular(12),
-                                bottomRight: Radius.circular(12),
+                            color: Colors.transparent,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF5F8FF),
+                                borderRadius: const BorderRadius.only(
+                                  bottomLeft: Radius.circular(8),
+                                  bottomRight: Radius.circular(8),
+                                ),
+                                border: const Border(
+                                  left: BorderSide(color: Color(0xFFDDDDDD), width: 2),
+                                  right: BorderSide(color: Color(0xFFDDDDDD), width: 2),
+                                  bottom: BorderSide(color: Color(0xFFDDDDDD), width: 2),
+                                  top: BorderSide.none, // 👈 no top border
+                                ),
+                                //border: Border.all(color: const Color(0xFFDDDDDD), width: 2), // 👈 same border
+                                // borderTop: BorderSide.none, // 👈 avoid double border with top box
                               ),
+                              child: popupWidget,
                             ),
-                            child: popupWidget,
                           );
                         },
                       ),
@@ -637,7 +678,7 @@ class _RdScreenState extends State<RdScreen> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
-                              color: selectedItem == null ? Colors.grey : Colors.black,
+                              color: selectedItem == null ? Color(0xFF6E6A7C) : Colors.black,
                             ),
                           ),
                         );
@@ -814,7 +855,7 @@ class _RdScreenState extends State<RdScreen> {
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
-                                  color: selectedItem == null ? Colors.grey : Colors.black,
+                                  color: selectedItem == null ? Color(0xFF6E6A7C) : Colors.black,
                                 ),
                               ),
                             );
@@ -829,7 +870,7 @@ class _RdScreenState extends State<RdScreen> {
                         ),
                       )
                     ),
-
+                  SizedBox(height: 12),
                   _textInput(
                     hint: 'Daily Task Details',
                     controller: taskDetailsController,
@@ -863,13 +904,14 @@ class _RdScreenState extends State<RdScreen> {
 
                     ],
                   ),
-
+                  SizedBox(height: 8),
                   _textInput(
                     hint: 'Task Hour',
                     controller: taskHourController,
                     keyboardType: TextInputType.number,
                     readOnly: true, // ✅ disabled input
                   ),
+                  SizedBox(height: 6),
                   _textInput(
                     hint: 'Task Minute',
                     controller: taskMinuteController,

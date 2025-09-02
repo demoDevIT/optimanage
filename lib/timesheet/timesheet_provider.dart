@@ -412,6 +412,7 @@ class timesheet_provider extends ChangeNotifier {
                                       decoration: BoxDecoration(
                                         color: const Color(0xFFF5F8FF),
                                         borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(color: const Color(0xFFDDDDDD), width: 2),
                                       ),
                                       child: Theme(
                                         data: Theme.of(context).copyWith(
@@ -454,7 +455,12 @@ class timesheet_provider extends ChangeNotifier {
                                     ),
                                     disabledHint: Text(
                                       leaveType ?? "Leave Type",
-                                      style: const TextStyle(color: Colors.grey), // hint when disabled
+                                      style: const TextStyle(
+                                        fontFamily: 'Inter',
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xFF444444),
+                                      ), // hint when disabled
                                     ),
                                   ),),
 
@@ -463,7 +469,20 @@ class timesheet_provider extends ChangeNotifier {
                                   Transform.translate(
                                     offset: const Offset(0, -8), // 👈 shifts the whole list up by 8 pixels
                                     child: Container(
-                                      color: const Color(0xFFF5F8FF),
+                                      //color: const Color(0xFFF5F8FF),
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFFF5F8FF),
+                                        borderRadius: BorderRadius.only(
+                                          bottomLeft: Radius.circular(8),
+                                          bottomRight: Radius.circular(8),
+                                        ),
+                                        border: Border(
+                                          left: BorderSide(color: Color(0xFFDDDDDD), width: 2),
+                                          right: BorderSide(color: Color(0xFFDDDDDD), width: 2),
+                                          bottom: BorderSide(color: Color(0xFFDDDDDD), width: 2),
+                                        ),
+                                      ),
+
                                       child: ListView.builder(
                                         shrinkWrap: true,
                                         itemCount: leaveTypes.length,
@@ -558,7 +577,14 @@ class timesheet_provider extends ChangeNotifier {
                                   maxLines: 4,
                                   autofocus: true,
                                   decoration: InputDecoration(
-                                    hintText: 'Description',
+                                    //hintText: 'Description',
+                                    labelText: 'Description', // 👈 Label name at top-left inside border
+                                    floatingLabelBehavior: FloatingLabelBehavior.always,
+                                    labelStyle: const TextStyle(
+                                      color: Color(0xFF6E6A7C),
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 18,
+                                    ),
                                     filled: true,
 
                                     fillColor: Color(0xFFF5F9FE),
