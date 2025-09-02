@@ -341,12 +341,12 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
         ),
         child: DropdownSearch<TaskStatusModel>(
           selectedItem: provider.statusList.firstWhere(
-            (e) => e.id.toString() == _selectedStatus,
+                (e) => e.id.toString() == _selectedStatus,
             orElse: () => provider.statusList.isNotEmpty
                 ? provider.statusList.first
                 : TaskStatusModel(id: 0, text: ""),
           ),
-          compareFn: (TaskStatusModel a, TaskStatusModel b) => a.id == b.id,
+          compareFn: (a, b) => a.id == b.id,
           items: (filter, _) => provider.statusList,
           popupProps: PopupProps.menu(
             showSearchBox: true,
@@ -603,6 +603,8 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
   }
 
   Future<void> _submitForm() async {
+    print("original date -> ${widget.selectedDate}");
+    print("formatted date -> ${DateFormat('yyyy-MM-dd').format(widget.selectedDate)}");
     if (!_formKey.currentState!.validate() ||
         _startTime == null ||
         _endTime == null) {
@@ -647,6 +649,7 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
         _endTime!.minute.toString().padLeft(2, '0');
 
     final formattedDate = DateFormat('yyyy-MM-dd').format(widget.selectedDate);
+    print("🟢 Selected Status before submit: $_selectedStatus");
 
     await provider.submitDailyTask(
         context: context,
@@ -661,6 +664,7 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
         moduleId: 0,
         // Replace with actual moduleId if needed
         userId: widget.userId,
+      //  actualDate: widget.selectedDate,
         // Replace with actual userId
         selectedDate: formattedDate);
   }

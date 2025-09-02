@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+//import '../assignedtask/assignedtask_screen.dart';
 import '../timesheet/timesheet_screen.dart';
 import '../utils/UtilityClass.dart';
 import 'package:optimanage/services/HttpService.dart';
@@ -49,9 +50,13 @@ class DailyTaskProvider with ChangeNotifier {
     required int projectId,
     required int userId,
     required int moduleId,
+    //required DateTime actualDate,
     required String selectedDate
   }) async {
     try {
+
+      // print("actualDate date -> ${actualDate}");
+      // print("selectedDate date -> ${selectedDate}");
 
       final now = DateTime.now();
       final entryDate = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
@@ -97,6 +102,7 @@ class DailyTaskProvider with ChangeNotifier {
           ),
         );
 
+        // too OLD redirection
         // Navigator.of(context).popUntil((route) => route.isFirst);
         // Navigator.push(
         //   context,

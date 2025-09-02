@@ -103,7 +103,7 @@ class _TaskSummaryScreenState extends State<TaskSummaryScreen> {
                     _buildDivider(),
                     _buildInfoRow("Last Action Date", task.actionDate),
                     _buildDivider(),
-                    _buildInfoRow("Module", task.moduleName),
+                    _buildInfoRow("Module", task.moduleName, allowWrap: true),
                     _buildDivider(),
 
                     const SizedBox(height: 10),
@@ -278,17 +278,34 @@ class _TaskSummaryScreenState extends State<TaskSummaryScreen> {
   }
 
 
-  Widget _buildInfoRow(String label, String value) {
+  Widget _buildInfoRow(String label, String value, {bool allowWrap = false}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment:
+        allowWrap ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+        mainAxisAlignment:
+        allowWrap ? MainAxisAlignment.start : MainAxisAlignment.spaceBetween,
         children: [
           Text(
             label,
             style: const TextStyle(fontSize: 13, color: Colors.black87),
           ),
-          Text(
+          const SizedBox(width: 120),
+          allowWrap
+              ? Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+                color: Colors.black,
+              ),
+              softWrap: true,
+              overflow: TextOverflow.visible,
+            ),
+          )
+              : Text(
             value,
             style: const TextStyle(
               fontWeight: FontWeight.w600,

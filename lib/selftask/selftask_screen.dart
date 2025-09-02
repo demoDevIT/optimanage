@@ -1,10 +1,11 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../assignedtask/assignedtask_screen.dart';
 import '../selftask/selftask_provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
+import '../assignedtask/assignedtask_provider.dart';
 import '../utils/PrefUtil.dart';
 
 class SelfTaskScreen extends StatefulWidget {
@@ -1180,7 +1181,33 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
 
       print("📦 Form submitted successfully! Navigating back...");
 
-      Navigator.pop(context, true);
+     // Navigator.pop(context, true);
+
+      // as discussed with mohit, redirect to assigned page directly
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) =>
+      //         AssignedTaskScreen(
+      //           selectedDate: widget.selectedDate!,
+      //           userId: userId,
+      //         ),
+      //
+      //   ),
+      // );
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ChangeNotifierProvider(
+            create: (_) => AssignedTaskProvider(),
+            child: AssignedTaskScreen(
+              selectedDate: widget.selectedDate!,
+              userId: userId,
+            ),
+          ),
+        ),
+      );
     }
   }
 
