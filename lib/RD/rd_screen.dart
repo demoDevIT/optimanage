@@ -35,6 +35,9 @@ class _RdScreenState extends State<RdScreen> {
   final taskHourController = TextEditingController();
   final taskMinuteController = TextEditingController();
 
+  String? projectError;
+  String? moduleError;
+
   @override
   void initState() {
     super.initState();
@@ -122,9 +125,37 @@ class _RdScreenState extends State<RdScreen> {
                     ),
                     filled: true,
                     fillColor: const Color(0xFFF5F8FF),
-                    border: OutlineInputBorder(
+                    enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
+                      borderSide: const BorderSide(
+                        color: Color(0xFFDDDDDD),
+                        width: 2,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: Color(0xFFDDDDDD), // keep same color to avoid blue underline
+                        width: 2,
+                      ),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: Color(0xFFDDDDDD), // 👈 override red with grey
+                        width: 2,
+                      ),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: Color(0xFFDDDDDD), // 👈 keep same grey even on focus
+                        width: 2,
+                      ),
+                    ),
+                    errorStyle: TextStyle(
+                      color: Colors.red.shade700,
+                      fontSize: 13,
                     ),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                   ),
@@ -192,9 +223,33 @@ class _RdScreenState extends State<RdScreen> {
           filled: true,
           fillColor: Color(0xFFF5F8FF),
           contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          border: OutlineInputBorder(
+          enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
+            borderSide: const BorderSide(
+              color: Color(0xFFDDDDDD),
+              width: 2,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(
+              color: Color(0xFFDDDDDD), // keep same color to avoid blue underline
+              width: 2,
+            ),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(
+              color: Color(0xFFDDDDDD), // 👈 override red with grey
+              width: 2,
+            ),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(
+              color: Color(0xFFDDDDDD), // 👈 keep same grey even on focus
+              width: 2,
+            ),
           ),
           errorStyle: TextStyle(
             color: Colors.red.shade700,
@@ -246,6 +301,17 @@ class _RdScreenState extends State<RdScreen> {
 
 
   Future<void> _submitForm() async {
+    // if (selectedProject == null) {
+    //   setState(() => projectError = "Please select project");
+    //   return;
+    // }
+    //
+    // if (selectedModule == null) {
+    //   setState(() => moduleError = "Please select module");
+    //   return;
+    // }
+
+
     if (!_formKey.currentState!.validate() || _startTime == null || _endTime == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Please fill all required fields including time')),
@@ -299,6 +365,8 @@ class _RdScreenState extends State<RdScreen> {
     bool _isProjectPopupOpen = false;
     bool _isModulePopupOpen = false;
     bool _isSubModulePopupOpen = false;
+
+
 
     return GestureDetector(
      // onTap: () => FocusScope.of(context).unfocus(),
@@ -502,18 +570,31 @@ class _RdScreenState extends State<RdScreen> {
                             selectedProject = val;
                             selectedModule = null;
                             selectedSubModule = null;
+                            projectError = null;
                           });
                           final project = rdProvider.projects
                               .firstWhere((p) => p.fieldName == val);
                           rdProvider.fetchModuleList(context, project.fieldId);
                         }
                       },
-                      validator: (val) => (val == null || val.isEmpty)
-                          ? 'Please select project'
-                          : null,
+                      // validator: (val) => (val == null || val.isEmpty)
+                      //     ? 'Please select project'
+                      //     : null,
                     ),
                   ),
                 ),
+                  // if (projectError != null)
+                  //   Padding(
+                  //     padding: const EdgeInsets.only(left: 4, top: 4),
+                  //     child: Text(
+                  //       projectError!,
+                  //       style: const TextStyle(
+                  //         fontSize: 12,
+                  //         color: Colors.red,
+                  //         fontWeight: FontWeight.w500,
+                  //       ),
+                  //     ),
+                  //   ),
 
                   SizedBox(height: 16),
                 Container(
@@ -688,6 +769,7 @@ class _RdScreenState extends State<RdScreen> {
                           setState(() {
                             selectedModule = val;
                             selectedSubModule = null;
+                            moduleError = null;
                           });
                           final module =
                           rdProvider.modules.firstWhere((m) => m.text == val);
@@ -697,12 +779,24 @@ class _RdScreenState extends State<RdScreen> {
                               context, module.value, project.fieldId);
                         }
                       },
-                      validator: (val) => val == null || val.isEmpty
-                          ? 'Please select module'
-                          : null,
+                      // validator: (val) => val == null || val.isEmpty
+                      //     ? 'Please select module'
+                      //     : null,
                     ),
                   ),
                 ),
+                  // if (moduleError != null)
+                  //   Padding(
+                  //     padding: const EdgeInsets.only(left: 4, top: 4),
+                  //     child: Text(
+                  //       moduleError!,
+                  //       style: const TextStyle(
+                  //         fontSize: 12,
+                  //         color: Colors.red,
+                  //         fontWeight: FontWeight.w500,
+                  //       ),
+                  //     ),
+                  //   ),
 
                   if (rdProvider.subModules.isNotEmpty)
                     Container(

@@ -137,9 +137,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         filled: true,
         fillColor: const Color(0xFFF3F7FF),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        border: OutlineInputBorder(
+        enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+          borderSide: const BorderSide(
+            color: Color(0xFFDDDDDD), // 👈 Border color when not focused
+            width: 2,
+          ),
         ),
         hintStyle: const TextStyle(
           color: Color(0xFF6E6A7C),

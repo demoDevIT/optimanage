@@ -187,9 +187,40 @@ class _NoTaskAssignScreenState extends State<NoTaskAssignScreen> {
         filled: true,
         fillColor: const Color(0xFFF3F7FF),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        border: OutlineInputBorder(
+        // 👇 Border when not focused
+        enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+          borderSide: const BorderSide(
+            color: Color(0xFFDDDDDD),
+            width: 2,
+          ),
+        ),
+
+        // 👇 Border when focused (same as enabledBorder)
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(
+            color: Color(0xFFDDDDDD), // keep same color to avoid blue underline
+            width: 2,
+          ),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(
+            color: Color(0xFFDDDDDD), // 👈 override red with grey
+            width: 2,
+          ),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(
+            color: Color(0xFFDDDDDD), // 👈 keep same grey even on focus
+            width: 2,
+          ),
+        ),
+        errorStyle: TextStyle(
+          color: Colors.red.shade700,
+          fontSize: 13,
         ),
       ),
     );

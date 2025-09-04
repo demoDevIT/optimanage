@@ -29,12 +29,16 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   String? selectedProject;
+  String? selectedModule;
   String? selectedSubModule;
   String? selectedTaskType;
   String? selectedAssignee;
   bool isPriority = false;
 
   //XFile? selectedFile;
+
+  String? projectError;
+  String? moduleError;
 
   final TextEditingController taskNameController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
@@ -76,6 +80,7 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
       // 🔄 Re-fetch fresh project list
       provider.fetchProjectList(context);
       provider.setSelectedProject(null);
+
     });
   }
 
@@ -166,9 +171,35 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
           filled: true,
           fillColor: Color(0xFFF5F8FF),
           contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          border: OutlineInputBorder(
+          enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
+            borderSide: const BorderSide(
+              color: Color(0xFFDDDDDD),
+              width: 2,
+            ),
+          ),
+
+          // 👇 Border when focused (same as enabledBorder)
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(
+              color: Color(0xFFDDDDDD), // keep same color to avoid blue underline
+              width: 2,
+            ),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(
+              color: Color(0xFFDDDDDD), // 👈 override red with grey
+              width: 2,
+            ),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(
+              color: Color(0xFFDDDDDD), // 👈 keep same grey even on focus
+              width: 2,
+            ),
           ),
           errorStyle: TextStyle(
             color: Colors.red.shade700,
@@ -191,6 +222,10 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
           decoration: BoxDecoration(
             color: const Color(0xFFF5F9FE),
             borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: const Color(0xFFDDDDDD), // 👈 same grey border
+              width: 2,
+            ),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -487,7 +522,18 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
                     ),
                   ),
                 ),
-
+                // if (projectError != null)
+                //   Padding(
+                //     padding: const EdgeInsets.only(left: 4, top: 4),
+                //     child: Text(
+                //       projectError!,
+                //       style: const TextStyle(
+                //         fontSize: 12,
+                //         color: Colors.red,
+                //         fontWeight: FontWeight.w500,
+                //       ),
+                //     ),
+                //   ),
                 const SizedBox(height: 12),
 
                 Container(
@@ -1115,6 +1161,16 @@ class _SelfTaskScreenState extends State<SelfTaskScreen> {
   }
 
   Future<void> _submitSelfTaskForm() async {
+    // if (selectedProject == null) {
+    //   setState(() => projectError = "Please select project");
+    //   return;
+    // }
+    //
+    // if (selectedModule == null) {
+    //   setState(() => moduleError = "Please select module");
+    //   return;
+    // }
+
     if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill all required fields')),

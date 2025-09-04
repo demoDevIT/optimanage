@@ -622,13 +622,31 @@ class timesheet_provider extends ChangeNotifier {
                                     contentPadding: const EdgeInsets.all(10),
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide.none, // No border
+                                      borderSide: const BorderSide(
+                                        color: Color(0xFFDDDDDD),
+                                        width: 2,
+                                      ),
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide(
-                                          color: Color(0xFF2196F3),
-                                          width: 2), // Blue border on focus
+                                      borderSide: const BorderSide(
+                                        color: Color(0xFFDDDDDD), // keep same color to avoid blue underline
+                                        width: 2,
+                                      ),
+                                    ),
+                                    errorBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: const BorderSide(
+                                        color: Color(0xFFDDDDDD), // 👈 override red with grey
+                                        width: 2,
+                                      ),
+                                    ),
+                                    focusedErrorBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: const BorderSide(
+                                        color: Color(0xFFDDDDDD), // 👈 keep same grey even on focus
+                                        width: 2,
+                                      ),
                                     ),
                                   ),
                                   validator: (val) =>
@@ -908,6 +926,15 @@ class timesheet_provider extends ChangeNotifier {
                                     ),
                                   ),
                                   const SizedBox(height: 10),
+                                  // _buildRow("Task", task.TaskName),
+                                  // const SizedBox(height: 10),
+
+                                  const Divider(
+                                    thickness: 1,
+                                    height: 1,
+                                    color: Color(0xFFE2E2E2),
+                                  ),
+                                  const SizedBox(height: 10),
                                   _buildRow("Timesheet Date", task.EntryDate),
                                   const Divider(
                                     thickness: 1,
@@ -958,6 +985,29 @@ class timesheet_provider extends ChangeNotifier {
                                     color: Color(0xFFE2E2E2),
                                   ),
                                   const SizedBox(height: 8),
+                                  const Text(
+                                    "Task Name",
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    task.TaskName,
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  const Divider(
+                                    thickness: 1,
+                                    height: 1,
+                                    color: Color(0xFFE2E2E2),
+                                  ),
+                                  const SizedBox(height: 6),
                                   const Text(
                                     "Task Description",
                                     style: TextStyle(
@@ -1544,7 +1594,12 @@ class timesheet_provider extends ChangeNotifier {
           padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
           decoration: BoxDecoration(
             color: Color(0xFFF5F9FE), // ✅ Match dropdown background
-            borderRadius: BorderRadius.circular(12), // Rounded corners
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: const Color(0xFFDDDDDD), // ✅ Same grey border
+              width: 2,
+            ),
+            // Rounded corners
             // Removed border
           ),
           child: Row(

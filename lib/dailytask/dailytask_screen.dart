@@ -225,9 +225,19 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
         // hintStyle: const TextStyle(color: Color(0xFF6E6A7C)),
         filled: true,
         fillColor: const Color(0xFFF5F9FE),
-        border: OutlineInputBorder(
+        enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+          borderSide: const BorderSide(
+            color: Color(0xFFDDDDDD),
+            width: 2,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(
+            color: Color(0xFFDDDDDD), // keep same color to avoid blue underline
+            width: 2,
+          ),
         ),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -308,9 +318,33 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
           filled: true,
           fillColor: Color(0xFFF5F8FF),
           contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          border: OutlineInputBorder(
+          enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
+            borderSide: const BorderSide(
+              color: Color(0xFFDDDDDD),
+              width: 2,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(
+              color: Color(0xFFDDDDDD), // keep same color to avoid blue underline
+              width: 2,
+            ),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(
+              color: Color(0xFFDDDDDD), // 👈 override red with grey
+              width: 2,
+            ),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(
+              color: Color(0xFFDDDDDD), // 👈 keep same grey even on focus
+              width: 2,
+            ),
           ),
           errorStyle: TextStyle(color: Colors.red.shade700, fontSize: 13),
         ),
@@ -568,9 +602,33 @@ class _DailyTaskScreenState extends State<DailyTaskScreen> {
                     ),
                     filled: true,
                     fillColor: const Color(0xFFF5F8FF),
-                    border: OutlineInputBorder(
+                    enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
+                      borderSide: const BorderSide(
+                        color: Color(0xFFDDDDDD),
+                        width: 2,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: Color(0xFFDDDDDD), // keep same color to avoid blue underline
+                        width: 2,
+                      ),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: Color(0xFFDDDDDD), // 👈 override red with grey
+                        width: 2,
+                      ),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: Color(0xFFDDDDDD), // 👈 keep same grey even on focus
+                        width: 2,
+                      ),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                         horizontal: 12, vertical: 14),
